@@ -2,9 +2,7 @@ package com.senpure.base.struct;
 
 import java.io.Serializable;
 
-/**
- * Created by Administrator on 2017/1/23.
- */
+
 public class KeyValue<K,V>  implements Serializable{
 
     private static final long serialVersionUID = 2710755315144432920L;

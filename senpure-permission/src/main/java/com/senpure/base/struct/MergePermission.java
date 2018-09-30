@@ -2,9 +2,7 @@ package com.senpure.base.struct;
 
 import java.io.Serializable;
 
-/**
- * Created by 罗中正 on 2017/5/10.
- */
+
 public class MergePermission implements Serializable {
 
 

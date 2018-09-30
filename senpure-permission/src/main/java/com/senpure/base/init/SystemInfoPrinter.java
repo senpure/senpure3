@@ -18,9 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 
-/**
- * Created by 罗中正 on 2017/7/27.
- */
+
 @Component
 public class SystemInfoPrinter extends SpringContextRefreshEvent implements ApplicationRunner, ApplicationContextAware {
 

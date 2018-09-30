@@ -10,9 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Administrator on 2017/2/6.
- */
 
 
 public abstract class ResourceVerifySupportService<T> implements ResourceVerifyService<T>, InitializingBean {

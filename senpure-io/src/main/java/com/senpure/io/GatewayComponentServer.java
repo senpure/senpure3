@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 网关管理一个服务的多个实例 每个实例可能含有多个管道channel
- * Created by 罗中正 on 2018/3/5 0005.
  */
 public class GatewayComponentServer {
     private CSRelationPlayerGatewayMessage message = new CSRelationPlayerGatewayMessage();

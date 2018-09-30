@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Created by Administrator on 2017/2/6.
- */
+
 @Service
 public class ResourceVerifyPermissionService extends ResourceVerifySupportService<Long> {
 

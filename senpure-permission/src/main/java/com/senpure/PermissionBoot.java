@@ -5,9 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cache.annotation.EnableCaching;
 
-/**
- * Created by 罗中正 on 2017/10/11.
- */
+
 @SpringBootApplication
 @ServletComponentScan
 @EnableCaching

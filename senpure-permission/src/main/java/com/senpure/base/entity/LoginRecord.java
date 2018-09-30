@@ -8,9 +8,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.Date;
 
-/**
- * Created by DZ on 2016-07-02 14:04
- */
 
 @Table(name = PermissionConstant.DATA_BASE_PREFIX+ "_LOGIN_RECORD")
 public class LoginRecord extends LongAndVersionEntity{

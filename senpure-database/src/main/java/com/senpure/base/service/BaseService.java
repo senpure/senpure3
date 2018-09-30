@@ -6,9 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * Created by 罗中正 on 2017/10/11.
- */
+
 public class BaseService {
     protected Logger logger;
 

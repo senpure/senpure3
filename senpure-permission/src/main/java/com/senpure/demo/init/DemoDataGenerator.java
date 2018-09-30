@@ -23,9 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by 罗中正 on 2017/10/20.
- */
+
 @Component
 public class DemoDataGenerator extends SpringContextRefreshEvent {
     @Autowired

@@ -1,8 +1,6 @@
 package com.senpure.demo;
 
-/**
- * Created by 罗中正 on 2018/1/16 0016.
- */
+
 public class CacheTest {
     // 10000 次
     //fastjson save 2840 3063 3019 2920 3262

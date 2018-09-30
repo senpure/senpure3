@@ -11,9 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * Created by 罗中正 on 2017/6/7.
- */
+
 @Component
 public class IPGeter extends SpringContextRefreshEvent {
     private static String ip;

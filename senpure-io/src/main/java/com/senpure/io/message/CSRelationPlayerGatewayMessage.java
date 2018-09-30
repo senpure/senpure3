@@ -1,15 +1,14 @@
 package com.senpure.io.message;
 
-import com.senpure.io.message.Message;
 import io.netty.buffer.ByteBuf;
 
 /**
-  * 关联玩家与网关
-  * 
-  * @author senpure-generator
-  * @version 2018-3-16 17:14:32
-  */
-public class CSRelationPlayerGatewayMessage extends  Message {
+ * 关联玩家与网关
+ *
+ * @author senpure-generator
+ * @version 2018-3-16 17:14:32
+ */
+public class CSRelationPlayerGatewayMessage extends Message {
     //channel token
     private int token;
     //玩家Id
@@ -19,11 +18,11 @@ public class CSRelationPlayerGatewayMessage extends  Message {
      * 写入字节缓存
      */
     @Override
-    public void write(ByteBuf buf){
+    public void write(ByteBuf buf) {
         //channel token
-        writeInt(buf,token);
+        writeInt(buf, token);
         //玩家Id
-        writeInt(buf,playerId);
+        writeInt(buf, playerId);
     }
 
 
@@ -31,7 +30,7 @@ public class CSRelationPlayerGatewayMessage extends  Message {
      * 读取字节缓存
      */
     @Override
-    public void read(ByteBuf buf){
+    public void read(ByteBuf buf) {
         //channel token
         this.token = readInt(buf);
         //玩家Id
@@ -40,9 +39,10 @@ public class CSRelationPlayerGatewayMessage extends  Message {
 
     /**
      * get channel token
+     *
      * @return
      */
-    public  int getToken() {
+    public int getToken() {
         return token;
     }
 
@@ -50,14 +50,16 @@ public class CSRelationPlayerGatewayMessage extends  Message {
      * set channel token
      */
     public CSRelationPlayerGatewayMessage setToken(int token) {
-        this.token=token;
+        this.token = token;
         return this;
     }
+
     /**
      * get 玩家Id
+     *
      * @return
      */
-    public  int getPlayerId() {
+    public int getPlayerId() {
         return playerId;
     }
 
@@ -65,7 +67,7 @@ public class CSRelationPlayerGatewayMessage extends  Message {
      * set 玩家Id
      */
     public CSRelationPlayerGatewayMessage setPlayerId(int playerId) {
-        this.playerId=playerId;
+        this.playerId = playerId;
         return this;
     }
 
@@ -77,10 +79,10 @@ public class CSRelationPlayerGatewayMessage extends  Message {
     @Override
     public String toString() {
         return "CSRelationPlayerGatewayMessage{"
-                +"token=" + token
-                +",playerId=" + playerId
+                + "token=" + token
+                + ",playerId=" + playerId
                 + "}";
-   }
+    }
 
     //最长字段长度 8
     private int filedPad = 8;

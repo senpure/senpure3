@@ -11,9 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Created by 罗中正 on 2017/5/27.
- */
+
 public class MessageHandlerUtil {
     private static Map<Integer, MessageHandler> handlerMap = new HashMap<>();
     private static ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);

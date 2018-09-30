@@ -17,9 +17,6 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.SSLException;
 import java.security.cert.CertificateException;
 
-/**
- * Created by 罗中正 on 2018/2/28 0028.
- */
 
 
 public class GatewayClientAndGatewayServer {

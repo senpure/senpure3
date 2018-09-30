@@ -13,7 +13,6 @@ import java.util.List;
 
 /**
  * 将服务器转发到网关的消息，解析出来
- * Created by 罗中正 on 2018/2/28 0028.
  */
 public class GatewayServerAndGatewayMessageDecoder extends ByteToMessageDecoder {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());

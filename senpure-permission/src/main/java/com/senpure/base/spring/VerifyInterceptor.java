@@ -34,9 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Administrator on 2017/2/7.
- */
 
 public class VerifyInterceptor extends InterceptorSupport {
     private String loginURI = "/authorize/loginView";

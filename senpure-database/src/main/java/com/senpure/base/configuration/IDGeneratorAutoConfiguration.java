@@ -8,9 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Created by 罗中正 on 2017/8/25.
- */
+
 @Configuration
 @ConfigurationProperties(
         prefix = "store"

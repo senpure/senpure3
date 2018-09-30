@@ -21,9 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 
-/**
- * Created by 罗中正 on 2018/4/8 0008.
- */
 public class LoggerUtil {
     private static ConcurrentHashMap<Integer, LoggerAndAppender> loggers = new java.util.concurrent.ConcurrentHashMap();
     private static String FILE_PATH = "logs";

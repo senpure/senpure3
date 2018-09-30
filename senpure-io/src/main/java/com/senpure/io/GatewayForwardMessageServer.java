@@ -2,9 +2,7 @@ package com.senpure.io;
 
 import com.senpure.io.message.Client2GatewayMessage;
 
-/**
- * Created by 罗中正 on 2018/3/19 0019.
- */
+
 public class GatewayForwardMessageServer extends GatewayHandleMessageServer {
 
     private GatewayComponentServer gatewayComponentServer;

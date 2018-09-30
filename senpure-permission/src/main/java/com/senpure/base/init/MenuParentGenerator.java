@@ -10,9 +10,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by 罗中正 on 2017/6/15.
- */
+
 @Component
 @Order(0)
 public class MenuParentGenerator extends SpringContextRefreshEvent {

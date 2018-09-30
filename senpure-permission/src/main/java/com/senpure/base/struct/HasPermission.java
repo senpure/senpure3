@@ -2,9 +2,7 @@ package com.senpure.base.struct;
 
 import com.senpure.base.model.Permission;
 
-/**
- * Created by 罗中正 on 2017/12/27 0027.
- */
+
 public class HasPermission extends Permission implements Comparable<HasPermission> {
 
     private boolean has;

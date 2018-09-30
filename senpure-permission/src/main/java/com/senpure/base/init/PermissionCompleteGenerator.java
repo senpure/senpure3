@@ -18,9 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by 罗中正 on 2017/10/20.
- */
+
 @Component
 @Order(value = 3)
 public class PermissionCompleteGenerator extends SpringContextRefreshEvent {

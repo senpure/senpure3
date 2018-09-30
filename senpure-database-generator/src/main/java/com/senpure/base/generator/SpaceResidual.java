@@ -7,9 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
-/**
- * Created by 罗中正 on 2017/10/18.
- */
+
 public class SpaceResidual implements TemplateMethodModelEx {
     @Override
     public Object exec(List list) throws TemplateModelException {

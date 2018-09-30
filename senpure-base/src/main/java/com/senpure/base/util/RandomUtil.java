@@ -2,9 +2,7 @@ package com.senpure.base.util;
 
 import java.util.Random;
 
-/**
- * Created by 罗中正 on 2017/4/10.
- */
+
 public class RandomUtil {
 
     private static Random random=new Random();

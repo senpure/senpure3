@@ -11,9 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by 罗中正 on 2017/5/27.
- */
+
 public class ComponentMessageHandlerUtil {
     private static Map<Integer, ComponentMessageHandler> handlerMap = new HashMap<>();
 

@@ -10,9 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-/**
- * Created by Administrator on 2017/1/20.
- */
+
 //@Configuration
 @ConditionalOnMissingBean(name = "baseMultipleInterceptor")
 public class BaseInterceptorConfiguration extends WebMvcConfigurerAdapter {

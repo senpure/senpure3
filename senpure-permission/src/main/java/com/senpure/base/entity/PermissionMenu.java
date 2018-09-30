@@ -5,9 +5,7 @@ import com.senpure.base.PermissionConstant;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-/**
- * Created by 罗中正 on 2017/6/16.
- */
+
 @Entity
 @Table(name = PermissionConstant.DATA_BASE_PREFIX+ "_PERMISSION_MENU")
 public class PermissionMenu extends LongAndVersionEntity{

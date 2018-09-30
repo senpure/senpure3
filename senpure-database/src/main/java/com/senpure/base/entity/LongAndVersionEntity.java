@@ -5,9 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.io.Serializable;
 
-/**
- * Created by 罗中正 on 2017/10/11.
- */
+
 @MappedSuperclass
 public class LongAndVersionEntity implements Serializable {
     private static final long serialVersionUID = -4479206002542553414L;

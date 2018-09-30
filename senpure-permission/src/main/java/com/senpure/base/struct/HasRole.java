@@ -3,9 +3,7 @@ package com.senpure.base.struct;
 
 import com.senpure.base.model.Role;
 
-/**
- * Created by 罗中正 on 2017/5/23.
- */
+
 public class HasRole extends Role {
     private boolean has;
 

@@ -3,9 +3,7 @@ package com.senpure.base;
 import com.senpure.base.generator.Config;
 import com.senpure.base.generator.DatabaseGenerator;
 
-/**
- * Created by 罗中正 on 2017/10/11.
- */
+
 public class PermissionCodeGenerator {
     public static void main(String[] args) {
 

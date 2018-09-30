@@ -6,9 +6,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
-/**
- * Created by 罗中正 on 2017/8/29.
- */
+
 public class MessageLoggingHandler extends LoggingHandler {
     private IOMessageProperties config;
 

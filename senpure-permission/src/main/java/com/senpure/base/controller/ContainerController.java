@@ -24,9 +24,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-/**
- * Created by 罗中正 on 2017/12/25 0025.
- */
 
 @Controller
 @RequestMapping("/authorize")

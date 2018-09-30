@@ -2,9 +2,6 @@ package com.senpure.base.service;
 
 import java.util.List;
 
-/**
- * Created by Administrator on 2017/2/6.
- */
 
 public interface ResourceVerifyService<T> {
 

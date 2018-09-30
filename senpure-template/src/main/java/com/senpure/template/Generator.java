@@ -12,7 +12,7 @@ import java.io.*;
 /**
  * Generator
  *
- * @author 罗中正
+ * @author senpure
  * @email senpure@senpure.com
  * @github https://github.com/senpure
  * @date 2018-05-08

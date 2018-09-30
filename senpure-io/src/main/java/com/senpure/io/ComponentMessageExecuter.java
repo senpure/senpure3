@@ -10,9 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-/**
- * Created by 罗中正 on 2018/3/1 0001.
- */
+
 public class ComponentMessageExecuter {
 
     private ExecutorService service;

@@ -5,9 +5,7 @@ import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 
 import java.util.List;
 
-/**
- * Created by 罗中正 on 2018/1/22 0022.
- */
+
 public class PatternsRequestConditionTest  {
 
     @Test

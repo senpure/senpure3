@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 将服务器发到网关的消息，转发给客户端
- * Created by 罗中正 on 2018/3/1 0001.
  */
 public class GatewayClientAndGatewayMessageEncoder extends MessageToByteEncoder<Server2GatewayMessage> {
     protected Logger logger = LoggerFactory.getLogger(getClass());

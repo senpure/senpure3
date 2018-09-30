@@ -8,9 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 
-/**
- * Created by 罗中正 on 2017/12/27 0027.
- */
 @Configuration
 @ConditionalOnClass({RedisTemplate.class})
 public class RedisCacheErrorHandlerConfiguration extends  BaseConfiguration {

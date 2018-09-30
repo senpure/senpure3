@@ -12,9 +12,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-/**
- * Created by 罗中正 on 2018/3/5 0005.
- */
 public class ComponentGatewayServer {
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());

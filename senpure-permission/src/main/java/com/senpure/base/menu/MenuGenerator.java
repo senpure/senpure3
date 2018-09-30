@@ -2,9 +2,7 @@ package com.senpure.base.menu;
 
 import java.lang.annotation.*;
 
-/**
- * Created by 罗中正 on 2017/6/15.
- */
+
 @Target({ElementType.METHOD,ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

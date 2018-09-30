@@ -3,9 +3,7 @@ package com.senpure.base.generator;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by 罗中正 on 2017/9/21.
- */
+
 public class AfterReadColum {
 
 

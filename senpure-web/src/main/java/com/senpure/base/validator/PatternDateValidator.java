@@ -13,9 +13,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 
-/**
- * Created by 罗中正 on 2017/5/15.
- */
+
 public class PatternDateValidator implements ConstraintValidator<DynamicDate, PatternDate> {
     private static Logger logger = LoggerFactory.getLogger(PatternDateValidator.class);
     @Override

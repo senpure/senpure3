@@ -9,7 +9,6 @@ import java.util.Date;
 
 /**
  * 只记录账号信息相关信息<br>
- * Created by DZ on 2016-06-27 10:47
  */
 @Entity
 @Table(name = PermissionConstant.DATA_BASE_PREFIX+"_ACCOUNT")

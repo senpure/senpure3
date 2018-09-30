@@ -5,9 +5,7 @@ import java.util.*;
 
 public class SortProperties extends Properties {
 
-    /**
-     *
-     */
+
     private static final long serialVersionUID = -1291274099733093658L;
     private  final LinkedHashSet<Object> keys = new LinkedHashSet<Object>();
 

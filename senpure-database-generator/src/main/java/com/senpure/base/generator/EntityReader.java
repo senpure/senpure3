@@ -22,9 +22,7 @@ import java.lang.reflect.Modifier;
 import java.sql.Types;
 import java.util.*;
 
-/**
- * Created by 罗中正 on 2017/9/21.
- */
+
 public class EntityReader {
 
     private Config config;

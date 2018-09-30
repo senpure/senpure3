@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * Created by 罗中正 on 2017/6/1.
- */
+
 @Controller
 @RequestMapping("/tools")
 public class ToolsController extends BaseController {

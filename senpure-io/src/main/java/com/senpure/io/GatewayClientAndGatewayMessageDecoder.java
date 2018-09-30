@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * Created by 罗中正 on 2018/2/28 0028.
- */
+
 public class GatewayClientAndGatewayMessageDecoder extends ByteToMessageDecoder {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 

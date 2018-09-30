@@ -5,9 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Created by 罗中正 on 2017/5/26.
- */
+
 public class DateFormatUtil {
     /**
      * DATE FORMAT PATTERN YEAR TO MILLISECOND like 2017-12-12 12:45:50:123

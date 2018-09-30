@@ -22,9 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-/**
- * Created by Administrator on 2017/1/20.
- */
+
 @Controller
 @RequestMapping("/")
 public class LoginController extends BaseController {

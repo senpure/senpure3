@@ -12,9 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * Created by 罗中正 on 2018/3/19 0019.
- */
+
 public class GatewayReadAskMessageServer extends GatewayHandleMessageServer {
 
     private List<GatewayComponentServer> gatewayComponentServers = new ArrayList<>(16);

@@ -10,9 +10,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.Locale;
 
-/**
- * Created by Administrator on 2017/1/20.
- */
+
 @Configuration
 @ConditionalOnMissingBean(name = "localeResolver")
 public class LocaleResolverConfiguration {

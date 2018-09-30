@@ -5,9 +5,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 import java.io.Serializable;
 
-/**
- * Created by 罗中正 on 2017/8/25.
- */
+
 @MappedSuperclass
 public class VersionEntity implements Serializable {
 

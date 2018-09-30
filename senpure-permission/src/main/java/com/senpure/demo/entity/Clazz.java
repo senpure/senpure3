@@ -7,9 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.Date;
 
-/**
- * Created by 罗中正 on 2017/10/20.
- */
+
 @Explain("班级信息")
 @Entity
 @Table(name = "DEMO_CLASS")

@@ -13,9 +13,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * Created by 罗中正 on 2017/10/13.
- */
+
 @Service
 public class AuthorizeService extends BaseService {
 

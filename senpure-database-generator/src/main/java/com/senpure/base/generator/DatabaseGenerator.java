@@ -15,9 +15,7 @@ import org.springframework.boot.ansi.AnsiOutput;
 import java.io.*;
 import java.util.*;
 
-/**
- * Created by 罗中正 on 2017/9/26.
- */
+
 public class DatabaseGenerator {
 
     private Logger logger = LoggerFactory.getLogger(DatabaseGenerator.class);

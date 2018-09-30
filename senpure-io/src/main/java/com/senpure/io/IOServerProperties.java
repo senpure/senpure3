@@ -2,9 +2,7 @@ package com.senpure.io;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- * Created by 罗中正 on 2018/3/1 0001.
- */
+
 @ConfigurationProperties("game")
 public class IOServerProperties {
 

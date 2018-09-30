@@ -32,9 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * Created by 罗中正 on 2018/1/23 0023.
- */
+
 @WebFilter(urlPatterns = "/*", filterName = "verifyFilter")
 public class VerifyFilter extends SpringContextRefreshEvent implements Filter {
     private Logger logger = LoggerFactory.getLogger(getClass());

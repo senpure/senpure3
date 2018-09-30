@@ -4,9 +4,7 @@ import com.senpure.base.annotation.ExtPermission;
 import org.junit.Test;
 import org.springframework.stereotype.Controller;
 
-/**
- * Created by 罗中正 on 2018/1/15 0015.
- */
+
 @ExtPermission
 public class AnnAdd {
 

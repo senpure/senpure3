@@ -10,9 +10,7 @@ import org.springframework.util.StringUtils;
 
 import java.nio.charset.Charset;
 
-/**
- * Created by Administrator on 2017/1/20.
- */
+
 //MessageSourceAutoConfiguration
 
 @Configuration

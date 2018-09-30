@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-/**
- * Created by 罗中正 on 2017/7/20.
- */
+
 public class Analyzer {
     static {
         System.setProperty("PID", AppEvn.getPid());

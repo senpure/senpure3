@@ -6,9 +6,7 @@ import com.senpure.base.model.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Created by Administrator on 2017/2/6.
- */
+
 @Service
 public class ResourceVerifyAccountService extends ResourceVerifySupportService<Long> {
 

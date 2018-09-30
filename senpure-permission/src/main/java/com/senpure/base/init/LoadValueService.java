@@ -23,9 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by 罗中正 on 2017/5/12.
- */
+
 @Component
 public class LoadValueService implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired

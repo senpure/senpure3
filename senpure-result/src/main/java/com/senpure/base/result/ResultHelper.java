@@ -18,9 +18,7 @@ import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.*;
 
-/**
- * Created by 罗中正 on 2017/8/2.
- */
+
 @Component
 @ConfigurationProperties(
         prefix = "senpure"

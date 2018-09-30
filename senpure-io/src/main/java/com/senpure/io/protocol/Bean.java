@@ -7,9 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-/**
- * Created by 罗中正 on 2018/4/13 0013.
- */
+
 public abstract class Bean {
     public abstract void write(ByteBuf buf);
 

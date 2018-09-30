@@ -7,9 +7,7 @@ import freemarker.template.TemplateModelException;
 
 import java.util.List;
 
-/**
- * Created by 罗中正 on 2017/10/13.
- */
+
 public class NameRule implements TemplateMethodModelEx {
     @Override
     public Object exec(List list) throws TemplateModelException {

@@ -5,9 +5,7 @@ import com.senpure.base.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Created by Administrator on 2017/2/6.
- */
+
 @Service
 public class ResourceVerifyRoleService extends ResourceVerifySupportService<Long> {
 

@@ -7,9 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by 罗中正 on 2017/10/9.
- */
+
 public class Config {
     
     public static final String TABLE_TYPE_MIX = "MIX";

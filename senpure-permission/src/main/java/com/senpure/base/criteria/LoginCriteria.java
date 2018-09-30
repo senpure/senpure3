@@ -3,9 +3,7 @@ package com.senpure.base.criteria;
 import com.senpure.base.criterion.Criteria;
 import org.hibernate.validator.constraints.Length;
 
-/**
- * Created by DZ on 2016-07-25 16:55
- */
+
     public class LoginCriteria extends Criteria {
 
     @Length(max=24,min=5,message="{username.length.error}")

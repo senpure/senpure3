@@ -17,10 +17,6 @@ import javax.net.ssl.SSLException;
 import java.security.cert.CertificateException;
 
 
-/**
- * Created by 罗中正 on 2017/5/26.
- */
-
 public class ServerServer {
     protected Logger logger = LoggerFactory.getLogger(getClass());
     private IOServerProperties properties;

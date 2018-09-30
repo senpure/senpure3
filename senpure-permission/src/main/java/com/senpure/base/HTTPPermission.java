@@ -3,9 +3,7 @@ package com.senpure.base;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
-/**
- * Created by 罗中正 on 2018/1/22 0022.
- */
+
 public class HTTPPermission {
     public static final int HTTP_GET = 1;
     public static final int HTTP_POST = 2;

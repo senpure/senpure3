@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Soverignty
  *
- * @author 罗中正
+ * @author senpure
  * @email senpure@senpure.com
  * @github https://github.com/senpure
  * @date 2018-05-08 10:39
@@ -29,10 +29,10 @@ public class Sovereignty {
     private Map<Template, Boolean> checks = new HashMap<>();
 
     private Sovereignty() {
-        sovereignties.add("author    罗中正");
+        sovereignties.add("author    senpure");
         sovereignties.add("email     senpure@senpure.com");
         sovereignties.add("github    https://github.com/senpure");
-        javaSovereignties.add("author 罗中正");
+        javaSovereignties.add("author senpure");
         javaSovereignties.add("email senpure@senpure.com");
         javaSovereignties.add("github https://github.com/senpure");
     }
@@ -51,7 +51,7 @@ public class Sovereignty {
 
     public String sovereigntyLuaLRKComment() {
         List<String> sovereignties = new ArrayList<>();
-        sovereignties.add("author    李荣科    罗中正");
+        sovereignties.add("author    李荣科    senpure");
         sovereignties.add("email     senpure@senpure.com");
         sovereignties.add("github    https://github.com/senpure");
         return sovereignty("",true,sovereignties);

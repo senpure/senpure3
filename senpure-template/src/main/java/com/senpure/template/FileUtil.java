@@ -9,9 +9,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
-/**
- * Created by 罗中正 on 2018/4/28 0028.
- */
+
 public class FileUtil {
 
     private static Logger logger = LoggerFactory.getLogger(FileUtil.class);

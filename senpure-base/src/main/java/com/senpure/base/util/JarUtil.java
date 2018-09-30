@@ -11,9 +11,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- */
+
 public class JarUtil {
     public static int BUF_SIZE = 1024;
     private static List<File> getFiles(File dir) {

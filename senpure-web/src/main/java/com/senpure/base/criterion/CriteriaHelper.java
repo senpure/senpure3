@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * CriteriaHelper
  *
- * @author 罗中正
+ * @author senpure
  * @email senpure@senpure.com
  * @github https://github.com/senpure
  * @time 2018-06-06 18:20:51

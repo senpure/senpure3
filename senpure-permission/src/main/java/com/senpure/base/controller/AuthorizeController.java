@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-/**
- * Created by 罗中正 on 2018/1/13 0013.
- */
+
 @Controller
 @RequestMapping("/authorize")
 public class AuthorizeController extends BaseController {

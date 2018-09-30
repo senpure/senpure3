@@ -4,9 +4,7 @@ import com.senpure.base.PermissionConstant;
 
 import javax.persistence.*;
 
-/**
- * Created by DZ on 2016-06-28 13:58
- */
+
 @Entity
 @Table(name = PermissionConstant.DATA_BASE_PREFIX+ "_ACCOUNT_VALUE")
 public class AccountValue extends LongAndVersionEntity{

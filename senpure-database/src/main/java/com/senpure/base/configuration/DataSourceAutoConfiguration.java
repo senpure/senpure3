@@ -28,17 +28,13 @@ import javax.sql.DataSource;
 
 /**
  * copy from DruidDataSourceAutoConfigure
- *
- * @author 罗中正
- * @date 2017/12/7 0007
  */
-
 
 @Configuration
 @MapperScan(basePackages = "com.senpure", sqlSessionFactoryRef = "sqlSessionFactory")
 @EnableTransactionManagement
 @EnableJpaRepositories
-@ConditionalOnMissingBean(name= "dataSource")
+@ConditionalOnMissingBean(name = "dataSource")
 public class DataSourceAutoConfiguration extends BaseConfiguration {
 
     @Bean(name = "dataSourceProperties")
@@ -55,7 +51,7 @@ public class DataSourceAutoConfiguration extends BaseConfiguration {
     public DataSource dataSource() {
         DataSourceProperties prop = dataSourceProperties();
         DatabaseUtil.checkAndCreateDatabase(prop);
-        return  DruidDataSourceBuilder.create().build();
+        return DruidDataSourceBuilder.create().build();
     }
 
 
@@ -68,7 +64,7 @@ public class DataSourceAutoConfiguration extends BaseConfiguration {
         //配置mapper文件位置
 
         // sqlSessionFactoryBean.setMapperLocations(resolver.getResources(mapperLocations));
-       // logger.info("sqlsessionFactory {}", mapperLocations);
+        // logger.info("sqlsessionFactory {}", mapperLocations);
         return sqlSessionFactoryBean.getObject();
     }
 
@@ -77,6 +73,7 @@ public class DataSourceAutoConfiguration extends BaseConfiguration {
     public SqlSessionTemplate testSqlSessionTemplate(@Qualifier("sqlSessionFactory") SqlSessionFactory sqlSessionFactory) throws Exception {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
+
     /**
      * 配置事物管理器
      *
@@ -119,12 +116,10 @@ public class DataSourceAutoConfiguration extends BaseConfiguration {
     }
 
 
-
-
-   // @Bean
-    public ServletRegistrationBean DruidStatViewServlet(){
+    // @Bean
+    public ServletRegistrationBean DruidStatViewServlet() {
         //org.springframework.boot.context.embedded.ServletRegistrationBean提供类的进行注册.
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new StatViewServlet(),"/druid/*");
+        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new StatViewServlet(), "/druid/*");
         servletRegistrationBean.setLoadOnStartup(-2);
         //添加初始化参数：initParams
 
@@ -133,15 +128,13 @@ public class DataSourceAutoConfiguration extends BaseConfiguration {
         //IP黑名单 (存在共同时，deny优先于allow) : 如果满足deny的话提示:Sorry, you are not permitted to view this page.
         //servletRegistrationBean.addInitParameter("deny","192.168.1.129");
         //登录查看信息的账号密码.
-       // servletRegistrationBean.addInitParameter("loginUsername",account);
-       // servletRegistrationBean.addInitParameter("loginPassword",passwrod);
+        // servletRegistrationBean.addInitParameter("loginUsername",account);
+        // servletRegistrationBean.addInitParameter("loginPassword",passwrod);
         //是否能够重置数据.
         logger.debug("self statViewServlet");
-        servletRegistrationBean.addInitParameter("resetEnable","false");
+        servletRegistrationBean.addInitParameter("resetEnable", "false");
         return servletRegistrationBean;
     }
-
-
 
 
 }

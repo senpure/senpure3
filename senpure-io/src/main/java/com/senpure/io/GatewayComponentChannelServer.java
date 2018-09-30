@@ -10,9 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by 罗中正 on 2018/3/2 0002.
- */
+
 public class GatewayComponentChannelServer {
 
     private ConcurrentMap<Integer, Channel> serverChannels = new ConcurrentHashMap<>();

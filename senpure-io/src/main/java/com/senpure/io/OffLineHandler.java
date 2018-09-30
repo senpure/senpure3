@@ -12,8 +12,6 @@ import java.util.List;
 /**
  * 处理网络断开(正常断开，与非正常断开)
  *
- * @author 罗中正
- * @version 1.0
  */
 public class OffLineHandler extends ChannelInboundHandlerAdapter {
 

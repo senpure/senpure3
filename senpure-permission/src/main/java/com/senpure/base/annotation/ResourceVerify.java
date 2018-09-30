@@ -1,8 +1,5 @@
 package com.senpure.base.annotation;
 
-/**
- * Created by 罗中正 on 2017/6/16.
- */
 
 import java.lang.annotation.*;
 

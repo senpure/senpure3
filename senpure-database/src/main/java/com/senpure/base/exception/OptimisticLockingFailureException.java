@@ -1,8 +1,6 @@
 package com.senpure.base.exception;
 
-/**
- * Created by 罗中正 on 2017/10/11.
- */
+
 public class OptimisticLockingFailureException extends RuntimeException  {
     /**
      * Constructs a new runtime exception with {@code null} as its

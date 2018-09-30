@@ -2,9 +2,7 @@ package com.senpure.io.message;
 
 import io.netty.buffer.ByteBuf;
 
-/**
- * Created by 罗中正 on 2018/3/1 0001.
- */
+
 public class Gateway2ServerMessage  {
 
     private int token;

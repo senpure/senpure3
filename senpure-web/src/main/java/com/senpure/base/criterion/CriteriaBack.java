@@ -12,9 +12,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Created by 罗中正 on 2017/5/15.
- */
+
 public class CriteriaBack implements Serializable {
 
     public static final String ORDER_DESC = "DESC";

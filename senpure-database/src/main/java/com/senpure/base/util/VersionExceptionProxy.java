@@ -12,9 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by DZ on 2016-07-19 16:25
- */
+
 @Aspect
 @Component
 public class VersionExceptionProxy {

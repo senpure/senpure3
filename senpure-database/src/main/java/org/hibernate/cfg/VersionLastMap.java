@@ -5,9 +5,7 @@ import org.hibernate.annotations.common.reflection.java.JavaXMember;
 import javax.persistence.Version;
 import java.util.LinkedHashMap;
 
-/**
- * Created by 罗中正 on 2017/9/30.
- */
+
 public class VersionLastMap<K, V> extends LinkedHashMap<K, V> {
 
     private K versionKey;

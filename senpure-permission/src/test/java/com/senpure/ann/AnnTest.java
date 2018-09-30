@@ -10,9 +10,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
-/**
- * Created by 罗中正 on 2017/10/25.
- */
+
 public class AnnTest {
 
     @DynamicDate

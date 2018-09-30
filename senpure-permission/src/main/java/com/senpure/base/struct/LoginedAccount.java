@@ -8,9 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Administrator on 2017/2/7.
- */
+
 public class LoginedAccount implements Serializable {
     private static final long serialVersionUID = 1347550701424356203L;
     private Long id;

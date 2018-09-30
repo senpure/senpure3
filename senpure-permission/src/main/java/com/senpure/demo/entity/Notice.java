@@ -7,9 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.Date;
 
-/**
- * Created by 罗中正 on 2018/1/18 0018.
- */
+
 @Entity
 @Table(name = "demo_notice")
 @Explain("公告模型")

@@ -7,9 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.Date;
 
-/**
- * Created by 罗中正 on 2018/1/16 0016.
- */
+
 @Entity
 @Table(name = "demo_author")
 public class Author  extends LongAndVersionEntity {

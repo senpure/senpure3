@@ -9,9 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 
-/**
- * Created by 罗中正 on 2017/6/15.
- */
+
 @Entity
 @Table(name = PermissionConstant.DATA_BASE_PREFIX+ "_MENU")
 public class Menu  extends VersionEntity implements Serializable{

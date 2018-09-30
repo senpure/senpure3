@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by 罗中正 on 2018/4/8 0008.
- */
 
 public class LoggerUtilTest {
 

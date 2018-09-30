@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
-/**
- * Created by 罗中正 on 2017/9/22.
- */
+
 public class JavaCommentReader {
 
     private Logger logger = LoggerFactory.getLogger(getClass());

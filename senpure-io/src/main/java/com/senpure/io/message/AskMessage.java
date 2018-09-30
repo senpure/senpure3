@@ -1,8 +1,6 @@
 package com.senpure.io.message;
 
-/**
- * Created by 罗中正 on 2018/3/21 0021.
- */
+
 public class AskMessage {
 
     private Client2GatewayMessage message;

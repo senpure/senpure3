@@ -5,9 +5,7 @@ import com.senpure.io.message.Gateway2ServerMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-/**
- * Created by 罗中正 on 2018/2/28 0028.
- */
+
 public class ComponentServerHandler extends SimpleChannelInboundHandler<Gateway2ServerMessage> {
 
 

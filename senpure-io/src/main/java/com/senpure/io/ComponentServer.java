@@ -19,9 +19,7 @@ import java.security.cert.CertificateException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Created by 罗中正 on 2018/3/1 0001.
- */
+
 public class ComponentServer {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 

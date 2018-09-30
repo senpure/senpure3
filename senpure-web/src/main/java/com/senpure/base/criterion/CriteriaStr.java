@@ -9,9 +9,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
-/**
- * Created by 罗中正 on 2017/5/15.
- */
+
 public class CriteriaStr implements Serializable {
 
     public static final String ORDER_DESC = "DESC";

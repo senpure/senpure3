@@ -6,9 +6,7 @@ import com.senpure.base.util.BannerShow;
 import org.fusesource.jansi.AnsiConsole;
 import org.springframework.boot.ansi.AnsiOutput;
 
-/**
- * Created by 罗中正 on 2017/7/20.
- */
+
 public class Boot {
 
     public static void main(String[] args) {

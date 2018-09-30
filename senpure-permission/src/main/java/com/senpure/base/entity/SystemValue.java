@@ -6,9 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-/**
- * Created by DZ on 2016-06-28 13:58
- */
+
 @Entity
 @Table(name = PermissionConstant.DATA_BASE_PREFIX+ "_SYSTEM_VALUE")
 public class SystemValue extends LongAndVersionEntity{

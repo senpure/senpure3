@@ -19,9 +19,7 @@ import java.net.URLDecoder;
 import java.text.NumberFormat;
 import java.util.*;
 
-/**
- * Created by 罗中正 on 2017/7/20.
- */
+
 public class Executer {
 
 

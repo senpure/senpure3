@@ -12,9 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-/**
- * Created by 罗中正 on 2017/8/28.
- */
 @Component
 public class Spring implements ApplicationContextAware {
 

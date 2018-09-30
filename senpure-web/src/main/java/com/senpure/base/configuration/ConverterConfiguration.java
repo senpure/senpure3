@@ -8,9 +8,7 @@ import org.springframework.core.convert.converter.Converter;
 import java.text.ParseException;
 import java.util.Date;
 
-/**
- * Created by 罗中正 on 2018/1/19 0019.
- */
+
 @Configuration
 public class ConverterConfiguration {
 

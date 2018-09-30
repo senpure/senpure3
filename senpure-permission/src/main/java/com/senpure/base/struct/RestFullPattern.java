@@ -5,9 +5,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import javax.servlet.http.HttpServletRequest;
 
-/**
- * Created by 罗中正 on 2018/1/23 0023.
- */
+
 public class RestFullPattern {
 
     private PatternsRequestCondition patternsRequestCondition;

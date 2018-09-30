@@ -1,8 +1,6 @@
 package com.senpure.base.generator;
 
-/**
- * Created by 罗中正 on 2017/9/21.
- */
+
 public class ModelField {
 
     private boolean hasExplain;

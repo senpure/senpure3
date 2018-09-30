@@ -25,9 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-/**
- * Created by 罗中正 on 2017/12/22 0022.
- */
+
 @Controller
 @RequestMapping("/authorize")
 @MenuGenerator(id = 1, text = "组织架构", icon = "glyphicon glyphicon-fire faa-float")

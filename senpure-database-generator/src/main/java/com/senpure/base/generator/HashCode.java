@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
- * Created by 罗中正 on 2017/12/28 0028.
- */
+
 public class HashCode implements TemplateMethodModelEx {
     @Override
     public Object exec(List list) throws TemplateModelException {

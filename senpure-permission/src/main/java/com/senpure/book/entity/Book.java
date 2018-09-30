@@ -9,9 +9,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.Date;
 
-/**
- * Created by 罗中正 on 2018/1/16 0016.
- */
+
 @Entity
 @Table(name = "demo_book")
 public class Book extends LongAndVersionEntity {

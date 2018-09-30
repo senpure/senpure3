@@ -8,9 +8,7 @@ import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * Created by Administrator on 2017/1/22.
- */
+
 @Configuration
 
 public class ValidatorConfiguration implements WebMvcConfigurer {

@@ -13,11 +13,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-/**
- *
- * @author Administrator
- * @date 2017/1/20
- */
+
 @Configuration
 public class InterceptorConfiguration implements WebMvcConfigurer {
     protected Logger logger = LoggerFactory.getLogger(getClass());

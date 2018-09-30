@@ -9,9 +9,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.Date;
 
-/**
- * Created by 罗中正 on 2017/10/20.
- */
 
 @Entity
 @Table(name = "DEMO_STUDENT")

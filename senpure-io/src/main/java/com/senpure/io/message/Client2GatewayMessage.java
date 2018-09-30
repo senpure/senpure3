@@ -2,9 +2,7 @@ package com.senpure.io.message;
 
 import java.util.Arrays;
 
-/**
- * Created by 罗中正 on 2018/2/28 0028.
- */
+
 public class Client2GatewayMessage {
     private int messageId;
 

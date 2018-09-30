@@ -7,9 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.Date;
 
-/**
- * Created by 罗中正 on 2018/3/22 0022.
- */
+
 @Entity
 @Table(name = "demo_proxy")
 @Explain("代理关系表")

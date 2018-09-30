@@ -6,9 +6,7 @@ import com.senpure.base.annotation.Explain;
 
 import javax.persistence.*;
 
-/**
- * Created by Administrator on 2017/2/7.
- */
+
 @Entity
 @Table(name = PermissionConstant.DATA_BASE_PREFIX + "_URI_PERMISSION")
 public class URIPermission extends LongAndVersionEntity{

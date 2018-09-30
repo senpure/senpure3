@@ -12,7 +12,6 @@ import java.util.List;
 
 /**
  * 解析网关发过来的消息
- * Created by 罗中正 on 2018/2/28 0028.
  */
 public class ComponentMessageDecoder extends ByteToMessageDecoder {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());

@@ -4,9 +4,6 @@ import com.senpure.io.message.Message;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-/**
- * Created by 罗中正 on 2017/5/27.
- */
 
 public class ServerHandler extends SimpleChannelInboundHandler<Message> {
     @Override

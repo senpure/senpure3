@@ -5,9 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 
-/**
- * Created by 罗中正 on 2017/5/26.
- */
+
 public abstract class Bean {
     public abstract void write(ByteBuf buf);
 

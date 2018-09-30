@@ -8,9 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.ResolvableType;
 
-/**
- * Created by 罗中正 on 2017/5/26.
- */
+
 public abstract class AbstractMessageHandler<T extends Message> implements MessageHandler<T>, InitializingBean {
     protected Logger logger;
     protected Class<T> messageClass;

@@ -20,9 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-/**
- * Created by 罗中正 on 2017/6/19.
- */
+
 @Controller
 @RequestMapping("/authorize")
 @MenuGenerator(id = 2000000000, text = "系统设置",icon = "glyphicon glyphicon-cog faa-spin",sort = Integer.MAX_VALUE)

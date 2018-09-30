@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.SSLException;
 import java.security.cert.CertificateException;
 
-/**
- * Created by 罗中正 on 2018/3/1 0001.
- */
+
 public class ClientServer {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 

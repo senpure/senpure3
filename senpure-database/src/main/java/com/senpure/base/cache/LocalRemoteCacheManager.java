@@ -10,9 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by 罗中正 on 2017/10/17.
- */
+
 public class LocalRemoteCacheManager extends RedisCacheManager {
 
     private Logger logger = LoggerFactory.getLogger(getClass());

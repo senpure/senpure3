@@ -3,9 +3,7 @@ package com.senpure.demo;
 import com.senpure.base.AppEvn;
 import org.junit.Test;
 
-/**
- * Created by 罗中正 on 2018/1/12 0012.
- */
+
 public class GetSet {
 
     private  boolean man;

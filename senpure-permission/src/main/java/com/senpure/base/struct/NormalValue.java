@@ -2,9 +2,7 @@ package com.senpure.base.struct;
 
 import java.io.Serializable;
 
-/**
- * Created by 罗中正 on 2017/12/25 0025.
- */
+
 public class NormalValue implements Serializable {
 
 

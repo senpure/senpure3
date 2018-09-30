@@ -1,8 +1,6 @@
 package com.senpure.jre;
 
-/**
- * Created by 罗中正 on 2017/7/25.
- */
+
 public class Config {
 
     //目标class根目录，可以是jar完整路径

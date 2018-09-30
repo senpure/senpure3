@@ -16,9 +16,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-/**
- * Created by 罗中正 on 2018/3/1 0001.
- */
 
 public class GatewayMessageExecuter {
     private static Logger logger = LoggerFactory.getLogger(GatewayMessageExecuter.class);

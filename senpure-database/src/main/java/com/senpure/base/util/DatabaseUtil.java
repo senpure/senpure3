@@ -9,7 +9,7 @@ import java.sql.*;
 /**
  * DatabaseUtil
  *
- * @author 罗中正
+ * @author senpure
  * @email senpure@senpure.com
  * @github https://github.com/senpure
  * @time 2018-06-04 17:04:57
