@@ -6,8 +6,8 @@ import java.util.Arrays;
 public class Client2GatewayMessage {
     private int messageId;
 
-    private int playerId;
-    private int token;
+    private long playerId;
+    private long token;
 
     private byte[] data;
 
@@ -19,12 +19,21 @@ public class Client2GatewayMessage {
         this.messageId = messageId;
     }
 
-    public int getPlayerId() {
+
+    public long getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(int playerId) {
+    public void setPlayerId(long playerId) {
         this.playerId = playerId;
+    }
+
+    public long getToken() {
+        return token;
+    }
+
+    public void setToken(long token) {
+        this.token = token;
     }
 
     public byte[] getData() {
@@ -33,11 +42,6 @@ public class Client2GatewayMessage {
 
     public void setData(byte[] data) {
         this.data = data;
-    }
-
-
-    public int getToken() {
-        return token;
     }
 
     public void setToken(int token) {

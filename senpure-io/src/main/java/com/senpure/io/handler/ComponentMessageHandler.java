@@ -9,7 +9,7 @@ public interface ComponentMessageHandler<T extends Message> {
 
     T getEmptyMessage();
 
-    void execute(Channel channel, int token, int playerId, T message);
+    void execute(Channel channel, long token, long playerId, T message);
 
     int handlerId();
 

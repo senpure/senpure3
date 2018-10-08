@@ -5,9 +5,9 @@ import java.util.Arrays;
 
 public class Server2GatewayMessage {
 
-    private Integer[] playerIds;
+    private Long[] playerIds;
 
-    private int token;
+    private long token;
     private int messageId;
     //具体服务器上有值
     private Message message;
@@ -15,13 +15,7 @@ public class Server2GatewayMessage {
     private byte[] data;
 
 
-    public Integer[] getPlayerIds() {
-        return playerIds;
-    }
 
-    public void setPlayerIds(Integer[] playerIds) {
-        this.playerIds = playerIds;
-    }
 
 
     public int getMessageId() {
@@ -48,11 +42,19 @@ public class Server2GatewayMessage {
         this.data = data;
     }
 
-    public int getToken() {
+    public Long[] getPlayerIds() {
+        return playerIds;
+    }
+
+    public void setPlayerIds(Long[] playerIds) {
+        this.playerIds = playerIds;
+    }
+
+    public long getToken() {
         return token;
     }
 
-    public void setToken(int token) {
+    public void setToken(long token) {
         this.token = token;
     }
 

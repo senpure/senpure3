@@ -1,5 +1,6 @@
-package com.senpure.io;
+package com.senpure.io.gateway;
 
+import com.senpure.io.GatewayComponentChannelServer;
 import com.senpure.io.message.CSRelationPlayerGatewayMessage;
 import com.senpure.io.message.Client2GatewayMessage;
 import io.netty.buffer.ByteBuf;
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 网关管理一个服务的多个实例 每个实例可能含有多个管道channel
  */
-public class GatewayComponentServer {
+public class ServerManager {
     private CSRelationPlayerGatewayMessage message = new CSRelationPlayerGatewayMessage();
     private int relationMessageId = message.getMessageId();
     private ConcurrentMap<Integer, Channel> playerChannelMap = new ConcurrentHashMap<>();

@@ -5,10 +5,10 @@ import io.netty.buffer.ByteBuf;
 
 public class Gateway2ServerMessage  {
 
-    private int token;
+    private long token;
     private int messageId;
 
-    private int playerId;
+    private long playerId;
 
     private ByteBuf buf;
 
@@ -20,13 +20,7 @@ public class Gateway2ServerMessage  {
         this.messageId = messageId;
     }
 
-    public int getPlayerId() {
-        return playerId;
-    }
 
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
-    }
 
 
 
@@ -39,12 +33,20 @@ public class Gateway2ServerMessage  {
     }
 
 
-    public int getToken() {
+    public long getToken() {
         return token;
     }
 
-    public void setToken(int token) {
+    public void setToken(long token) {
         this.token = token;
+    }
+
+    public long getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(long playerId) {
+        this.playerId = playerId;
     }
 
     @Override
