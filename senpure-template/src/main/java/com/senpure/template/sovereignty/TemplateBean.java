@@ -4,8 +4,6 @@ package com.senpure.template.sovereignty;
  * TemplateBean
  *
  * @author senpure
- * @email senpure@senpure.com
- * @github https://github.com/senpure
  * @date 2018-05-08
  */
 public class TemplateBean {

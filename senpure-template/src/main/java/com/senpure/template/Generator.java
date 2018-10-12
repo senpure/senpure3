@@ -13,8 +13,6 @@ import java.io.*;
  * Generator
  *
  * @author senpure
- * @email senpure@senpure.com
- * @github https://github.com/senpure
  * @date 2018-05-08
  */
 public class Generator {

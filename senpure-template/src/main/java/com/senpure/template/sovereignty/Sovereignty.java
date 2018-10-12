@@ -11,8 +11,6 @@ import java.util.Map;
  * Soverignty
  *
  * @author senpure
- * @email senpure@senpure.com
- * @github https://github.com/senpure
  * @date 2018-05-08 10:39
  */
 public class Sovereignty {
@@ -30,11 +28,11 @@ public class Sovereignty {
 
     private Sovereignty() {
         sovereignties.add("author    senpure");
-        sovereignties.add("email     senpure@senpure.com");
-        sovereignties.add("github    https://github.com/senpure");
+       // sovereignties.add("email     senpure@senpure.com");
+        //sovereignties.add("github    https://github.com/senpure");
         javaSovereignties.add("author senpure");
-        javaSovereignties.add("email senpure@senpure.com");
-        javaSovereignties.add("github https://github.com/senpure");
+        //javaSovereignties.add("email senpure@senpure.com");
+        //javaSovereignties.add("github https://github.com/senpure");
     }
 
     public String sovereignty() {
@@ -52,8 +50,8 @@ public class Sovereignty {
     public String sovereigntyLuaLRKComment() {
         List<String> sovereignties = new ArrayList<>();
         sovereignties.add("author    李荣科    senpure");
-        sovereignties.add("email     senpure@senpure.com");
-        sovereignties.add("github    https://github.com/senpure");
+        //sovereignties.add("email     senpure@senpure.com");
+        //sovereignties.add("github    https://github.com/senpure");
         return sovereignty("",true,sovereignties);
     }
 

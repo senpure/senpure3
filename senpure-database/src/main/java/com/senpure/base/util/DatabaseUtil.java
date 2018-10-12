@@ -10,8 +10,6 @@ import java.sql.*;
  * DatabaseUtil
  *
  * @author senpure
- * @email senpure@senpure.com
- * @github https://github.com/senpure
  * @time 2018-06-04 17:04:57
  */
 public class DatabaseUtil {

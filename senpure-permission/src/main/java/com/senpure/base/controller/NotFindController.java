@@ -24,8 +24,6 @@ import java.util.Locale;
  * NotFindController
  *
  * @author senpure
- * @email senpure@senpure.com
- * @github https://github.com/senpure
  * @time 2018-06-03 11:26:59
  */
 @Controller
