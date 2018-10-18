@@ -1,17 +1,20 @@
-package com.senpure.io;
+package com.senpure.io.gateway;
 
 import com.senpure.base.util.Assert;
-import com.senpure.io.message.Client2GatewayMessage;
+import com.senpure.io.message.Server2GatewayMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
-
-public class GatewayClientAndGatewayMessageDecoder extends ByteToMessageDecoder {
+/**
+ * 将服务器转发到网关的消息，解析出来
+ */
+public class GatewayAndServerMessageDecoder extends ByteToMessageDecoder {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
@@ -33,16 +36,30 @@ public class GatewayClientAndGatewayMessageDecoder extends ByteToMessageDecoder 
                 this.logger.info("数据不够一个数据包 packageLength ={} ,readableBytes={}", Integer.valueOf(packageLength), Integer.valueOf(in.readableBytes()));
                 in.resetReaderIndex();
             } else {
+                int token=in.readInt();
+                short playerLen = in.readShort();
+               Integer[] playerIds = new Integer[playerLen];
+                for (int i = 0; i <playerLen ; i++) {
+                    playerIds[i] = in.readInt();
+                }
                 int messageId = in.readInt();
-                int messageLength = packageLength - 4;
+                int messageLength = packageLength - 10-(playerLen<<2);
                 byte data[] = new byte[messageLength];
                 in.readBytes(data);
-                Client2GatewayMessage transfer = new Client2GatewayMessage();
-                transfer.setData(data);
-                transfer.setMessageId(messageId);
-                out.add(transfer);
+                Server2GatewayMessage serverMessage=new Server2GatewayMessage();
+                serverMessage.setData(data);
+                serverMessage.setToken(token);
+                serverMessage.setMessageId(messageId);
+              //  serverMessage.setUserIds(playerIds);
+                out.add(serverMessage);
             }
 
         }
+    }
+
+    public static void main(String[] args) {
+
+        new ArrayList<>(17);
+        System.out.println(2&8);
     }
 }

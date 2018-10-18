@@ -1,11 +1,14 @@
 package com.senpure.io.bean;
 
+import com.senpure.io.protocol.Bean;
 import io.netty.buffer.ByteBuf;
 
 /**
-* @author senpure-generator
-* @version 2018-3-21 20:05:32
-*/
+ * <br><b>index start:1 end:7</b>
+ * 
+ * @author senpure
+ * @time 2018-10-17 14:59:15
+ */
 public class HandleMessage extends  Bean {
     //可以处理的消息ID
     private int handleMessageId;
@@ -21,48 +24,102 @@ public class HandleMessage extends  Bean {
     private long numStart;
     //范围结束
     private long numEnd;
-
     /**
      * 写入字节缓存
      */
     @Override
     public void write(ByteBuf buf){
+        getSerializedSize();
         //可以处理的消息ID
-        writeInt(buf,handleMessageId);
+        writeVar32(buf,8,handleMessageId);
         //消息类名
-        writeStr(buf,messageClasses);
+        if (messageClasses != null){
+            writeString(buf,16,messageClasses);
+        }
         //是否共享messageId 不同的服务都可以处理
-        writeBoolean(buf,serverShare);
+        writeBoolean(buf,24,serverShare);
         //消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
-        writeInt(buf,messageType);
+        writeVar32(buf,32,messageType);
         //数字类型 0int 1 long
-        writeInt(buf,valueType);
+        writeVar32(buf,40,valueType);
         //范围开始
-        writeLong(buf,numStart);
+        writeVar64(buf,48,numStart);
         //范围结束
-        writeLong(buf,numEnd);
+        writeVar64(buf,56,numEnd);
     }
-
 
     /**
      * 读取字节缓存
      */
     @Override
-    public void read(ByteBuf buf){
+    public void read(ByteBuf buf,int endIndex){
+        while(true){
+            int tag = readTag(buf, endIndex);
+            switch (tag) {
+                case 0://end
+                return;
+                //可以处理的消息ID
+                case 8:// 1 << 3 | 0
+                        handleMessageId = readVar32(buf);
+                    break;
+                //消息类名
+                case 16:// 2 << 3 | 0
+                        messageClasses = readString(buf);
+                    break;
+                //是否共享messageId 不同的服务都可以处理
+                case 24:// 3 << 3 | 0
+                        serverShare = readBoolean(buf);
+                    break;
+                //消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
+                case 32:// 4 << 3 | 0
+                        messageType = readVar32(buf);
+                    break;
+                //数字类型 0int 1 long
+                case 40:// 5 << 3 | 0
+                        valueType = readVar32(buf);
+                    break;
+                //范围开始
+                case 48:// 6 << 3 | 0
+                        numStart = readVar64(buf);
+                    break;
+                //范围结束
+                case 56:// 7 << 3 | 0
+                        numEnd = readVar64(buf);
+                    break;
+                default://skip
+                    skip(buf, tag);
+                    break;
+            }
+        }
+    }
+
+    private int serializedSize = -1;
+
+    @Override
+    public int getSerializedSize(){
+        int size = serializedSize ;
+        if (size != -1 ){
+            return size;
+        }
+        size = 0 ;
         //可以处理的消息ID
-        this.handleMessageId = readInt(buf);
+        size += computeVar32Size(1,handleMessageId);
         //消息类名
-        this.messageClasses= readStr(buf);
+        if (messageClasses != null){
+            size += computeStringSize(1,messageClasses);
+        }
         //是否共享messageId 不同的服务都可以处理
-        this.serverShare = readBoolean(buf);
+        size += computeBooleanSize(1,serverShare);
         //消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
-        this.messageType = readInt(buf);
+        size += computeVar32Size(1,messageType);
         //数字类型 0int 1 long
-        this.valueType = readInt(buf);
+        size += computeVar32Size(1,valueType);
         //范围开始
-        this.numStart = readLong(buf);
+        size += computeVar64Size(1,numStart);
         //范围结束
-        this.numEnd = readLong(buf);
+        size += computeVar64Size(1,numEnd);
+        serializedSize = size ;
+        return size ;
     }
 
     /**
@@ -167,6 +224,62 @@ public class HandleMessage extends  Bean {
      * set 范围结束
      */
     public HandleMessage setNumEnd(long numEnd) {
+        this.numEnd=numEnd;
+        return this;
+    }
+
+    /**
+     * set 可以处理的消息ID
+     */
+    public HandleMessage set1HandleMessageId(int handleMessageId) {
+        this.handleMessageId=handleMessageId;
+        return this;
+    }
+
+    /**
+     * set 消息类名
+     */
+    public HandleMessage set2MessageClasses(String messageClasses) {
+        this.messageClasses=messageClasses;
+        return this;
+    }
+
+    /**
+     * set 是否共享messageId 不同的服务都可以处理
+     */
+    public HandleMessage set3ServerShare(boolean serverShare) {
+        this.serverShare=serverShare;
+        return this;
+    }
+
+    /**
+     * set 消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
+     */
+    public HandleMessage set4MessageType(int messageType) {
+        this.messageType=messageType;
+        return this;
+    }
+
+    /**
+     * set 数字类型 0int 1 long
+     */
+    public HandleMessage set5ValueType(int valueType) {
+        this.valueType=valueType;
+        return this;
+    }
+
+    /**
+     * set 范围开始
+     */
+    public HandleMessage set6NumStart(long numStart) {
+        this.numStart=numStart;
+        return this;
+    }
+
+    /**
+     * set 范围结束
+     */
+    public HandleMessage set7NumEnd(long numEnd) {
         this.numEnd=numEnd;
         return this;
     }

@@ -1,4 +1,4 @@
-package com.senpure.io;
+package com.senpure.io.gateway;
 
 import com.senpure.io.message.Client2GatewayMessage;
 import io.netty.buffer.ByteBuf;
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 将客户端发到网关的消息，重新编码，发送给具体的服务器
  */
-public class GatewayServerAndGatewayMessageEncoder extends MessageToByteEncoder<Client2GatewayMessage> {
+public class GatewayAndServerMessageEncoder extends MessageToByteEncoder<Client2GatewayMessage> {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
 
@@ -20,8 +20,8 @@ public class GatewayServerAndGatewayMessageEncoder extends MessageToByteEncoder<
         //messageId 4 token +4 + playerId 4+ data
         out.ensureWritable(16+msg.getData().length  );
         out.writeInt(12 + msg.getData().length);
-        out.writeInt(msg.getToken());
-        out.writeInt(msg.getPlayerId());
+      //  out.writeInt(msg.getToken());
+       // out.writeInt(msg.getUserId());
         out.writeInt(msg.getMessageId());
         out.writeBytes(msg.getData());
 

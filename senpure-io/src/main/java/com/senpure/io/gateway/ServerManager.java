@@ -1,7 +1,7 @@
 package com.senpure.io.gateway;
 
-import com.senpure.io.GatewayComponentChannelServer;
 import com.senpure.io.message.CSRelationPlayerGatewayMessage;
+import com.senpure.io.message.CSRelationUserGatewayMessage;
 import com.senpure.io.message.Client2GatewayMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -21,31 +21,29 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ServerManager {
     private CSRelationPlayerGatewayMessage message = new CSRelationPlayerGatewayMessage();
     private int relationMessageId = message.getMessageId();
-    private ConcurrentMap<Integer, Channel> playerChannelMap = new ConcurrentHashMap<>();
-    private List<GatewayComponentChannelServer> useChannelServer = new ArrayList<>();
+    private ConcurrentMap<Long, Channel> userChannelMap = new ConcurrentHashMap<>();
+    private List<ServerChannelManager> useChannelManagers = new ArrayList<>();
 
-    private List<GatewayComponentChannelServer> prepStopOldInstance = new ArrayList<>();
+    private List<ServerChannelManager> prepStopOldInstance = new ArrayList<>();
     private Map<Integer, Boolean> handleIdsMap = new HashMap<>();
     private String serverName;
     private AtomicInteger atomicIndex = new AtomicInteger(-1);
 
-    public Channel channel(Integer playerId, int token) {
-        Channel channel = playerChannelMap.get(playerId);
+    public Channel channel(Long userId, Long token) {
+        Channel channel = userChannelMap.get(userId);
         if (channel == null) {
-            channel = nextGatewayComponentChannelServer().nextChannel();
-            relationGateway(channel, token, playerId);
+            channel =nextServerChannelManager().nextChannel();
+            relationGateway(channel, token, userId);
             return channel;
         }
         return channel;
     }
 
-    public void relationGateway(Channel channel, int token, int playerId) {
-        if (playerId > 0) {
-            playerChannelMap.put(playerId, channel);
-        }
-        CSRelationPlayerGatewayMessage message = new CSRelationPlayerGatewayMessage();
-        message.setPlayerId(playerId);
+    public void relationGateway(Channel channel, long token, long userId) {
+
+        CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
         message.setToken(token);
+        message.setUserId(userId);
         Client2GatewayMessage toMessage = new Client2GatewayMessage();
         toMessage.setMessageId(relationMessageId);
         ByteBuf buf = Unpooled.buffer();
@@ -54,18 +52,18 @@ public class ServerManager {
         channel.writeAndFlush(toMessage);
     }
 
-    private GatewayComponentChannelServer nextGatewayComponentChannelServer() {
-        GatewayComponentChannelServer server = useChannelServer.get(nextIndex());
-        return server;
+    private ServerChannelManager nextServerChannelManager() {
+        ServerChannelManager manager = useChannelManagers.get(nextIndex());
+        return manager;
     }
 
     private int nextIndex() {
-        if (useChannelServer.size() == 0) {
+        if (useChannelManagers.size() == 0) {
             return 0;
         }
         int index = atomicIndex.incrementAndGet();
-       return Math.abs(index % useChannelServer.size());
-//        if (index >= useChannelServer.size()) {
+       return Math.abs(index % useChannelManagers.size());
+//        if (index >= useChannelManagers.size()) {
 //            boolean reset = atomicIndex.compareAndSet(index, 0);
 //            if (!reset) {
 //                return nextIndex();
@@ -76,8 +74,8 @@ public class ServerManager {
     }
 
     public synchronized void prepStopOldInstance() {
-        prepStopOldInstance.addAll(useChannelServer);
-        useChannelServer.clear();
+        prepStopOldInstance.addAll(useChannelManagers);
+        useChannelManagers.clear();
     }
 
     public String getServerName() {
@@ -89,29 +87,29 @@ public class ServerManager {
     }
 
 
-    public GatewayComponentChannelServer getChannelServer(String serverKey) {
-        for (GatewayComponentChannelServer server : useChannelServer) {
-            if (server.getServerKey().equals(serverKey)) {
-                return server;
+    public ServerChannelManager getChannelServer(String serverKey) {
+        for (ServerChannelManager manager : useChannelManagers) {
+            if (manager.getServerKey().equals(serverKey)) {
+                return manager;
             }
         }
-        GatewayComponentChannelServer server = new GatewayComponentChannelServer();
-        server.setServerKey(serverKey);
-        return server;
+        ServerChannelManager manager = new  ServerChannelManager();
+     manager.setServerKey(serverKey);
+        return manager;
 
     }
 
-    public List<GatewayComponentChannelServer> getUseChannelServer() {
-        return useChannelServer;
+    public List<ServerChannelManager> getUseChannelManagers() {
+        return useChannelManagers;
     }
 
-    public synchronized void checkChannelServer(String serverKey, GatewayComponentChannelServer channelServer) {
-        for (GatewayComponentChannelServer server : useChannelServer) {
-            if (server.getServerKey().equals(serverKey)) {
+    public synchronized void checkChannelServer(String serverKey, ServerChannelManager channelServer) {
+        for (ServerChannelManager manager : useChannelManagers) {
+            if (manager.getServerKey().equals(serverKey)) {
                 return;
             }
         }
-        useChannelServer.add(channelServer);
+        useChannelManagers.add(channelServer);
     }
 
     public void markHandleId(int messageId) {

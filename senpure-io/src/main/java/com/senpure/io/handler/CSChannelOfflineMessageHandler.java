@@ -1,28 +1,20 @@
 package com.senpure.io.handler;
 
-import com.senpure.io.ComponentGatewayServer;
 import com.senpure.io.message.CSChannelOfflineMessage;
 import io.netty.channel.Channel;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 客户端掉线处理器
  *
- * @author senpure-generator
- * @version 2018-3-16 17:14:32
+ * @author senpure
+ * @time 2018-10-17 14:59:15
  */
-public class CSChannelOfflineMessageHandler extends AbstractInnerComponentMessageHandler<CSChannelOfflineMessage> {
+public class CSChannelOfflineMessageHandler extends AbstractRealityMessageHandler<CSChannelOfflineMessage> {
 
-    @Autowired
-    private ComponentGatewayServer gatewayServer;
     @Override
-    public void execute(Channel channel, int token, int playerId, CSChannelOfflineMessage message) {
+    public void execute(Channel channel, long token, long userId, CSChannelOfflineMessage message) {
+        //TODO 请在这里写下你的代码
 
-        gatewayServer.offline(message.getToken(),message.getPlayerId());
-    }
-
-    public void setGatewayServer(ComponentGatewayServer gatewayServer) {
-        this.gatewayServer = gatewayServer;
     }
 
     @Override

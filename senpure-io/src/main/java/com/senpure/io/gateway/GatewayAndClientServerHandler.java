@@ -9,10 +9,10 @@ import io.netty.channel.SimpleChannelInboundHandler;
 public class GatewayAndClientServerHandler extends SimpleChannelInboundHandler<Client2GatewayMessage> {
 
 
-    private MessageExecuter messageExecuter;
+    private GatewayMessageExecuter messageExecuter;
 
 
-    public GatewayAndClientServerHandler(MessageExecuter messageExecuter) {
+    public GatewayAndClientServerHandler(GatewayMessageExecuter messageExecuter) {
         this.messageExecuter = messageExecuter;
     }
 

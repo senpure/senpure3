@@ -1,14 +1,15 @@
 package com.senpure.io.message;
 
+import com.senpure.io.protocol.Message;
 import io.netty.buffer.ByteBuf;
 
 /**
  * 应答是否可以请求
  * 
- * @author senpure-generator
- * @version 2018-3-21 20:49:21
+ * @author senpure
+ * @time 2018-10-17 14:59:15
  */
-public class SCAskHandleMessage extends Message {
+public class SCAskHandleMessage extends  Message {
     //是否可以处理
     private boolean handle;
     //token
@@ -17,36 +18,78 @@ public class SCAskHandleMessage extends Message {
     private int fromMessageId;
     //值
     private String value;
-
     /**
      * 写入字节缓存
      */
     @Override
     public void write(ByteBuf buf){
+        getSerializedSize();
         //是否可以处理
-        writeBoolean(buf,handle);
+        writeBoolean(buf,8,handle);
         //token
-        writeLong(buf,token);
+        writeVar64(buf,16,token);
         //消息ID
-        writeInt(buf,fromMessageId);
+        writeVar32(buf,24,fromMessageId);
         //值
-        writeStr(buf,value);
+        if (value != null){
+            writeString(buf,32,value);
+        }
     }
-
 
     /**
      * 读取字节缓存
      */
     @Override
-    public void read(ByteBuf buf){
+    public void read(ByteBuf buf,int endIndex){
+        while(true){
+            int tag = readTag(buf, endIndex);
+            switch (tag) {
+                case 0://end
+                return;
+                //是否可以处理
+                case 8:// 1 << 3 | 0
+                        handle = readBoolean(buf);
+                    break;
+                //token
+                case 16:// 2 << 3 | 0
+                        token = readVar64(buf);
+                    break;
+                //消息ID
+                case 24:// 3 << 3 | 0
+                        fromMessageId = readVar32(buf);
+                    break;
+                //值
+                case 32:// 4 << 3 | 0
+                        value = readString(buf);
+                    break;
+                default://skip
+                    skip(buf, tag);
+                    break;
+            }
+        }
+    }
+
+    private int serializedSize = -1;
+
+    @Override
+    public int getSerializedSize(){
+        int size = serializedSize ;
+        if (size != -1 ){
+            return size;
+        }
+        size = 0 ;
         //是否可以处理
-        this.handle = readBoolean(buf);
+        size += computeBooleanSize(1,handle);
         //token
-        this.token = readLong(buf);
+        size += computeVar64Size(1,token);
         //消息ID
-        this.fromMessageId = readInt(buf);
+        size += computeVar32Size(1,fromMessageId);
         //值
-        this.value= readStr(buf);
+        if (value != null){
+            size += computeStringSize(1,value);
+        }
+        serializedSize = size ;
+        return size ;
     }
 
     /**
@@ -105,12 +148,12 @@ public class SCAskHandleMessage extends Message {
 
     @Override
     public int getMessageId() {
-    return 1106;
+        return 1106;
     }
 
     @Override
     public String toString() {
-        return "SCAskHandleMessage{"
+        return "SCAskHandleMessage[1106]{"
                 +"handle=" + handle
                 +",token=" + token
                 +",fromMessageId=" + fromMessageId
@@ -125,7 +168,7 @@ public class SCAskHandleMessage extends Message {
     public String toString(String indent) {
         indent = indent == null ? "" : indent;
         StringBuilder sb = new StringBuilder();
-        sb.append("SCAskHandleMessage").append("{");
+        sb.append("SCAskHandleMessage").append("[1106]").append("{");
         //是否可以处理
         sb.append("\n");
         sb.append(indent).append(rightPad("handle", filedPad)).append(" = ").append(handle);

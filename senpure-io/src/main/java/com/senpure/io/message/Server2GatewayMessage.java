@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class Server2GatewayMessage {
 
-    private Long[] playerIds;
+    private Long[] userIds;
 
     private long token;
     private int messageId;
@@ -42,12 +42,12 @@ public class Server2GatewayMessage {
         this.data = data;
     }
 
-    public Long[] getPlayerIds() {
-        return playerIds;
+    public Long[] getUserIds() {
+        return userIds;
     }
 
-    public void setPlayerIds(Long[] playerIds) {
-        this.playerIds = playerIds;
+    public void setUserIds(Long[] userIds) {
+        this.userIds = userIds;
     }
 
     public long getToken() {
@@ -61,7 +61,7 @@ public class Server2GatewayMessage {
     @Override
     public String toString() {
         return "Server2GatewayMessage{" +
-                "playerIds=" + Arrays.toString(playerIds) +
+                "userIds=" + Arrays.toString(userIds) +
                 ", token=" + token +
                 ", messageId=" + messageId +
                 ", data=" + data==null?"":data.length+""+

@@ -6,18 +6,19 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
 
 public class ChannelAttributeUtil {
-    private static String PLAYER_ID = "playerId";
-    private static String PLAYER_NAME = "playerName";
+    private static String USER_ID = "userId";
+    private static String TOKEN = "token";
+    private static String USER_NAME = "userName";
 
     private static String OFFLINE_HANDLER = "offlineHandler";
-    private static String CHANNEL_PLAYER = "channelPlayer";
+    private static String CHANNEL_USER = "channelUser";
 
-    private static String IP_AND_PORT= "ipAndPort";
-    public static AttributeKey<Integer> playerIdKey = AttributeKey.valueOf(PLAYER_ID);
-
-    public static AttributeKey<String> playerNameKey = AttributeKey.valueOf(PLAYER_NAME);
+    private static String IP_AND_PORT = "ipAndPort";
+    public static AttributeKey<Long> userIdKey = AttributeKey.valueOf(USER_ID);
+    public static AttributeKey<Long> tokenKey = AttributeKey.valueOf(TOKEN);
+    public static AttributeKey<String> userNameKey = AttributeKey.valueOf(USER_NAME);
     public static AttributeKey<String> ipAndPortKey = AttributeKey.valueOf(IP_AND_PORT);
-    public static AttributeKey<ChannelPlayer> channelPlayerKey = AttributeKey.valueOf(CHANNEL_PLAYER);
+    public static AttributeKey<ChannelPlayer> channelPlayerKey = AttributeKey.valueOf(CHANNEL_USER);
     public static AttributeKey<OffLineHandler> offlineHandlerKey = AttributeKey.valueOf(OFFLINE_HANDLER);
 
     public static void clear(ChannelHandlerContext ctx, AttributeKey<?> key) {
@@ -32,45 +33,55 @@ public class ChannelAttributeUtil {
     }
 
 
-    public static Integer getPlayerId(ChannelHandlerContext ctx) {
+    public static Long getUserId(ChannelHandlerContext ctx) {
         if (ctx == null) {
             return null;
         }
 
-        return ctx.channel().attr(playerIdKey).get();
+        return ctx.channel().attr(userIdKey).get();
 
     }
 
-    public static void setPlayerId(Channel channel, Integer playerId) {
 
-        channel.attr(playerIdKey).set(playerId);
-
-    }
-
-    public static void setPlayerId(ChannelHandlerContext ctx, Integer playerId) {
-
-        ctx.channel().attr(playerIdKey).set(playerId);
+    public static void setToken(Channel channel, Long token) {
+        channel.attr(tokenKey).set(token);
 
     }
 
-    public static void setPlayerName(Channel channel, String name) {
+    public static Long getToken(Channel channel) {
 
-        channel.attr(playerNameKey).set(name);
+        return channel.attr(tokenKey).get();
+    }
+
+    public static void setUserId(Channel channel, Long playerId) {
+
+        channel.attr(userIdKey).set(playerId);
 
     }
 
-    public static Integer getPlayerId(Channel channel) {
+    public static void setUserId(ChannelHandlerContext ctx, Long playerId) {
 
-        return channel.attr(playerIdKey).get();
-
-    }
-
-    public static String getPlayerName(Channel channel) {
-
-        return channel.attr(playerNameKey).get();
+        ctx.channel().attr(userIdKey).set(playerId);
 
     }
 
+    public static void setUserName(Channel channel, String name) {
+
+        channel.attr(userNameKey).set(name);
+
+    }
+
+    public static Long getUserId(Channel channel) {
+
+        return channel.attr(userIdKey).get();
+
+    }
+
+    public static String getUserName(Channel channel) {
+
+        return channel.attr(userNameKey).get();
+
+    }
 
 
     public static String getIpAndPort(Channel channel) {
@@ -79,11 +90,12 @@ public class ChannelAttributeUtil {
 
     }
 
-    public static void setIpAndPort(Channel channel,String ipAndPort) {
+    public static void setIpAndPort(Channel channel, String ipAndPort) {
 
-     channel.attr(ipAndPortKey).set(ipAndPort);
+        channel.attr(ipAndPortKey).set(ipAndPort);
 
     }
+
     public static void setOfflineHandler(Channel channel, OffLineHandler handler) {
 
         channel.attr(offlineHandlerKey).set(handler);
@@ -108,8 +120,8 @@ public class ChannelAttributeUtil {
     private static void appenPlayerStr(Channel channel, StringBuilder sb) {
         ChannelPlayer player = ChannelAttributeUtil.getChannelPlayer(channel);
         if (player == null) {
-            Integer playerId = ChannelAttributeUtil.getPlayerId(channel);
-            String name = ChannelAttributeUtil.getPlayerName(channel);
+            Long playerId = ChannelAttributeUtil.getUserId(channel);
+            String name = ChannelAttributeUtil.getUserName(channel);
             if (playerId != null) {
                 sb.append("[ID][").append(playerId).append("]");
             }

@@ -24,6 +24,15 @@
         <field type="long" name="userId" explain="用户Id"></field>
     </message>
 
+    <message id="102" type="SC" name="RelationUserGateway" explain="关联用户与网关">
+        <field type="long" name="token" explain="channel token"></field>
+        <field type="long" name="userId" explain="用户Id"></field>
+    </message>
+
+    <message id="202" type="SC" name="BreakUserGateway" explain="断开用户与网关">
+        <field type="long" name="token" explain="channel token"></field>
+        <field type="long" name="userId" explain="用户Id"></field>
+    </message>
     <message id="103" type="CS" name="ChannelOffline" explain="客户端掉线">
         <field type="long" name="token" explain="channel token"></field>
         <field type="long" name="userId" explain="用户Id"></field>

@@ -54,8 +54,6 @@ public class GatewayChannelManager {
 
     public static void main(String[] args) {
         ConcurrentMap<Integer, Integer> ids = new ConcurrentHashMap<>();
-
-
         System.out.println(ids.putIfAbsent(1, 1));
         System.out.println(ids.putIfAbsent(1, 2));
         System.out.println(ids.putIfAbsent(1, 3));

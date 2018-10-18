@@ -1,50 +1,89 @@
 package com.senpure.io.message;
 
+import com.senpure.io.protocol.Message;
 import io.netty.buffer.ByteBuf;
 
 /**
  * 询问服务器是否可以处理该值得请求
  * 
- * @author senpure-generator
- * @version 2018-3-21 20:05:32
+ * @author senpure
+ * @time 2018-10-17 14:59:15
  */
-public class CSAskHandleMessage extends Message {
-    //yuan
+public class CSAskHandleMessage extends  Message {
+    //token
     private long token;
     //消息ID
     private int fromMessageId;
     //值
     private String value;
-
     /**
      * 写入字节缓存
      */
     @Override
     public void write(ByteBuf buf){
-        //yuan
-        writeLong(buf,token);
+        getSerializedSize();
+        //token
+        writeVar64(buf,8,token);
         //消息ID
-        writeInt(buf,fromMessageId);
+        writeVar32(buf,16,fromMessageId);
         //值
-        writeStr(buf,value);
+        if (value != null){
+            writeString(buf,24,value);
+        }
     }
-
 
     /**
      * 读取字节缓存
      */
     @Override
-    public void read(ByteBuf buf){
-        //yuan
-        this.token = readLong(buf);
+    public void read(ByteBuf buf,int endIndex){
+        while(true){
+            int tag = readTag(buf, endIndex);
+            switch (tag) {
+                case 0://end
+                return;
+                //token
+                case 8:// 1 << 3 | 0
+                        token = readVar64(buf);
+                    break;
+                //消息ID
+                case 16:// 2 << 3 | 0
+                        fromMessageId = readVar32(buf);
+                    break;
+                //值
+                case 24:// 3 << 3 | 0
+                        value = readString(buf);
+                    break;
+                default://skip
+                    skip(buf, tag);
+                    break;
+            }
+        }
+    }
+
+    private int serializedSize = -1;
+
+    @Override
+    public int getSerializedSize(){
+        int size = serializedSize ;
+        if (size != -1 ){
+            return size;
+        }
+        size = 0 ;
+        //token
+        size += computeVar64Size(1,token);
         //消息ID
-        this.fromMessageId = readInt(buf);
+        size += computeVar32Size(1,fromMessageId);
         //值
-        this.value= readStr(buf);
+        if (value != null){
+            size += computeStringSize(1,value);
+        }
+        serializedSize = size ;
+        return size ;
     }
 
     /**
-     * get yuan
+     * get token
      * @return
      */
     public  long getToken() {
@@ -52,7 +91,7 @@ public class CSAskHandleMessage extends Message {
     }
 
     /**
-     * set yuan
+     * set token
      */
     public CSAskHandleMessage setToken(long token) {
         this.token=token;
@@ -84,12 +123,12 @@ public class CSAskHandleMessage extends Message {
 
     @Override
     public int getMessageId() {
-    return 1105;
+        return 1105;
     }
 
     @Override
     public String toString() {
-        return "CSAskHandleMessage{"
+        return "CSAskHandleMessage[1105]{"
                 +"token=" + token
                 +",fromMessageId=" + fromMessageId
                 +",value=" + value
@@ -103,8 +142,8 @@ public class CSAskHandleMessage extends Message {
     public String toString(String indent) {
         indent = indent == null ? "" : indent;
         StringBuilder sb = new StringBuilder();
-        sb.append("CSAskHandleMessage").append("{");
-        //yuan
+        sb.append("CSAskHandleMessage").append("[1105]").append("{");
+        //token
         sb.append("\n");
         sb.append(indent).append(rightPad("token", filedPad)).append(" = ").append(token);
         //消息ID

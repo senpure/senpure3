@@ -28,7 +28,7 @@ public class GatewayAndClientServer {
     private ChannelFuture channelFuture;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private MessageExecuter messageExecuter;
+    private GatewayMessageExecuter messageExecuter;
 
     private String serverName = "gatewayServer[cs]";
     private String readableServerName = "网关[CS]服务器";
@@ -132,11 +132,11 @@ public class GatewayAndClientServer {
         this.readableServerName = readableServerName;
     }
 
-    public MessageExecuter getMessageExecuter() {
+    public GatewayMessageExecuter getMessageExecuter() {
         return messageExecuter;
     }
 
-    public void setMessageExecuter(MessageExecuter messageExecuter) {
+    public void setMessageExecuter(GatewayMessageExecuter messageExecuter) {
         this.messageExecuter = messageExecuter;
     }
 }

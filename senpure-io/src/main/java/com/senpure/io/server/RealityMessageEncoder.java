@@ -19,13 +19,13 @@ public class RealityMessageEncoder extends MessageToByteEncoder<Server2GatewayMe
         message.getMessage().write(buf);
         int length = buf.writerIndex();
         //head 4 +messageId 4 token 4+ playerLen 2+playerIds*4+ content length
-        int playerLen = message.getPlayerIds().length;
+        int playerLen = message.getUserIds().length;
         int packageLen = 14 + (playerLen << 2) + length;
         out.ensureWritable(packageLen);
         out.writeInt(packageLen - 4);
         out.writeLong(message.getToken());
         out.writeShort(playerLen);
-        for (long i : message.getPlayerIds()) {
+        for (long i : message.getUserIds()) {
             out.writeLong(i);
         }
         out.writeInt(message.getMessageId());

@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerChannelManager {
 
-    private ConcurrentMap<Integer, Channel> serverChannels = new ConcurrentHashMap<>();
+   // private ConcurrentMap<Integer, Channel> serverChannels = new ConcurrentHashMap<>();
     private List<Channel> channels = new ArrayList<>(16);
 
     private AtomicInteger atomicIndex = new AtomicInteger(-1);
@@ -55,24 +55,27 @@ public class ServerChannelManager {
 
     public void markMessageId(int messageId) {
         handleIds.add(messageId);
-
     }
 
     public Channel nextChannel() {
-
         return channels.get(nextIndex());
     }
 
     private int nextIndex() {
-        int index = atomicIndex.incrementAndGet();
-        if (index >= channels.size()) {
-            boolean reset = atomicIndex.compareAndSet(index, 0);
-            if (!reset) {
-                return nextIndex();
-            }
+        if (channels.size() == 0) {
             return 0;
         }
-        return index;
+        int index = atomicIndex.incrementAndGet();
+        return Math.abs(index % channels.size());
+//        int index = atomicIndex.incrementAndGet();
+//        if (index >= channels.size()) {
+//            boolean reset = atomicIndex.compareAndSet(index, 0);
+//            if (!reset) {
+//                return nextIndex();
+//            }
+//            return 0;
+//        }
+      //  return index;
     }
 
 

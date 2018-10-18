@@ -1,18 +1,18 @@
 package com.senpure.io.message;
 
 import com.senpure.io.bean.HandleMessage;
-import com.senpure.io.message.Message;
+import com.senpure.io.protocol.Message;
 import io.netty.buffer.ByteBuf;
 
 import java.util.List;
 import java.util.ArrayList;
 
 /**
-  * 服务器注册消息处理器到网关
-  * 
-  * @author senpure-generator
-  * @version 2018-3-16 17:14:32
-  */
+ * 服务器注册消息处理器到网关
+ * 
+ * @author senpure
+ * @time 2018-10-17 14:59:15
+ */
 public class SCRegServerHandleMessageMessage extends  Message {
     //服务器名
     private String serverName;
@@ -21,44 +21,93 @@ public class SCRegServerHandleMessageMessage extends  Message {
     //服务器名
     private String readableServerName;
     //可以处理的消息
-    private List<HandleMessage> messages=new ArrayList();
-
+    private List<HandleMessage> messages = new ArrayList(16);
     /**
      * 写入字节缓存
      */
     @Override
     public void write(ByteBuf buf){
+        getSerializedSize();
         //服务器名
-        writeStr(buf,serverName);
+        if (serverName != null){
+            writeString(buf,8,serverName);
+        }
         //ip和端口号
-        writeStr(buf,ipAndFirstPort);
+        if (ipAndFirstPort != null){
+            writeString(buf,16,ipAndFirstPort);
+        }
         //服务器名
-        writeStr(buf,readableServerName);
+        if (readableServerName != null){
+            writeString(buf,24,readableServerName);
+        }
         //可以处理的消息
-        int messagesSize=messages.size();
-        writeShort(buf,messagesSize);
-        for(int i=0;i< messagesSize;i++){
-            writeBean(buf,messages.get(i),false);
-           }
+        for (int i= 0;i< messages.size();i++){
+            writeBean(buf,35,messages.get(i));
+        }
     }
-
 
     /**
      * 读取字节缓存
      */
     @Override
-    public void read(ByteBuf buf){
+    public void read(ByteBuf buf,int endIndex){
+        while(true){
+            int tag = readTag(buf, endIndex);
+            switch (tag) {
+                case 0://end
+                return;
+                //服务器名
+                case 8:// 1 << 3 | 0
+                        serverName = readString(buf);
+                    break;
+                //ip和端口号
+                case 16:// 2 << 3 | 0
+                        ipAndFirstPort = readString(buf);
+                    break;
+                //服务器名
+                case 24:// 3 << 3 | 0
+                        readableServerName = readString(buf);
+                    break;
+                //可以处理的消息
+                case 35:// 4 << 3 | 3
+                        HandleMessage tempMessagesBean = new HandleMessage();
+                        readBean(buf,tempMessagesBean);
+                        messages.add(tempMessagesBean);
+                    break;
+                default://skip
+                    skip(buf, tag);
+                    break;
+            }
+        }
+    }
+
+    private int serializedSize = -1;
+
+    @Override
+    public int getSerializedSize(){
+        int size = serializedSize ;
+        if (size != -1 ){
+            return size;
+        }
+        size = 0 ;
         //服务器名
-        this.serverName= readStr(buf);
+        if (serverName != null){
+            size += computeStringSize(1,serverName);
+        }
         //ip和端口号
-        this.ipAndFirstPort= readStr(buf);
+        if (ipAndFirstPort != null){
+            size += computeStringSize(1,ipAndFirstPort);
+        }
         //服务器名
-        this.readableServerName= readStr(buf);
+        if (readableServerName != null){
+            size += computeStringSize(1,readableServerName);
+        }
         //可以处理的消息
-        int messagesSize=readShort(buf);
-        for(int i=0;i<messagesSize;i++){
-            this.messages.add((HandleMessage)readBean(buf,HandleMessage.class,false));
-         }
+        for(int i=0;i< messages.size();i++){
+            size += computeBeanSize(1,messages.get(i));
+        }
+        serializedSize = size ;
+        return size ;
     }
 
     /**
@@ -117,6 +166,10 @@ public class SCRegServerHandleMessageMessage extends  Message {
       * set 可以处理的消息
       */
     public SCRegServerHandleMessageMessage setMessages (List<HandleMessage> messages){
+        if(messages == null){
+        this.messages = new ArrayList(16);
+            return this;
+        }
         this.messages=messages;
         return this;
     }
@@ -129,7 +182,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
 
     @Override
     public String toString() {
-        return "SCRegServerHandleMessageMessage{"
+        return "SCRegServerHandleMessageMessage[1104]{"
                 +"serverName=" + serverName
                 +",ipAndFirstPort=" + ipAndFirstPort
                 +",readableServerName=" + readableServerName
@@ -146,7 +199,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
     public String toString(String indent) {
         indent = indent == null ? "" : indent;
         StringBuilder sb = new StringBuilder();
-        sb.append("SCRegServerHandleMessageMessage").append("{");
+        sb.append("SCRegServerHandleMessageMessage").append("[1104]").append("{");
         //服务器名
         sb.append("\n");
         sb.append(indent).append(rightPad("serverName", filedPad)).append(" = ").append(serverName);

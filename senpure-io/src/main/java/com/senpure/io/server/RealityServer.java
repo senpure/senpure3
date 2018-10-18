@@ -94,7 +94,7 @@ public class RealityServer {
             logger.info("{}启动完成", getReadableServerName());
             markFirstPort(host, address.getPort());
             String gatewayKey=host+":"+port;
-            GatewayChannelManager channelServer = gatewayServer.getComponentGatewayChannelServer( gatewayKey);
+            GatewayChannelManager channelServer = gatewayServer.getGatewayChannelServer( gatewayKey);
             channelServer.addChannel(channel);
             ChannelAttributeUtil.setIpAndPort(channel,gatewayKey);
 

@@ -17,103 +17,96 @@ public class GatewayManager {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
     private ConcurrentMap<String, GatewayChannelManager> gatewayChannelMap = new ConcurrentHashMap<>();
 
-    private ConcurrentMap<Integer, GatewayChannelManager> playerGatewayMap = new ConcurrentHashMap<>();
+    private ConcurrentMap<Long, GatewayChannelManager> userGatewayMap = new ConcurrentHashMap<>();
 
-    private ConcurrentMap<Integer, GatewayChannelManager> tokenGatewayMap = new ConcurrentHashMap<>();
+    private ConcurrentMap<Long, GatewayChannelManager> tokenGatewayMap = new ConcurrentHashMap<>();
 
-    public synchronized GatewayChannelManager getComponentGatewayChannelServer(String serverKey) {
+    public synchronized GatewayChannelManager getGatewayChannelServer(String serverKey) {
 
-        GatewayChannelManager server = gatewayChannelMap.get(serverKey);
-        if (server == null) {
-            server = new GatewayChannelManager();
-            gatewayChannelMap.put(serverKey, server);
+        GatewayChannelManager manager = gatewayChannelMap.get(serverKey);
+        if (manager == null) {
+            manager = new GatewayChannelManager();
+            gatewayChannelMap.put(serverKey, manager);
             return gatewayChannelMap.get(serverKey);
         }
-        return server;
+        return manager;
     }
 
-    public void relationPlayer(String serverKey, Integer playerId) {
-        playerGatewayMap.putIfAbsent(playerId, gatewayChannelMap.get(serverKey));
+    public void relationUser(String serverKey, Long userId) {
+        userGatewayMap.putIfAbsent(userId, gatewayChannelMap.get(serverKey));
     }
 
-    public void relationToken(String serverKey, Integer token) {
+    public void relationToken(String serverKey, Long token) {
         tokenGatewayMap.putIfAbsent(token, gatewayChannelMap.get(serverKey));
     }
 
-    public void breakPlayer(Integer playerId) {
-        playerGatewayMap.remove(playerId);
+    public void breakUser(Long userId) {
+        userGatewayMap.remove(userId);
     }
 
-    public void breakToken(Integer token) {
+    public void breakToken(Long token) {
         tokenGatewayMap.remove(token);
     }
 
-    public void offline(int token, int playerId) {
-        logger.debug("token {} id {}离线", token, playerId);
+    public void offline(long token, long userId) {
+        logger.debug("token {} id {}离线", token, userId);
         if (token != 0) {
             breakToken(token);
         }
-        if (playerId > 0) {
-            breakPlayer(playerId);
+        if (userId > 0) {
+            breakUser(userId);
         }
     }
 
-    public boolean canHandleMessageValue(int messageId,String value)
-    {
+    public boolean canHandleMessageValue(int messageId,String value) {
         return  false;
     }
 
     public void sendMessage2GatewayByToken(Long token, Message message) {
         Server2GatewayMessage toGateway = new Server2GatewayMessage();
         toGateway.setToken(token);
-        toGateway.setPlayerIds(new Long[0]);
+        toGateway.setUserIds(new Long[0]);
         toGateway.setMessage(message);
         toGateway.setMessageId(message.getMessageId());
         GatewayChannelManager channelServer = tokenGatewayMap.get(token);
         Channel channel = channelServer.nextChannel();
         channel.writeAndFlush(toGateway);
-
     }
 
-    public void sendMessage2Gateway(Long playerId, Message message) {
+    public void sendMessage2Gateway(Long userId, Message message) {
         Server2GatewayMessage toGateway = new Server2GatewayMessage();
-        toGateway.setPlayerIds(new Long[]{playerId});
-
+        toGateway.setUserIds(new Long[]{userId});
         toGateway.setMessage(message);
         toGateway.setMessageId(message.getMessageId());
-        playerGatewayMap.get(playerId).nextChannel().writeAndFlush(toGateway);
+        userGatewayMap.get(userId).nextChannel().writeAndFlush(toGateway);
 
     }
 
-    public void sendMessage2Gateway(List<Integer> playerIds, Message message) {
-        Map<Integer, GatewayPlayers> map = new HashMap<>();
-        for (Integer playerId : playerIds) {
-            GatewayChannelManager gatewayChannelServer = playerGatewayMap.get(playerId);
-            Integer number = gatewayChannelServer.getNumber();
-            GatewayPlayers gatewayPlayers = map.get(number);
-            if (gatewayPlayers == null) {
-                gatewayPlayers = new GatewayPlayers();
-                gatewayPlayers.gatewayChannelServer = gatewayChannelServer;
-                map.put(number, gatewayPlayers);
+    public void sendMessage2Gateway(List<Long> userIds, Message message) {
+        Map<Integer, GatewayUsers> map = new HashMap<>();
+        for (Long userId : userIds) {
+            GatewayChannelManager gatewayChannelManager = userGatewayMap.get(userId);
+            Integer number = gatewayChannelManager.getNumber();
+            GatewayUsers gatewayUsers = map.get(number);
+            if (gatewayUsers == null) {
+                gatewayUsers = new GatewayUsers();
+                gatewayUsers.gatewayChannelManager = gatewayChannelManager;
+                map.put(number, gatewayUsers);
             }
-            gatewayPlayers.playerIds.add(playerId);
+            gatewayUsers.userIds.add(userId);
         }
-        map.values().forEach(gatewayPlayers -> {
+        map.values().forEach(gatewayUsers -> {
             Server2GatewayMessage toGateway = new Server2GatewayMessage();
             toGateway.setMessage(message);
             toGateway.setMessageId(message.getMessageId());
-            Integer[] players = new Integer[gatewayPlayers.playerIds.size()];
-
-            gatewayPlayers.playerIds.toArray(players);
-
-            gatewayPlayers.gatewayChannelServer.nextChannel().writeAndFlush(toGateway);
-
+            Long[] users = new Long[gatewayUsers.userIds.size()];
+            gatewayUsers.userIds.toArray(users);
+            gatewayUsers.gatewayChannelManager.nextChannel().writeAndFlush(toGateway);
         });
-
     }
 
-    class GatewayPlayers {
-        List<Integer> playerIds = new ArrayList<>(16);
-        GatewayChannelManager gatewayChannelServer;
+    class GatewayUsers {
+        List<Long> userIds = new ArrayList<>(16);
+        GatewayChannelManager gatewayChannelManager;
     }
 }

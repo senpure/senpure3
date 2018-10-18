@@ -1,4 +1,4 @@
-package com.senpure.io;
+package com.senpure.io.gateway;
 
 import com.senpure.io.message.Client2GatewayMessage;
 

@@ -1,27 +1,21 @@
 package com.senpure.io.handler;
 
-import com.senpure.io.ComponentGatewayServer;
 import com.senpure.io.message.CSAskHandleMessage;
 import io.netty.channel.Channel;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 询问服务器是否可以处理该值得请求处理器
  *
- * @author senpure-generator
- * @version 2018-3-21 16:38:05
+ * @author senpure
+ * @time 2018-10-17 14:59:15
  */
-
-public class CSAskHandleMessageHandler extends AbstractInnerComponentMessageHandler<CSAskHandleMessage> {
-    @Autowired
-    private ComponentGatewayServer gatewayServer;
+public class CSAskHandleMessageHandler extends AbstractRealityMessageHandler<CSAskHandleMessage> {
 
     @Override
-    public void execute(Channel channel, int token, int playerId, CSAskHandleMessage message) {
+    public void execute(Channel channel, long token, long userId, CSAskHandleMessage message) {
+        //TODO 请在这里写下你的代码
 
-        gatewayServer.canHandleMessageValue(message.getFromMessageId(), message.getValue());
     }
-
 
     @Override
     public int handlerId() {
@@ -32,6 +26,4 @@ public class CSAskHandleMessageHandler extends AbstractInnerComponentMessageHand
     public CSAskHandleMessage getEmptyMessage() {
         return new CSAskHandleMessage();
     }
-
-
 }

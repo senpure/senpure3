@@ -1,11 +1,11 @@
 package com.senpure.io.gateway;
 
+import com.senpure.base.util.IDGenerator;
 import com.senpure.io.ChannelAttributeUtil;
-import com.senpure.io.GatewayComponentChannelServer;
-import com.senpure.io.GatewayComponentServer;
-import com.senpure.io.GatewayHandleMessageServer;
+
 import com.senpure.io.bean.HandleMessage;
 import com.senpure.io.message.*;
+import com.senpure.io.protocol.Message;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -20,8 +20,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-public class MessageExecuter {
-    private static Logger logger = LoggerFactory.getLogger(MessageExecuter.class);
+public class GatewayMessageExecuter {
+    private static Logger logger = LoggerFactory.getLogger(GatewayMessageExecuter.class);
     private ExecutorService service;
     private int csLoginMessageId = 1;
     private int csLogoutMessageId = 2;
@@ -33,27 +33,31 @@ public class MessageExecuter {
     private Message askMessage = new SCAskHandleMessage();
     private int askMessageId = askMessage.getMessageId();
 
-    private ConcurrentMap<Integer, Channel> prepLoginChannels = new ConcurrentHashMap<>(2048);
+    private IDGenerator idGenerator = new IDGenerator(0, 0);
 
-    private ConcurrentMap<Integer, Channel> playerClientChannel = new ConcurrentHashMap<>(32768);
-    private ConcurrentMap<Integer, Channel> tokenChannel = new ConcurrentHashMap<>(32768);
-    private ConcurrentMap<String, GatewayComponentServer> serverInstanceMap = new ConcurrentHashMap<>(128);
+    private ConcurrentMap<Long, Channel> prepLoginChannels = new ConcurrentHashMap<>(2048);
 
-    private ConcurrentMap<Integer, GatewayComponentServer> messageHandleMap = new ConcurrentHashMap<>(2048);
+    private ConcurrentMap<Long, Channel> userClientChannel = new ConcurrentHashMap<>(32768);
+    private ConcurrentMap<Long, Channel> tokenChannel = new ConcurrentHashMap<>(32768);
+    private ConcurrentMap<String, ServerManager> serverInstanceMap = new ConcurrentHashMap<>(128);
+
+    private ConcurrentMap<Integer, ServerManager> messageHandleMap = new ConcurrentHashMap<>(2048);
     private ConcurrentMap<Integer, GatewayHandleMessageServer> handleMessageMap = new ConcurrentHashMap<>(2048);
 
     private ConcurrentMap<Long, AskMessage> askMap = new ConcurrentHashMap<>();
 
-    public MessageExecuter() {
+    public GatewayMessageExecuter() {
         service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
     }
 
-    public MessageExecuter(ExecutorService service) {
+    public GatewayMessageExecuter(ExecutorService service) {
         this.service = service;
     }
 
     public void channelActive(Channel channel) {
-        tokenChannel.putIfAbsent(channel.hashCode(), channel);
+        Long token = idGenerator.nextId();
+        ChannelAttributeUtil.setToken(channel, token);
+        tokenChannel.putIfAbsent(token, channel);
     }
 
     //将客户端消息转发给具体的服务器
@@ -62,29 +66,27 @@ public class MessageExecuter {
             logger.info("messageId {} data {}", message.getMessageId(), message.getData()[0]);
             //登录
             if (message.getMessageId() == csLoginMessageId) {
-                prepLoginChannels.putIfAbsent(channel.hashCode(), channel);
-
+                prepLoginChannels.putIfAbsent(ChannelAttributeUtil.getToken(channel), channel);
             }
-            message.setToken(channel.hashCode());
+            message.setToken(ChannelAttributeUtil.getToken(channel));
             //转发到具体的子服务器
-            Integer playerId = ChannelAttributeUtil.getPlayerId(channel);
-            if (playerId != null) {
-                message.setPlayerId(playerId);
+            Long userId = ChannelAttributeUtil.getUserId(channel);
+            if (userId != null) {
+                message.setUserId(userId);
             }
-            Channel componentChannel = getChannel(message);
-            if (componentChannel == null) {
+            Channel serverChannel = getChannel(message);
+            if (serverChannel == null) {
                 logger.info("没有找到消息的接收服务器{}", message.getMessageId());
                 return;
             }
-            componentChannel.writeAndFlush(message);
-
+            serverChannel.writeAndFlush(message);
         });
     }
 
     public Channel getChannel(Client2GatewayMessage message) {
-        GatewayComponentServer componentServer = messageHandleMap.get(message.getMessageId());
-        if (componentServer != null) {
-            return componentServer.channel(message.getPlayerId(), message.getToken());
+        ServerManager serverManager = messageHandleMap.get(message.getMessageId());
+        if (serverManager != null) {
+            return serverManager.channel(message.getUserId(), message.getToken());
         } else {
             logger.warn("没有找到处理[{}] 的服务器", message.getMessageId());
             logger.info("{}", messageHandleMap);
@@ -103,15 +105,15 @@ public class MessageExecuter {
             return;
         }
         if (message.getMessageId() == scLoginMessageId) {
-            int playerId = message.getPlayerIds()[0];
+            long userId = message.getUserIds()[0];
             Channel clientChannel = prepLoginChannels.remove(message.getToken());
             if (clientChannel != null) {
-                ChannelAttributeUtil.setPlayerId(clientChannel, playerId);
-                playerClientChannel.putIfAbsent(playerId, clientChannel);
+                ChannelAttributeUtil.setUserId(clientChannel, userId);
+                userClientChannel.putIfAbsent(userId, clientChannel);
             }
         }
 
-        if (message.getPlayerIds().length == 0) {
+        if (message.getUserIds().length == 0) {
             Channel clientChannel = tokenChannel.get(message.getToken());
             if (clientChannel == null) {
                 logger.warn("没有找到channel{}", message.getToken());
@@ -119,10 +121,10 @@ public class MessageExecuter {
                 clientChannel.writeAndFlush(message);
             }
         } else {
-            for (Integer playerId : message.getPlayerIds()) {
-                Channel clientChannel = playerClientChannel.get(playerId);
+            for (Long userId : message.getUserIds()) {
+                Channel clientChannel = userClientChannel.get(userId);
                 if (clientChannel == null) {
-                    logger.warn("没有找到玩家{}", playerId);
+                    logger.warn("没有找到玩家{}", userId);
                 } else {
                     clientChannel.writeAndFlush(message);
                 }
@@ -135,7 +137,7 @@ public class MessageExecuter {
         SCAskHandleMessage message = new SCAskHandleMessage();
         ByteBuf buf = Unpooled.buffer();
         buf.writeBytes(server2GatewayMessage.getData());
-        message.read(buf);
+        message.read(buf, 0);
         if (message.isHandle()) {
 
         }
@@ -145,22 +147,22 @@ public class MessageExecuter {
         SCRegServerHandleMessageMessage message = new SCRegServerHandleMessageMessage();
         ByteBuf buf = Unpooled.buffer();
         buf.writeBytes(server2GatewayMessage.getData());
-        message.read(buf);
+        message.read(buf, 0);
         List<HandleMessage> handleMessages = message.getMessages();
         String serverKey = message.getServerName() + message.getIpAndFirstPort();
         logger.info("服务注册:{}:{} [{}]", message.getServerName(), message.getIpAndFirstPort(), message.getReadableServerName());
         for (HandleMessage handleMessage : handleMessages) {
             logger.info("{}", handleMessage);
         }
-        GatewayComponentServer componentServer = serverInstanceMap.get(message.getServerName());
-        if (componentServer == null) {
-            componentServer = new GatewayComponentServer();
-            serverInstanceMap.put(message.getServerName(), componentServer);
+        ServerManager serverManager = serverInstanceMap.get(message.getServerName());
+        if (serverManager == null) {
+            serverManager = new ServerManager();
+            serverInstanceMap.put(message.getServerName(), serverManager);
             for (HandleMessage handleMessage : handleMessages) {
-                componentServer.markHandleId(handleMessage.getHandleMessageId());
-                messageHandleMap.putIfAbsent(handleMessage.getHandleMessageId(), componentServer);
+                serverManager.markHandleId(handleMessage.getHandleMessageId());
+                messageHandleMap.putIfAbsent(handleMessage.getHandleMessageId(), serverManager);
             }
-            componentServer.setServerName(message.getServerName());
+            serverManager.setServerName(message.getServerName());
         }
 
         for (HandleMessage handleMessage : handleMessages) {
@@ -168,7 +170,7 @@ public class MessageExecuter {
             if (handleMessage.isServerShare()) {
                 handleMessageServer = handleMessageMap.get(handleMessage.getHandleMessageId());
                 if (handleMessage == null) {
-                    List<GatewayComponentServer> gatewayComponentServers = new ArrayList<>();
+                    List<ServerManager> serverManagers= new ArrayList<>();
                     //  handleMessageServer = new GatewayHandleMessageServer(gatewayComponentServers);
                 }
 
@@ -182,18 +184,18 @@ public class MessageExecuter {
         }
         //如果同一个服务有新的消息处理，旧得实例停止接收新的连接
         for (HandleMessage handleMessage : handleMessages) {
-            if (!componentServer.handleId(handleMessage.getHandleMessageId())) {
+            if (!serverManager.handleId(handleMessage.getHandleMessageId())) {
                 logger.info("{} 处理了新的消息{}[{}] ，旧的服务器停止接收新的请求分发", message.getServerName(), handleMessage.getHandleMessageId(), handleMessage.getMessageClasses());
-                componentServer.prepStopOldInstance();
+                serverManager.prepStopOldInstance();
                 for (HandleMessage hm : handleMessages) {
-                    componentServer.markHandleId(hm.getHandleMessageId());
+                    serverManager.markHandleId(hm.getHandleMessageId());
                 }
                 break;
             }
         }
-        GatewayComponentChannelServer componentChannelServer = componentServer.getChannelServer(serverKey);
-        componentChannelServer.addChannel(channel);
-        componentServer.checkChannelServer(serverKey, componentChannelServer);
+        ServerChannelManager serverChannelManager =serverManager.getChannelServer(serverKey);
+        serverChannelManager.addChannel(channel);
+        serverManager.checkChannelServer(serverKey, serverChannelManager);
 
     }
 
