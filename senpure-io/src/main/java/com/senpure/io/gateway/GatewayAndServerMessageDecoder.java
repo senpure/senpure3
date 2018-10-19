@@ -36,21 +36,22 @@ public class GatewayAndServerMessageDecoder extends ByteToMessageDecoder {
                 this.logger.info("数据不够一个数据包 packageLength ={} ,readableBytes={}", Integer.valueOf(packageLength), Integer.valueOf(in.readableBytes()));
                 in.resetReaderIndex();
             } else {
-                int token=in.readInt();
-                short playerLen = in.readShort();
-               Integer[] playerIds = new Integer[playerLen];
-                for (int i = 0; i <playerLen ; i++) {
-                    playerIds[i] = in.readInt();
-                }
                 int messageId = in.readInt();
-                int messageLength = packageLength - 10-(playerLen<<2);
+                long token = in.readInt();
+                short playerLen = in.readShort();
+                Long[] userIds = new Long[playerLen];
+                for (int i = 0; i < playerLen; i++) {
+                    userIds[i] = in.readLong();
+                }
+                int messageLength = packageLength - 14 - (playerLen << 3);
                 byte data[] = new byte[messageLength];
                 in.readBytes(data);
-                Server2GatewayMessage serverMessage=new Server2GatewayMessage();
+                Server2GatewayMessage serverMessage = new Server2GatewayMessage();
+                serverMessage.setMessageId(messageId);
                 serverMessage.setData(data);
                 serverMessage.setToken(token);
-                serverMessage.setMessageId(messageId);
-              //  serverMessage.setUserIds(playerIds);
+                serverMessage.setUserIds(userIds);
+                //  serverMessage.setUserIds(playerIds);
                 out.add(serverMessage);
             }
 
@@ -60,6 +61,6 @@ public class GatewayAndServerMessageDecoder extends ByteToMessageDecoder {
     public static void main(String[] args) {
 
         new ArrayList<>(17);
-        System.out.println(2&8);
+        System.out.println(2 & 8);
     }
 }

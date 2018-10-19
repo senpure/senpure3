@@ -2,7 +2,6 @@ package com.senpure.io.gateway;
 
 import com.senpure.base.util.IDGenerator;
 import com.senpure.io.ChannelAttributeUtil;
-
 import com.senpure.io.bean.HandleMessage;
 import com.senpure.io.message.*;
 import com.senpure.io.protocol.Message;
@@ -14,10 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 
 public class GatewayMessageExecuter {
@@ -28,9 +24,15 @@ public class GatewayMessageExecuter {
 
     private int scLoginMessageId = 3;
     private int scLogoutMessageId = 4;
-    private Message regServerInstanceMessage = new SCRegServerHandleMessageMessage();
-    private int regServerInstanceMessageId = regServerInstanceMessage.getMessageId();
+
+    private int regServerInstanceMessageId = new SCRegServerHandleMessageMessage().getMessageId();
+
+    private int scrRelationUserGatewayMessageId = new SCRelationUserGatewayMessage().getMessageId();
+
+    private int scBreakUserGatewayMessageId = new SCBreakUserGatewayMessage().getMessageId();
     private Message askMessage = new SCAskHandleMessage();
+
+
     private int askMessageId = askMessage.getMessageId();
 
     private IDGenerator idGenerator = new IDGenerator(0, 0);
@@ -45,6 +47,7 @@ public class GatewayMessageExecuter {
     private ConcurrentMap<Integer, GatewayHandleMessageServer> handleMessageMap = new ConcurrentHashMap<>(2048);
 
     private ConcurrentMap<Long, AskMessage> askMap = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<Long, CountDownLatch> waitRelationMap = new ConcurrentHashMap(16);
 
     public GatewayMessageExecuter() {
         service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
@@ -100,6 +103,9 @@ public class GatewayMessageExecuter {
         if (message.getMessageId() == regServerInstanceMessageId) {
             regServerInstance(channel, message);
             return;
+        } else if (message.getMessageId() == scrRelationUserGatewayMessageId) {
+
+            return;
         } else if (message.getMessageId() == askMessageId) {
             askMessage(channel, message);
             return;
@@ -137,17 +143,41 @@ public class GatewayMessageExecuter {
         SCAskHandleMessage message = new SCAskHandleMessage();
         ByteBuf buf = Unpooled.buffer();
         buf.writeBytes(server2GatewayMessage.getData());
-        message.read(buf, 0);
+        message.read(buf, buf.writerIndex());
         if (message.isHandle()) {
 
         }
+    }
+
+    public void relationMessage(Channel channel, Server2GatewayMessage server2GatewayMessage) {
+        SCRelationUserGatewayMessage message = new SCRelationUserGatewayMessage();
+        ByteBuf buf = Unpooled.buffer();
+        buf.writeBytes(server2GatewayMessage.getData());
+        message.read(buf, buf.writerIndex());
+        CountDownLatch countDownLatch = waitRelationMap.get(message.getOnceToken());
+        if (countDownLatch != null) {
+            countDownLatch.countDown();
+        }
+        else {
+//            CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
+//            breakUserGatewayMessage.setToken(message.getToken());
+//            breakUserGatewayMessage.setUserId(message.getUserId());
+//            Client2GatewayMessage toMessage = new Client2GatewayMessage();
+//            toMessage.setMessageId(csBreakUserGatewayMessageId);
+//            ByteBuf bf = Unpooled.buffer();
+//            message.write(bf);
+//            toMessage.setData(bf.array());
+//            channel.writeAndFlush(toMessage);
+           // toMessage.setData();
+        }
+
     }
 
     public synchronized void regServerInstance(Channel channel, Server2GatewayMessage server2GatewayMessage) {
         SCRegServerHandleMessageMessage message = new SCRegServerHandleMessageMessage();
         ByteBuf buf = Unpooled.buffer();
         buf.writeBytes(server2GatewayMessage.getData());
-        message.read(buf, 0);
+        message.read(buf, buf.writerIndex());
         List<HandleMessage> handleMessages = message.getMessages();
         String serverKey = message.getServerName() + message.getIpAndFirstPort();
         logger.info("服务注册:{}:{} [{}]", message.getServerName(), message.getIpAndFirstPort(), message.getReadableServerName());
@@ -156,7 +186,7 @@ public class GatewayMessageExecuter {
         }
         ServerManager serverManager = serverInstanceMap.get(message.getServerName());
         if (serverManager == null) {
-            serverManager = new ServerManager();
+            serverManager = new ServerManager(this);
             serverInstanceMap.put(message.getServerName(), serverManager);
             for (HandleMessage handleMessage : handleMessages) {
                 serverManager.markHandleId(handleMessage.getHandleMessageId());
@@ -170,7 +200,7 @@ public class GatewayMessageExecuter {
             if (handleMessage.isServerShare()) {
                 handleMessageServer = handleMessageMap.get(handleMessage.getHandleMessageId());
                 if (handleMessage == null) {
-                    List<ServerManager> serverManagers= new ArrayList<>();
+                    List<ServerManager> serverManagers = new ArrayList<>();
                     //  handleMessageServer = new GatewayHandleMessageServer(gatewayComponentServers);
                 }
 
@@ -193,7 +223,7 @@ public class GatewayMessageExecuter {
                 break;
             }
         }
-        ServerChannelManager serverChannelManager =serverManager.getChannelServer(serverKey);
+        ServerChannelManager serverChannelManager = serverManager.getChannelServer(serverKey);
         serverChannelManager.addChannel(channel);
         serverManager.checkChannelServer(serverKey, serverChannelManager);
 
@@ -202,5 +232,7 @@ public class GatewayMessageExecuter {
     public void addAskMessage(AskMessage askMessage) {
         askMap.put(askMessage.getToken(), askMessage);
     }
+
+
 
 }

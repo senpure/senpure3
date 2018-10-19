@@ -1,6 +1,6 @@
 package com.senpure.io;
 
-import com.senpure.io.message.Message;
+import com.senpure.io.bean.Message;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;

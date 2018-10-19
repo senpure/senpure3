@@ -1,7 +1,8 @@
 package com.senpure.io.server;
 
-import com.senpure.io.message.Message;
+
 import com.senpure.io.message.Server2GatewayMessage;
+import com.senpure.io.protocol.Message;
 import io.netty.channel.Channel;
 import org.slf4j.LoggerFactory;
 

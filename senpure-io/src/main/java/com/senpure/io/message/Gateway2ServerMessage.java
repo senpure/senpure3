@@ -8,7 +8,7 @@ public class Gateway2ServerMessage  {
     private long token;
     private int messageId;
 
-    private long playerId;
+    private long userId;
 
     private ByteBuf buf;
 
@@ -41,12 +41,12 @@ public class Gateway2ServerMessage  {
         this.token = token;
     }
 
-    public long getPlayerId() {
-        return playerId;
+    public long getUserId() {
+        return userId;
     }
 
-    public void setPlayerId(long playerId) {
-        this.playerId = playerId;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class Gateway2ServerMessage  {
         return "Gateway2ServerMessage{" +
                 "token=" + token +
                 ", messageId=" + messageId +
-                ", playerId=" + playerId +
+                ", userId=" + userId +
                 ", buf=" + buf.writerIndex()+
                 '}';
     }

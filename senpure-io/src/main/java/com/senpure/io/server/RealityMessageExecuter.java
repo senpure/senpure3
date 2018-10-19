@@ -1,7 +1,7 @@
 package com.senpure.io.server;
 
 import com.senpure.io.ChannelAttributeUtil;
-import com.senpure.io.ComponentMessageHandlerUtil;
+import com.senpure.io.RealityMessageHandlerUtil;
 import com.senpure.io.handler.RealityMessageHandler;
 import com.senpure.io.message.CSRelationPlayerGatewayMessage;
 import com.senpure.io.message.CSRelationUserGatewayMessage;
@@ -57,8 +57,8 @@ public class RealityMessageExecuter {
                 }
                 return;
             }
-            long playerId = gsMessage.getPlayerId();
-            RealityMessageHandler handler = ComponentMessageHandlerUtil.getHandler(gsMessage.getMessageId());
+            long playerId = gsMessage.getUserId();
+            RealityMessageHandler handler = RealityMessageHandlerUtil.getHandler(gsMessage.getMessageId());
             if (handler == null) {
                 logger.warn("没有找到消息出来程序{} playerId:{}", gsMessage.getMessageId(), playerId);
                 return;
@@ -66,7 +66,7 @@ public class RealityMessageExecuter {
             Message message = handler.getEmptyMessage();
             message.read(gsMessage.getBuf(),0);
             handler.execute(channel, gsMessage.getToken(), playerId, message);
-            //  ComponentMessageHandlerUtil.execute(gsMessage.getToken(),playerId,message);
+            //  RealityMessageHandlerUtil.execute(gsMessage.getToken(),playerId,message);
 
         });
     }

@@ -1,11 +1,14 @@
 package com.senpure.io.gateway;
 
+import com.senpure.base.util.IDGenerator;
 import com.senpure.io.message.CSRelationPlayerGatewayMessage;
 import com.senpure.io.message.CSRelationUserGatewayMessage;
 import com.senpure.io.message.Client2GatewayMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,44 +16,80 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 网关管理一个服务的多个实例 每个实例可能含有多个管道channel
  */
 public class ServerManager {
+    private IDGenerator idGenerator;
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    private GatewayMessageExecuter messageExecuter;
+
+    public ServerManager(GatewayMessageExecuter messageExecuter) {
+        this.messageExecuter = messageExecuter;
+    }
+
     private CSRelationPlayerGatewayMessage message = new CSRelationPlayerGatewayMessage();
-    private int relationMessageId = message.getMessageId();
-    private ConcurrentMap<Long, Channel> userChannelMap = new ConcurrentHashMap<>();
+    private int csRelationMessageId = message.getMessageId();
+
+    private ConcurrentMap<Long, ServerChannelManager> userServerChannelManagerMap = new ConcurrentHashMap<>();
     private List<ServerChannelManager> useChannelManagers = new ArrayList<>();
 
     private List<ServerChannelManager> prepStopOldInstance = new ArrayList<>();
     private Map<Integer, Boolean> handleIdsMap = new HashMap<>();
     private String serverName;
     private AtomicInteger atomicIndex = new AtomicInteger(-1);
+    private int relationWaitTime = 200;
+    private int waitTimeFailCount = 0;
+
+
 
     public Channel channel(Long userId, Long token) {
-        Channel channel = userChannelMap.get(userId);
-        if (channel == null) {
-            channel =nextServerChannelManager().nextChannel();
-            relationGateway(channel, token, userId);
-            return channel;
+        Channel channel = null;
+        ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(userId);
+        if (serverChannelManager == null) {
+            serverChannelManager = nextServerChannelManager();
+            channel = serverChannelManager.nextChannel();
+            Long onceToken = idGenerator.nextId();
+            CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
+            message.setToken(token);
+            message.setUserId(userId);
+            message.setOnceToken(onceToken);
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            messageExecuter.waitRelationMap.put(onceToken, countDownLatch);
+            Client2GatewayMessage toMessage = new Client2GatewayMessage();
+            toMessage.setMessageId(csRelationMessageId);
+            ByteBuf buf = Unpooled.buffer();
+            message.write(buf);
+            toMessage.setData(buf.array());
+            channel.writeAndFlush(toMessage);
+            try {
+                boolean result = countDownLatch.await(relationWaitTime, TimeUnit.MICROSECONDS);
+                if (!result) {
+                    waitTimeFailCount++;
+                    if (waitTimeFailCount >= 10) {
+                        relationWaitTime += 10;
+                        waitTimeFailCount = 0;
+                    }
+                    logger.warn("等待真实服务器返回关联结果过长 relationWaitTime {}  waitTimeFailCount{}", relationWaitTime, waitTimeFailCount);
+                    messageExecuter.waitRelationMap.remove(onceToken);
+                    return null;
+                }
+                userServerChannelManagerMap.put(userId, serverChannelManager);
+                return channel;
+            } catch (InterruptedException e) {
+                logger.error("等待关联用户与网关出错", e);
+            }
+
         }
+        channel = serverChannelManager.nextChannel();
         return channel;
     }
 
-    public void relationGateway(Channel channel, long token, long userId) {
-
-        CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
-        message.setToken(token);
-        message.setUserId(userId);
-        Client2GatewayMessage toMessage = new Client2GatewayMessage();
-        toMessage.setMessageId(relationMessageId);
-        ByteBuf buf = Unpooled.buffer();
-        message.write(buf);
-        toMessage.setData(buf.array());
-        channel.writeAndFlush(toMessage);
-    }
 
     private ServerChannelManager nextServerChannelManager() {
         ServerChannelManager manager = useChannelManagers.get(nextIndex());
@@ -62,7 +101,7 @@ public class ServerManager {
             return 0;
         }
         int index = atomicIndex.incrementAndGet();
-       return Math.abs(index % useChannelManagers.size());
+        return Math.abs(index % useChannelManagers.size());
 //        if (index >= useChannelManagers.size()) {
 //            boolean reset = atomicIndex.compareAndSet(index, 0);
 //            if (!reset) {
@@ -93,8 +132,8 @@ public class ServerManager {
                 return manager;
             }
         }
-        ServerChannelManager manager = new  ServerChannelManager();
-     manager.setServerKey(serverKey);
+        ServerChannelManager manager = new ServerChannelManager();
+        manager.setServerKey(serverKey);
         return manager;
 
     }

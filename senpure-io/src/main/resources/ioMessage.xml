@@ -22,13 +22,19 @@
     <message id="101" type="CS" name="RelationUserGateway" explain="关联用户与网关">
         <field type="long" name="token" explain="channel token"></field>
         <field type="long" name="userId" explain="用户Id"></field>
+        <field type="long" name="onceToken" explain="once token"></field>
     </message>
 
     <message id="102" type="SC" name="RelationUserGateway" explain="关联用户与网关">
         <field type="long" name="token" explain="channel token"></field>
         <field type="long" name="userId" explain="用户Id"></field>
+        <field type="long" name="onceToken" explain="once token"></field>
     </message>
 
+    <message id="201" type="CS" name="BreakUserGateway" explain="断开用户与网关">
+        <field type="long" name="token" explain="channel token"></field>
+        <field type="long" name="userId" explain="用户Id"></field>
+    </message>
     <message id="202" type="SC" name="BreakUserGateway" explain="断开用户与网关">
         <field type="long" name="token" explain="channel token"></field>
         <field type="long" name="userId" explain="用户Id"></field>

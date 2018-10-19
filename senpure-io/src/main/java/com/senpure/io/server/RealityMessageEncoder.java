@@ -18,17 +18,17 @@ public class RealityMessageEncoder extends MessageToByteEncoder<Server2GatewayMe
         ByteBuf buf = Unpooled.buffer();
         message.getMessage().write(buf);
         int length = buf.writerIndex();
-        //head 4 +messageId 4 token 4+ playerLen 2+playerIds*4+ content length
-        int playerLen = message.getUserIds().length;
-        int packageLen = 14 + (playerLen << 2) + length;
+        //head 4 +messageId 4 token 8+ playerLen 2+userLen*8+ content length
+        int userLen = message.getUserIds().length;
+        int packageLen = 18 + (userLen  << 3) + length;
         out.ensureWritable(packageLen);
         out.writeInt(packageLen - 4);
+        out.writeInt(message.getMessageId());
         out.writeLong(message.getToken());
-        out.writeShort(playerLen);
+        out.writeShort(userLen);
         for (long i : message.getUserIds()) {
             out.writeLong(i);
         }
-        out.writeInt(message.getMessageId());
         out.writeBytes(buf);
     }
 

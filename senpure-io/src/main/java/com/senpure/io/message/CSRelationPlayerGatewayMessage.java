@@ -1,5 +1,6 @@
 package com.senpure.io.message;
 
+import com.senpure.io.bean.Message;
 import io.netty.buffer.ByteBuf;
 
 /**

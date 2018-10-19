@@ -1,7 +1,4 @@
-package com.senpure.io.message;
-
-import com.senpure.io.bean.Bean;
-
+package com.senpure.io.bean;
 
 public abstract class Message extends Bean {
     public abstract int getMessageId();

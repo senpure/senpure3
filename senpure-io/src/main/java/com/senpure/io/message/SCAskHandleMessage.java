@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
  * 应答是否可以请求
  * 
  * @author senpure
- * @time 2018-10-17 14:59:15
+ * @time 2018-10-19 16:14:32
  */
 public class SCAskHandleMessage extends  Message {
     //是否可以处理

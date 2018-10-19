@@ -2,7 +2,7 @@ package com.senpure.io;
 
 
 import com.senpure.base.util.Assert;
-import com.senpure.io.message.Message;
+import com.senpure.io.bean.Message;
 import com.senpure.io.handler.MessageHandler;
 import io.netty.channel.Channel;
 

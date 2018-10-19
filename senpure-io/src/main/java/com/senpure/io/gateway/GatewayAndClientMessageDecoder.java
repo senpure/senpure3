@@ -29,6 +29,7 @@ public class GatewayAndClientMessageDecoder extends ByteToMessageDecoder {
             if (packageLength > in.readableBytes()) {
                 if (packageLength > 2000000) {
                     ctx.close().sync();
+                    return;
                 }
                 this.logger.info("数据不够一个数据包 packageLength ={} ,readableBytes={}", Integer.valueOf(packageLength), Integer.valueOf(in.readableBytes()));
                 in.resetReaderIndex();

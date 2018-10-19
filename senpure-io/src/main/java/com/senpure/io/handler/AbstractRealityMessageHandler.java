@@ -2,7 +2,7 @@ package com.senpure.io.handler;
 
 
 import com.senpure.base.util.Assert;
-import com.senpure.io.ComponentMessageHandlerUtil;
+import com.senpure.io.RealityMessageHandlerUtil;
 import com.senpure.io.protocol.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public abstract class AbstractRealityMessageHandler<T extends Message> implement
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        ComponentMessageHandlerUtil.regMessageHandler(this);
+        RealityMessageHandlerUtil.regMessageHandler(this);
 
     }
 

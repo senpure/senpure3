@@ -1,6 +1,6 @@
 package com.senpure.io;
 
-import com.senpure.io.message.Message;
+import com.senpure.io.bean.Message;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.logging.LogLevel;

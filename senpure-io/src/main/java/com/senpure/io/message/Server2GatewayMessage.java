@@ -1,5 +1,7 @@
 package com.senpure.io.message;
 
+import com.senpure.io.protocol.Message;
+
 import java.util.Arrays;
 
 

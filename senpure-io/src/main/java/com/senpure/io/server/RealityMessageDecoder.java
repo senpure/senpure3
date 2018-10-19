@@ -31,21 +31,20 @@ public class RealityMessageDecoder extends ByteToMessageDecoder {
             if (packageLength > in.readableBytes()) {
                 if (packageLength > 2000000) {
                     ctx.close().sync();
+                    return;
                 }
                 this.logger.info("数据不够一个数据包 packageLength ={} ,readableBytes={}", Integer.valueOf(packageLength), Integer.valueOf(in.readableBytes()));
                 in.resetReaderIndex();
             } else {
-
-                int token = in.readInt();
-                int playerId = in.readInt();
                 int messageId = in.readInt();
+                long token = in.readLong();
+                long userId = in.readLong();
                 Gateway2ServerMessage message = new Gateway2ServerMessage();
-                ByteBuf buf = in.readBytes(packageLength - 12);
+                ByteBuf buf = in.readBytes(packageLength - 20);
                 message.setMessageId(messageId);
                 message.setToken(token);
                 message.setBuf(buf);
-
-                message.setPlayerId(playerId);
+                message.setUserId(userId);
                 out.add(message);
             }
 
