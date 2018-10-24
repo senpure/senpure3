@@ -31,19 +31,17 @@ public class RealityServer {
     private EventLoopGroup group;
     private String serverName = "realityServer";
     private String readableServerName = "realityServer";
+    private boolean setReadbleServerName = false;
     private RealityMessageExecuter messageExecuter;
 
-    private static int firstPort = 0;
-
     private static Map<String, Integer> firstPortMap = new ConcurrentHashMap<>();
-
     private String host;
     private Channel channel;
-    private GatewayManager gatewayServer;
+    private GatewayManager gatewayManager;
 
 
     public boolean start(String host, int port) throws CertificateException, SSLException {
-        Assert.notNull(gatewayServer);
+        Assert.notNull(gatewayManager);
         Assert.notNull(messageExecuter);
         this.host = host;
         if (properties == null) {
@@ -54,9 +52,10 @@ public class RealityServer {
             ioMessageProperties.setInFormat(properties.isInFormat());
             ioMessageProperties.setOutFormat(properties.isOutFormat());
         }
-
         logger.debug("启动{}，网关地址 {}", getReadableServerName(), host + ":" + port);
-        readableServerName = readableServerName + "[" + host + ":" + port + "]";
+        if (!setReadbleServerName) {
+            readableServerName = readableServerName + "[" + host + ":" + port + "]";
+        }
         // Configure SSL.
         final SslContext sslCtx;
         if (properties.isSsl()) {
@@ -93,10 +92,10 @@ public class RealityServer {
             InetSocketAddress address = (InetSocketAddress) channel.localAddress();
             logger.info("{}启动完成", getReadableServerName());
             markFirstPort(host, address.getPort());
-            String gatewayKey=host+":"+port;
-            GatewayChannelManager channelServer = gatewayServer.getGatewayChannelServer( gatewayKey);
+            String gatewayKey = host + ":" + port;
+            GatewayChannelManager channelServer = gatewayManager.getGatewayChannelServer(gatewayKey);
             channelServer.addChannel(channel);
-            ChannelAttributeUtil.setIpAndPort(channel,gatewayKey);
+            ChannelAttributeUtil.setIpAndPort(channel, gatewayKey);
 
         } catch (Exception e) {
             logger.error("启动" + getReadableServerName() + " 失败", e);
@@ -106,7 +105,6 @@ public class RealityServer {
         return true;
 
     }
-
 
 
     public Channel getChannel() {
@@ -135,8 +133,8 @@ public class RealityServer {
 
     }
 
-    public void setGatewayServer(GatewayManager gatewayServer) {
-        this.gatewayServer = gatewayServer;
+    public void setGatewayManager(GatewayManager gatewayManager) {
+        this.gatewayManager = gatewayManager;
     }
 
     public int getFirstPort() {
@@ -162,10 +160,14 @@ public class RealityServer {
 
     public void setServerName(String serverName) {
         this.serverName = serverName;
+        if (!setReadbleServerName) {
+            readableServerName = serverName;
+        }
     }
 
 
     public void setReadableServerName(String readableServerName) {
         this.readableServerName = readableServerName;
+        setReadbleServerName = true;
     }
 }

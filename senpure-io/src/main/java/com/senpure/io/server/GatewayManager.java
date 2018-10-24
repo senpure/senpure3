@@ -59,9 +59,11 @@ public class GatewayManager {
         }
     }
 
-    public boolean canHandleMessageValue(int messageId,String value) {
-        return  false;
+    public boolean canHandleMessageValue(int messageId, String value) {
+        return false;
     }
+
+
 
     public void sendMessage2GatewayByToken(Long token, Message message) {
         Server2GatewayMessage toGateway = new Server2GatewayMessage();

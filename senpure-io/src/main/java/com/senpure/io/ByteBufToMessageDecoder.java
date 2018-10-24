@@ -2,7 +2,7 @@ package com.senpure.io;
 
 
 import com.senpure.base.util.Assert;
-import com.senpure.io.bean.Message;
+import com.senpure.io.protocol.Message;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -44,11 +44,12 @@ public class ByteBufToMessageDecoder extends ByteToMessageDecoder {
             int messageLengh = packageLength - 4;
             if (message == null) {
                 logger.warn("没有找到消息处理程序 messageId {}", messageId);
-                ctx.close();
+               // ctx.close();
                 in.skipBytes(messageLengh);
             } else {
                 try {
-                    message.read(in.copy(in.readerIndex(), packageLength - 4));
+                    message.read(in,in.readerIndex()+packageLength - 4);
+                   // message.read(in.copy(in.readerIndex(), packageLength - 4));
                     out.add(message);
                 } catch (Exception e) {
                     ctx.close();

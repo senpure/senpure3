@@ -30,12 +30,13 @@ public class GatewayMessageExecuter {
     private int scrRelationUserGatewayMessageId = new SCRelationUserGatewayMessage().getMessageId();
 
     private int scBreakUserGatewayMessageId = new SCBreakUserGatewayMessage().getMessageId();
+    private int csBreakUserGatewayMessageId = new CSBreakUserGatewayMessage().getMessageId();
     private Message askMessage = new SCAskHandleMessage();
 
 
     private int askMessageId = askMessage.getMessageId();
 
-    private IDGenerator idGenerator = new IDGenerator(0, 0);
+
 
     private ConcurrentMap<Long, Channel> prepLoginChannels = new ConcurrentHashMap<>(2048);
 
@@ -47,6 +48,8 @@ public class GatewayMessageExecuter {
     private ConcurrentMap<Integer, GatewayHandleMessageServer> handleMessageMap = new ConcurrentHashMap<>(2048);
 
     private ConcurrentMap<Long, AskMessage> askMap = new ConcurrentHashMap<>();
+
+    protected IDGenerator idGenerator = new IDGenerator(0, 0);
     protected ConcurrentHashMap<Long, CountDownLatch> waitRelationMap = new ConcurrentHashMap(16);
 
     public GatewayMessageExecuter() {
@@ -61,6 +64,7 @@ public class GatewayMessageExecuter {
         Long token = idGenerator.nextId();
         ChannelAttributeUtil.setToken(channel, token);
         tokenChannel.putIfAbsent(token, channel);
+        logger.debug(" {} 绑定 token {}",channel,token);
     }
 
     //将客户端消息转发给具体的服务器
@@ -92,8 +96,8 @@ public class GatewayMessageExecuter {
             return serverManager.channel(message.getUserId(), message.getToken());
         } else {
             logger.warn("没有找到处理[{}] 的服务器", message.getMessageId());
-            logger.info("{}", messageHandleMap);
-            logger.info("{}", serverInstanceMap);
+            logger.info(" messageHandleMap {}", messageHandleMap);
+            logger.info("serverInstanceMap {}", serverInstanceMap);
         }
         return null;
     }
@@ -105,6 +109,7 @@ public class GatewayMessageExecuter {
             return;
         } else if (message.getMessageId() == scrRelationUserGatewayMessageId) {
 
+            relationMessage(channel, message);
             return;
         } else if (message.getMessageId() == askMessageId) {
             askMessage(channel, message);
@@ -159,16 +164,16 @@ public class GatewayMessageExecuter {
             countDownLatch.countDown();
         }
         else {
-//            CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
-//            breakUserGatewayMessage.setToken(message.getToken());
-//            breakUserGatewayMessage.setUserId(message.getUserId());
-//            Client2GatewayMessage toMessage = new Client2GatewayMessage();
-//            toMessage.setMessageId(csBreakUserGatewayMessageId);
-//            ByteBuf bf = Unpooled.buffer();
-//            message.write(bf);
-//            toMessage.setData(bf.array());
-//            channel.writeAndFlush(toMessage);
-           // toMessage.setData();
+            CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
+            breakUserGatewayMessage.setToken(message.getToken());
+            breakUserGatewayMessage.setUserId(message.getUserId());
+            Client2GatewayMessage toMessage = new Client2GatewayMessage();
+            toMessage.setMessageId(csBreakUserGatewayMessageId);
+            ByteBuf bf = Unpooled.buffer();
+            message.write(bf);
+            toMessage.setData(bf.array());
+            channel.writeAndFlush(toMessage);
+
         }
 
     }
@@ -177,6 +182,7 @@ public class GatewayMessageExecuter {
         SCRegServerHandleMessageMessage message = new SCRegServerHandleMessageMessage();
         ByteBuf buf = Unpooled.buffer();
         buf.writeBytes(server2GatewayMessage.getData());
+        logger.info("writerIndex {} readerIndex {} ",buf.writerIndex(),buf.readerIndex());
         message.read(buf, buf.writerIndex());
         List<HandleMessage> handleMessages = message.getMessages();
         String serverKey = message.getServerName() + message.getIpAndFirstPort();
@@ -201,11 +207,11 @@ public class GatewayMessageExecuter {
                 handleMessageServer = handleMessageMap.get(handleMessage.getHandleMessageId());
                 if (handleMessage == null) {
                     List<ServerManager> serverManagers = new ArrayList<>();
-                    //  handleMessageServer = new GatewayHandleMessageServer(gatewayComponentServers);
+                      handleMessageServer = new GatewayHandleMessageServer(handleMessage.getMessageType());
                 }
 
             } else {
-                // handleMessageServer = new GatewayHandleMessageServer(componentServer);
+                 handleMessageServer = new GatewayHandleMessageServer(handleMessage.getMessageType());
             }
             handleMessageServer.setNumStart(handleMessage.getNumStart());
             handleMessageServer.setNumEnd(handleMessage.getNumEnd());

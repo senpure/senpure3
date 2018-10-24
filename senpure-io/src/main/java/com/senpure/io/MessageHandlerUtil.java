@@ -2,8 +2,8 @@ package com.senpure.io;
 
 
 import com.senpure.base.util.Assert;
-import com.senpure.io.bean.Message;
 import com.senpure.io.handler.MessageHandler;
+import com.senpure.io.protocol.Message;
 import io.netty.channel.Channel;
 
 import java.util.HashMap;

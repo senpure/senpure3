@@ -19,7 +19,7 @@ public class GatewayAndClientServerHandler extends SimpleChannelInboundHandler<C
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         messageExecuter.channelActive(ctx.channel());
-        super.channelActive(ctx);
+        //super.channelActive(ctx);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.senpure.io.gateway;
 
-import com.senpure.base.util.IDGenerator;
 import com.senpure.io.message.CSRelationPlayerGatewayMessage;
 import com.senpure.io.message.CSRelationUserGatewayMessage;
 import com.senpure.io.message.Client2GatewayMessage;
@@ -24,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 网关管理一个服务的多个实例 每个实例可能含有多个管道channel
  */
 public class ServerManager {
-    private IDGenerator idGenerator;
+
 
     private Logger logger = LoggerFactory.getLogger(getClass());
     private GatewayMessageExecuter messageExecuter;
@@ -37,6 +36,7 @@ public class ServerManager {
     private int csRelationMessageId = message.getMessageId();
 
     private ConcurrentMap<Long, ServerChannelManager> userServerChannelManagerMap = new ConcurrentHashMap<>();
+
     private List<ServerChannelManager> useChannelManagers = new ArrayList<>();
 
     private List<ServerChannelManager> prepStopOldInstance = new ArrayList<>();
@@ -46,7 +46,30 @@ public class ServerManager {
     private int relationWaitTime = 200;
     private int waitTimeFailCount = 0;
 
-
+    //不用等待返回
+    public Channel channel2(Long userId, Long token) {
+        Channel channel = null;
+        ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(userId);
+        if (serverChannelManager == null) {
+            serverChannelManager = nextServerChannelManager();
+            channel = serverChannelManager.nextChannel();
+            Long onceToken = messageExecuter.idGenerator.nextId();
+            CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
+            message.setToken(token);
+            message.setUserId(userId);
+            message.setOnceToken(onceToken);
+            Client2GatewayMessage toMessage = new Client2GatewayMessage();
+            toMessage.setMessageId(csRelationMessageId);
+            ByteBuf buf = Unpooled.buffer();
+            message.write(buf);
+            toMessage.setData(buf.array());
+            channel.writeAndFlush(toMessage);
+            userServerChannelManagerMap.put(userId, serverChannelManager);
+            return channel;
+        }
+        channel = serverChannelManager.nextChannel();
+        return channel;
+    }
 
     public Channel channel(Long userId, Long token) {
         Channel channel = null;
@@ -54,7 +77,7 @@ public class ServerManager {
         if (serverChannelManager == null) {
             serverChannelManager = nextServerChannelManager();
             channel = serverChannelManager.nextChannel();
-            Long onceToken = idGenerator.nextId();
+            Long onceToken = messageExecuter.idGenerator.nextId();
             CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
             message.setToken(token);
             message.setUserId(userId);
@@ -68,14 +91,14 @@ public class ServerManager {
             toMessage.setData(buf.array());
             channel.writeAndFlush(toMessage);
             try {
-                boolean result = countDownLatch.await(relationWaitTime, TimeUnit.MICROSECONDS);
+                boolean result = countDownLatch.await(relationWaitTime, TimeUnit.MILLISECONDS);
                 if (!result) {
                     waitTimeFailCount++;
                     if (waitTimeFailCount >= 10) {
                         relationWaitTime += 10;
                         waitTimeFailCount = 0;
                     }
-                    logger.warn("等待真实服务器返回关联结果过长 relationWaitTime {}  waitTimeFailCount{}", relationWaitTime, waitTimeFailCount);
+                    logger.warn("等待真实服务器返回关联结果过长 relationWaitTime {}  waitTimeFailCount {}", relationWaitTime, waitTimeFailCount);
                     messageExecuter.waitRelationMap.remove(onceToken);
                     return null;
                 }

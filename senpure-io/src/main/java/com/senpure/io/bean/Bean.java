@@ -6,6 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.UnsupportedEncodingException;
 
 
+/**
+ * @see com.senpure.io.protocol.Bean
+ */
+@Deprecated
 public abstract class Bean {
     public abstract void write(ByteBuf buf);
 

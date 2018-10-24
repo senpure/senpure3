@@ -1,6 +1,7 @@
 package com.senpure.io.handler;
 
-import com.senpure.io.bean.Message;
+
+import com.senpure.io.protocol.Message;
 import io.netty.channel.Channel;
 
 

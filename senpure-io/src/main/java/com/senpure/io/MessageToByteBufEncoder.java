@@ -1,8 +1,8 @@
 package com.senpure.io;
 
-import com.senpure.io.bean.Message;
+
+import com.senpure.io.protocol.Message;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.slf4j.Logger;
@@ -16,16 +16,16 @@ public class MessageToByteBufEncoder extends MessageToByteEncoder<Message> {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Message message, ByteBuf out) throws Exception {
 
-
-        ByteBuf buf = Unpooled.buffer();
-        message.write(buf);
-        int length = buf.writerIndex();
+        int length = message.getSerializedSize();
        // logger.debug("message length {}", length);
         //head 4 +messageId 4+ content length
+
         out.ensureWritable(8 + length);
         out.writeInt(length + 4);
         out.writeInt(message.getMessageId());
-        out.writeBytes(buf);
+
+        message.write(out);
+
        // logger.debug("out length {}", out.writerIndex());
 
 

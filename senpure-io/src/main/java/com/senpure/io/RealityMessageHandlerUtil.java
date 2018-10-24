@@ -2,7 +2,6 @@ package com.senpure.io;
 
 
 import com.senpure.base.util.Assert;
-import com.senpure.io.bean.HandleMessage;
 import com.senpure.io.handler.RealityMessageHandler;
 import com.senpure.io.protocol.Message;
 
@@ -20,13 +19,14 @@ public class RealityMessageHandlerUtil {
     }
 
 
-    public List<HandleMessage> regMessageIds = new ArrayList<>(128);
+    private static List<Integer> regMessageIds = new ArrayList<>(128);
+
     public static void regMessageHandler(RealityMessageHandler handler) {
         Assert.isNull(handlerMap.get(handler.handlerId()), handler.handlerId() + " -> " + handler.getEmptyMessage().getClass().getName() + "  处理程序已经存在");
         handlerMap.put(handler.handlerId(), handler);
 
         if (handler.regToGateway()) {
-            HandleMessage handleMessage=new HandleMessage();
+            regMessageIds.add(handler.handlerId());
 
         }
     }
@@ -40,6 +40,6 @@ public class RealityMessageHandlerUtil {
     }
 
     public static List<Integer> getHandlerMessageIds() {
-        return new ArrayList<>(handlerMap.keySet());
+        return new ArrayList<>(regMessageIds);
     }
 }

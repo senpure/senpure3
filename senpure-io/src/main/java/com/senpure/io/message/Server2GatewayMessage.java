@@ -17,9 +17,6 @@ public class Server2GatewayMessage {
     private byte[] data;
 
 
-
-
-
     public int getMessageId() {
         return messageId;
     }
@@ -60,13 +57,15 @@ public class Server2GatewayMessage {
         this.token = token;
     }
 
-    @Override
+
     public String toString() {
         return "Server2GatewayMessage{" +
-                "userIds=" + Arrays.toString(userIds) +
+                "messageId=" + messageId +
                 ", token=" + token +
-                ", messageId=" + messageId +
-                ", data=" + data==null?"":data.length+""+
+                ", userIds=" + Arrays.toString(userIds) +
+                ", dataLen=" + (data == null ? 0 : data.length) +
                 '}';
     }
+
+
 }
