@@ -3,7 +3,8 @@ package com.senpure.base.util;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class DateFormatUtil {
@@ -20,24 +21,26 @@ public class DateFormatUtil {
      * DATE FORMAT PATTERN YEAR TO Day like 2017-12-12
      */
     public static final String DFP_Y2D = "yyyy-MM-dd";
-    private static ConcurrentHashMap<String, DateFormat> dateFormatMap = new ConcurrentHashMap<>();
 
+    private static ThreadLocal<Map<String, DateFormat>> threadLocal = ThreadLocal.withInitial(() -> new HashMap<>());
 
-    public static DateFormat S_Y_S = getDateFormat("yyyyMMddHHmmss");
-    public static DateFormat S_Y_D = getDateFormat("yyyyMMdd");
-    public static DateFormat S_Y_M = getDateFormat("yyyyMM");
     public static DateFormat getDateFormat(String pattern) {
+        Map<String, DateFormat> dateFormatMap = threadLocal.get();
         DateFormat dateFormat = dateFormatMap.get(pattern);
         if (dateFormat != null) {
             return dateFormat;
         }
         dateFormat = new SimpleDateFormat(pattern);
-        try {
-            dateFormat.format(new Date());
-            dateFormatMap.putIfAbsent(pattern, dateFormat);
-        } catch (Exception e) {
-            Assert.error("格式化日期参数不对 " + pattern + "\n" + e.toString());
-        }
+        dateFormatMap.put(pattern, dateFormat);
         return dateFormatMap.get(pattern);
+    }
+
+    public static String format(Date date, String pattern) {
+
+        return getDateFormat(pattern).format(date);
+    }
+    public static String format(Date date) {
+
+        return getDateFormat(DFP_Y2S).format(date);
     }
 }
