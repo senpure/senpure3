@@ -8,11 +8,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@Component
+
 public class Spring implements ApplicationContextAware {
 
     protected static Logger logger = LogManager.getLogger(Spring.class);
