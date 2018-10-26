@@ -1,6 +1,6 @@
 package com.senpure.io.gateway;
 
-import com.senpure.io.message.CSRelationPlayerGatewayMessage;
+
 import com.senpure.io.message.CSRelationUserGatewayMessage;
 import com.senpure.io.message.Client2GatewayMessage;
 import io.netty.buffer.ByteBuf;
@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 网关管理一个服务的多个实例 每个实例可能含有多个管道channel
+ * 一个服务对应一个 serverManager
  */
 public class ServerManager {
 
@@ -32,8 +33,8 @@ public class ServerManager {
         this.messageExecuter = messageExecuter;
     }
 
-    private CSRelationPlayerGatewayMessage message = new CSRelationPlayerGatewayMessage();
-    private int csRelationMessageId = message.getMessageId();
+
+    private int csRelationMessageId = new CSRelationUserGatewayMessage().getMessageId();
 
     private ConcurrentMap<Long, ServerChannelManager> userServerChannelManagerMap = new ConcurrentHashMap<>();
 
@@ -125,14 +126,6 @@ public class ServerManager {
         }
         int index = atomicIndex.incrementAndGet();
         return Math.abs(index % useChannelManagers.size());
-//        if (index >= useChannelManagers.size()) {
-//            boolean reset = atomicIndex.compareAndSet(index, 0);
-//            if (!reset) {
-//                return nextIndex();
-//            }
-//            return 0;
-//        }
-//        return index;
     }
 
     public synchronized void prepStopOldInstance() {
@@ -165,18 +158,23 @@ public class ServerManager {
         return useChannelManagers;
     }
 
-    public synchronized void checkChannelServer(String serverKey, ServerChannelManager channelServer) {
+    public synchronized void checkChannelServer(String serverKey, ServerChannelManager channelManager) {
         for (ServerChannelManager manager : useChannelManagers) {
             if (manager.getServerKey().equals(serverKey)) {
                 return;
             }
         }
-        useChannelManagers.add(channelServer);
+        useChannelManagers.add(channelManager);
     }
 
     public void markHandleId(int messageId) {
         handleIdsMap.put(messageId, true);
     }
+
+    public List<Integer> getHandleIds() {
+        return new ArrayList<>(handleIdsMap.keySet());
+    }
+
 
     public boolean handleId(int messageId) {
         return handleIdsMap.get(messageId) != null;

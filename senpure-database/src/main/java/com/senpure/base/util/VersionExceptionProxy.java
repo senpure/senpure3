@@ -5,16 +5,16 @@ import com.senpure.base.annotation.Retry;
 import com.senpure.base.exception.OptimisticLockingFailureException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-
-@Aspect
-@Component
+/**
+ * 取消这个功能，保留代码以后参考
+ */
+//@Aspect
+//@Component
 public class VersionExceptionProxy {
 
     private ThreadLocal<Proxy> proxy = new ThreadLocal();

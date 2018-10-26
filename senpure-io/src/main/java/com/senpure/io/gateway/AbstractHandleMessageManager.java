@@ -1,10 +1,12 @@
 package com.senpure.io.gateway;
 
-import com.senpure.io.message.Client2GatewayMessage;
-
-
-public class GatewayHandleMessageServer {
-
+/**
+ * AbstractHandleMessageManager
+ *
+ * @author senpure
+ * @time 2018-10-25 15:13:28
+ */
+public abstract class AbstractHandleMessageManager {
 
     private int messageType;
     private long numStart;
@@ -13,14 +15,6 @@ public class GatewayHandleMessageServer {
     private boolean serverShare;
 
 
-    public void  handleMessage(Client2GatewayMessage message){}
-    public GatewayHandleMessageServer(int messageType) {
-        this.messageType = messageType;
-    }
-
-    public boolean handleRange(long num) {
-        return num >= numStart && num <= numEnd;
-    }
 
     public int getMessageType() {
         return messageType;

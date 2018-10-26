@@ -11,7 +11,6 @@ import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -37,7 +36,6 @@ public class GatewayMessageExecuter {
     private int askMessageId = askMessage.getMessageId();
 
 
-
     private ConcurrentMap<Long, Channel> prepLoginChannels = new ConcurrentHashMap<>(2048);
 
     private ConcurrentMap<Long, Channel> userClientChannel = new ConcurrentHashMap<>(32768);
@@ -45,7 +43,7 @@ public class GatewayMessageExecuter {
     private ConcurrentMap<String, ServerManager> serverInstanceMap = new ConcurrentHashMap<>(128);
 
     private ConcurrentMap<Integer, ServerManager> messageHandleMap = new ConcurrentHashMap<>(2048);
-    private ConcurrentMap<Integer, GatewayHandleMessageServer> handleMessageMap = new ConcurrentHashMap<>(2048);
+    private ConcurrentMap<Integer, HandleMessageManager> handleMessageManagerMap = new ConcurrentHashMap<>(2048);
 
     private ConcurrentMap<Long, AskMessage> askMap = new ConcurrentHashMap<>();
 
@@ -64,7 +62,7 @@ public class GatewayMessageExecuter {
         Long token = idGenerator.nextId();
         ChannelAttributeUtil.setToken(channel, token);
         tokenChannel.putIfAbsent(token, channel);
-        logger.debug(" {} 绑定 token {}",channel,token);
+        logger.debug(" {} 绑定 token {}", channel, token);
     }
 
     //将客户端消息转发给具体的服务器
@@ -162,8 +160,7 @@ public class GatewayMessageExecuter {
         CountDownLatch countDownLatch = waitRelationMap.get(message.getOnceToken());
         if (countDownLatch != null) {
             countDownLatch.countDown();
-        }
-        else {
+        } else {
             CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
             breakUserGatewayMessage.setToken(message.getToken());
             breakUserGatewayMessage.setUserId(message.getUserId());
@@ -182,7 +179,7 @@ public class GatewayMessageExecuter {
         SCRegServerHandleMessageMessage message = new SCRegServerHandleMessageMessage();
         ByteBuf buf = Unpooled.buffer();
         buf.writeBytes(server2GatewayMessage.getData());
-        logger.info("writerIndex {} readerIndex {} ",buf.writerIndex(),buf.readerIndex());
+        logger.info("writerIndex {} readerIndex {} ", buf.writerIndex(), buf.readerIndex());
         message.read(buf, buf.writerIndex());
         List<HandleMessage> handleMessages = message.getMessages();
         String serverKey = message.getServerName() + message.getIpAndFirstPort();
@@ -201,24 +198,24 @@ public class GatewayMessageExecuter {
             serverManager.setServerName(message.getServerName());
         }
 
-        for (HandleMessage handleMessage : handleMessages) {
-            GatewayHandleMessageServer handleMessageServer = null;
-            if (handleMessage.isServerShare()) {
-                handleMessageServer = handleMessageMap.get(handleMessage.getHandleMessageId());
-                if (handleMessage == null) {
-                    List<ServerManager> serverManagers = new ArrayList<>();
-                      handleMessageServer = new GatewayHandleMessageServer(handleMessage.getMessageType());
-                }
-
-            } else {
-                 handleMessageServer = new GatewayHandleMessageServer(handleMessage.getMessageType());
-            }
-            handleMessageServer.setNumStart(handleMessage.getNumStart());
-            handleMessageServer.setNumEnd(handleMessage.getNumEnd());
-            handleMessageServer.setMessageType(handleMessage.getMessageType());
-            handleMessageServer.setValueType(handleMessage.getValueType());
-        }
-        //如果同一个服务有新的消息处理，旧得实例停止接收新的连接
+//        for (HandleMessage handleMessage : handleMessages) {
+//            HandleMessageManager handleMessageManager = null;
+//            if (handleMessage.isServerShare()) {
+//                handleMessageManager = handleMessageManagerMap.get(handleMessage.getHandleMessageId());
+//                if (handleMessage == null) {
+//                    List<ServerManager> serverManagers = new ArrayList<>();
+//                      handleMessageManager = new HandleMessageManager(handleMessage.getMessageType());
+//                }
+//
+//            } else {
+//                 handleMessageManager = new HandleMessageManager(handleMessage.getMessageType());
+//            }
+//            handleMessageManager.setNumStart(handleMessage.getNumStart());
+//            handleMessageManager.setNumEnd(handleMessage.getNumEnd());
+//            handleMessageManager.setMessageType(handleMessage.getMessageType());
+//            handleMessageManager.setValueType(handleMessage.getValueType());
+//        }
+        //如果同一个服务处理消息id不一致，旧得实例停止接收新的连接
         for (HandleMessage handleMessage : handleMessages) {
             if (!serverManager.handleId(handleMessage.getHandleMessageId())) {
                 logger.info("{} 处理了新的消息{}[{}] ，旧的服务器停止接收新的请求分发", message.getServerName(), handleMessage.getHandleMessageId(), handleMessage.getMessageClasses());
@@ -229,16 +226,36 @@ public class GatewayMessageExecuter {
                 break;
             }
         }
+        for (Integer id : serverManager.getHandleIds()) {
+            boolean discard = true;
+            for (HandleMessage handleMessage : handleMessages) {
+                if (handleMessage.getHandleMessageId() == id.intValue()) {
+                    discard = false;
+                    break;
+                }
+            }
+            if (discard) {
+                logger.info("{} 丢弃了消息{} ，旧的服务器停止接收新的请求分发", message.getServerName(), id);
+                serverManager.prepStopOldInstance();
+                for (HandleMessage hm : handleMessages) {
+                    serverManager.markHandleId(hm.getHandleMessageId());
+                }
+                break;
+            }
+        }
+
         ServerChannelManager serverChannelManager = serverManager.getChannelServer(serverKey);
+
         serverChannelManager.addChannel(channel);
         serverManager.checkChannelServer(serverKey, serverChannelManager);
-
+        for (HandleMessage handleMessage : handleMessages) {
+            ServerHandleMessageInfo messageInfo = new  ServerHandleMessageInfo();
+        }
     }
 
     public void addAskMessage(AskMessage askMessage) {
         askMap.put(askMessage.getToken(), askMessage);
     }
-
 
 
 }
