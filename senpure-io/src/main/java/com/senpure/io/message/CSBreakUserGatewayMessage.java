@@ -7,13 +7,15 @@ import io.netty.buffer.ByteBuf;
  * 断开用户与网关
  * 
  * @author senpure
- * @time 2018-10-19 16:14:32
+ * @time 2018-11-1 15:06:13
  */
 public class CSBreakUserGatewayMessage extends  Message {
     //channel token
     private long token;
     //用户Id
     private long userId;
+    //relation token
+    private long relationToken;
     /**
      * 写入字节缓存
      */
@@ -24,6 +26,8 @@ public class CSBreakUserGatewayMessage extends  Message {
         writeVar64(buf,8,token);
         //用户Id
         writeVar64(buf,16,userId);
+        //relation token
+        writeVar64(buf,24,relationToken);
     }
 
     /**
@@ -43,6 +47,10 @@ public class CSBreakUserGatewayMessage extends  Message {
                 //用户Id
                 case 16:// 2 << 3 | 0
                         userId = readVar64(buf);
+                    break;
+                //relation token
+                case 24:// 3 << 3 | 0
+                        relationToken = readVar64(buf);
                     break;
                 default://skip
                     skip(buf, tag);
@@ -64,6 +72,8 @@ public class CSBreakUserGatewayMessage extends  Message {
         size += computeVar64Size(1,token);
         //用户Id
         size += computeVar64Size(1,userId);
+        //relation token
+        size += computeVar64Size(1,relationToken);
         serializedSize = size ;
         return size ;
     }
@@ -98,6 +108,21 @@ public class CSBreakUserGatewayMessage extends  Message {
         this.userId=userId;
         return this;
     }
+    /**
+     * get relation token
+     * @return
+     */
+    public  long getRelationToken() {
+        return relationToken;
+    }
+
+    /**
+     * set relation token
+     */
+    public CSBreakUserGatewayMessage setRelationToken(long relationToken) {
+        this.relationToken=relationToken;
+        return this;
+    }
 
     @Override
     public int getMessageId() {
@@ -109,11 +134,12 @@ public class CSBreakUserGatewayMessage extends  Message {
         return "CSBreakUserGatewayMessage[1201]{"
                 +"token=" + token
                 +",userId=" + userId
+                +",relationToken=" + relationToken
                 + "}";
    }
 
-    //最长字段长度 6
-    private int filedPad = 6;
+    //最长字段长度 13
+    private int filedPad = 13;
 
     @Override
     public String toString(String indent) {
@@ -126,6 +152,9 @@ public class CSBreakUserGatewayMessage extends  Message {
         //用户Id
         sb.append("\n");
         sb.append(indent).append(rightPad("userId", filedPad)).append(" = ").append(userId);
+        //relation token
+        sb.append("\n");
+        sb.append(indent).append(rightPad("relationToken", filedPad)).append(" = ").append(relationToken);
         sb.append("\n");
         sb.append(indent).append("}");
         return sb.toString();

@@ -7,15 +7,15 @@ import io.netty.buffer.ByteBuf;
  * 关联用户与网关
  * 
  * @author senpure
- * @time 2018-10-19 16:14:32
+ * @time 2018-11-1 15:06:13
  */
 public class SCRelationUserGatewayMessage extends  Message {
     //channel token
     private long token;
     //用户Id
     private long userId;
-    //once token
-    private long onceToken;
+    //relation token
+    private long relationToken;
     /**
      * 写入字节缓存
      */
@@ -26,8 +26,8 @@ public class SCRelationUserGatewayMessage extends  Message {
         writeVar64(buf,8,token);
         //用户Id
         writeVar64(buf,16,userId);
-        //once token
-        writeVar64(buf,24,onceToken);
+        //relation token
+        writeVar64(buf,24,relationToken);
     }
 
     /**
@@ -48,9 +48,9 @@ public class SCRelationUserGatewayMessage extends  Message {
                 case 16:// 2 << 3 | 0
                         userId = readVar64(buf);
                     break;
-                //once token
+                //relation token
                 case 24:// 3 << 3 | 0
-                        onceToken = readVar64(buf);
+                        relationToken = readVar64(buf);
                     break;
                 default://skip
                     skip(buf, tag);
@@ -72,8 +72,8 @@ public class SCRelationUserGatewayMessage extends  Message {
         size += computeVar64Size(1,token);
         //用户Id
         size += computeVar64Size(1,userId);
-        //once token
-        size += computeVar64Size(1,onceToken);
+        //relation token
+        size += computeVar64Size(1,relationToken);
         serializedSize = size ;
         return size ;
     }
@@ -109,18 +109,18 @@ public class SCRelationUserGatewayMessage extends  Message {
         return this;
     }
     /**
-     * get once token
+     * get relation token
      * @return
      */
-    public  long getOnceToken() {
-        return onceToken;
+    public  long getRelationToken() {
+        return relationToken;
     }
 
     /**
-     * set once token
+     * set relation token
      */
-    public SCRelationUserGatewayMessage setOnceToken(long onceToken) {
-        this.onceToken=onceToken;
+    public SCRelationUserGatewayMessage setRelationToken(long relationToken) {
+        this.relationToken=relationToken;
         return this;
     }
 
@@ -134,12 +134,12 @@ public class SCRelationUserGatewayMessage extends  Message {
         return "SCRelationUserGatewayMessage[1102]{"
                 +"token=" + token
                 +",userId=" + userId
-                +",onceToken=" + onceToken
+                +",relationToken=" + relationToken
                 + "}";
    }
 
-    //最长字段长度 9
-    private int filedPad = 9;
+    //最长字段长度 13
+    private int filedPad = 13;
 
     @Override
     public String toString(String indent) {
@@ -152,9 +152,9 @@ public class SCRelationUserGatewayMessage extends  Message {
         //用户Id
         sb.append("\n");
         sb.append(indent).append(rightPad("userId", filedPad)).append(" = ").append(userId);
-        //once token
+        //relation token
         sb.append("\n");
-        sb.append(indent).append(rightPad("onceToken", filedPad)).append(" = ").append(onceToken);
+        sb.append(indent).append(rightPad("relationToken", filedPad)).append(" = ").append(relationToken);
         sb.append("\n");
         sb.append(indent).append("}");
         return sb.toString();

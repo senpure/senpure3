@@ -1,47 +1,107 @@
 package com.senpure.io.gateway;
 
+import com.senpure.base.util.Assert;
+import com.senpure.io.message.CSAskHandleMessage;
+import com.senpure.io.message.Client2GatewayMessage;
+import com.senpure.io.protocol.Bean;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * 当前设计direct 会执行一个具体的服务器绑定
+ * 所以 direct 与 serverShare 不能同时为true
+ */
 public class HandleMessageManager {
 
 
-    private int messageType;
-    private long numStart;
-    private long numEnd;
-    private int valueType;
+    private boolean direct;
     private boolean serverShare;
-
+    private List<ServerManager> serverManagers = new ArrayList<>();
     private ServerManager serverManager;
+    private GatewayMessageExecuter messageExecuter;
+    private AtomicInteger atomicIndex = new AtomicInteger(-1);
+    private int handId = 0;
 
+    public HandleMessageManager(int handId, boolean direct, boolean serverShare, GatewayMessageExecuter messageExecuter) {
+        this.direct = direct;
+        this.serverShare = serverShare;
+        this.messageExecuter = messageExecuter;
+        this.handId = handId;
+        if (direct && serverShare) {
+            Assert.error("direct 与 serverShare 不能同时为true ");
+        }
 
-    public int getMessageType() {
-        return messageType;
     }
 
-    public void setMessageType(int messageType) {
-        this.messageType = messageType;
+    public synchronized void addServerManager(int handId, ServerManager serverManager) {
+        if (this.handId != handId) {
+
+            Assert.error("handId 不匹配");
+        }
+        boolean add = true;
+        for (ServerManager manager : serverManagers) {
+            if (manager.getServerName().equalsIgnoreCase(serverManager.getServerName())) {
+                add = false;
+                break;
+            }
+        }
+        if (add) {
+            if (serverManagers.size() >= 1 && direct) {
+                Assert.error("direct 与 serverShare 不能同时为true ");
+            }
+            serverManagers.add(serverManager);
+        }
+        if (direct) {
+            this.serverManager = serverManager;
+        }
     }
 
-    public long getNumStart() {
-        return numStart;
+    public void execute(Client2GatewayMessage message) {
+        if (direct) {
+            serverManager.sendMessage(message);
+        } else {
+            ByteBuf buf = Unpooled.buffer();
+            buf.writeBytes(message.getData());
+            String value = Bean.readString(buf);
+            CSAskHandleMessage askHandleMessage = new CSAskHandleMessage();
+            askHandleMessage.setFromMessageId(message.getMessageId());
+            askHandleMessage.setToken(messageExecuter.idGenerator.nextId());
+            askHandleMessage.setValue(value);
+            Client2GatewayMessage temp = new Client2GatewayMessage();
+            temp.setToken(message.getToken());
+            temp.setUserId(message.getUserId());
+            buf = Unpooled.buffer();
+            askHandleMessage.write(buf);
+            temp.setData(buf.array());
+            for (ServerManager serverManager : serverManagers) {
+                Channel channel = serverManager.nextServerChannelManager().nextChannel();
+                if (channel != null) {
+                    channel.writeAndFlush(temp);
+                }
+            }
+        }
     }
 
-    public void setNumStart(long numStart) {
-        this.numStart = numStart;
+    private int nextIndex() {
+        if (serverManagers.size() == 0) {
+            return 0;
+        }
+        int index = atomicIndex.incrementAndGet();
+        return Math.abs(index % serverManagers.size());
     }
 
-    public long getNumEnd() {
-        return numEnd;
+
+    public boolean isDirect() {
+        return direct;
     }
 
-    public void setNumEnd(long numEnd) {
-        this.numEnd = numEnd;
-    }
-
-    public int getValueType() {
-        return valueType;
-    }
-
-    public void setValueType(int valueType) {
-        this.valueType = valueType;
+    public void setDirect(boolean direct) {
+        this.direct = direct;
     }
 
     public boolean isServerShare() {
@@ -52,11 +112,4 @@ public class HandleMessageManager {
         this.serverShare = serverShare;
     }
 
-    public ServerManager getServerManager() {
-        return serverManager;
-    }
-
-    public void setServerManager(ServerManager serverManager) {
-        this.serverManager = serverManager;
-    }
 }

@@ -1,6 +1,7 @@
 package com.senpure.io.gateway;
 
 import com.senpure.base.util.IDGenerator;
+import com.senpure.base.util.NameThreadFactory;
 import com.senpure.io.ChannelAttributeUtil;
 import com.senpure.io.bean.HandleMessage;
 import com.senpure.io.message.*;
@@ -11,30 +12,27 @@ import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 
 public class GatewayMessageExecuter {
-    private static Logger logger = LoggerFactory.getLogger(GatewayMessageExecuter.class);
-    private ExecutorService service;
+    protected static Logger logger = LoggerFactory.getLogger(GatewayMessageExecuter.class);
+    private ScheduledExecutorService service;
     private int csLoginMessageId = 1;
     private int csLogoutMessageId = 2;
 
     private int scLoginMessageId = 3;
     private int scLogoutMessageId = 4;
-
     private int regServerInstanceMessageId = new SCRegServerHandleMessageMessage().getMessageId();
-
     private int scrRelationUserGatewayMessageId = new SCRelationUserGatewayMessage().getMessageId();
-
     private int scBreakUserGatewayMessageId = new SCBreakUserGatewayMessage().getMessageId();
     private int csBreakUserGatewayMessageId = new CSBreakUserGatewayMessage().getMessageId();
     private Message askMessage = new SCAskHandleMessage();
 
-
     private int askMessageId = askMessage.getMessageId();
-
 
     private ConcurrentMap<Long, Channel> prepLoginChannels = new ConcurrentHashMap<>(2048);
 
@@ -47,14 +45,18 @@ public class GatewayMessageExecuter {
 
     private ConcurrentMap<Long, AskMessage> askMap = new ConcurrentHashMap<>();
 
+
     protected IDGenerator idGenerator = new IDGenerator(0, 0);
-    protected ConcurrentHashMap<Long, CountDownLatch> waitRelationMap = new ConcurrentHashMap(16);
+    protected ConcurrentHashMap<Long, WaitRelationTask> waitRelationMap = new ConcurrentHashMap(16);
 
     public GatewayMessageExecuter() {
-        service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+
+        service = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() * 2,
+                new NameThreadFactory("gateway-executor"));
+
     }
 
-    public GatewayMessageExecuter(ExecutorService service) {
+    public GatewayMessageExecuter(ScheduledExecutorService service) {
         this.service = service;
     }
 
@@ -67,6 +69,7 @@ public class GatewayMessageExecuter {
 
     //将客户端消息转发给具体的服务器
     public void execute(final Channel channel, final Client2GatewayMessage message) {
+
         service.execute(() -> {
             logger.info("messageId {} data {}", message.getMessageId(), message.getData()[0]);
             //登录
@@ -79,12 +82,13 @@ public class GatewayMessageExecuter {
             if (userId != null) {
                 message.setUserId(userId);
             }
-            Channel serverChannel = getChannel(message);
-            if (serverChannel == null) {
-                logger.info("没有找到消息的接收服务器{}", message.getMessageId());
+            HandleMessageManager handleMessageManager = handleMessageManagerMap.get(message.getMessageId());
+            if (handleMessageManager == null) {
+                logger.warn("没有找到消息的接收服务器{}", message.getMessageId());
                 return;
             }
-            serverChannel.writeAndFlush(message);
+            handleMessageManager.execute(message);
+
         });
     }
 
@@ -152,20 +156,31 @@ public class GatewayMessageExecuter {
         }
     }
 
-    public void relationMessage(Channel channel, Server2GatewayMessage server2GatewayMessage) {
-        SCRelationUserGatewayMessage message = new SCRelationUserGatewayMessage();
+    private void readMessage(Message message, Server2GatewayMessage server2GatewayMessage) {
         ByteBuf buf = Unpooled.buffer();
         buf.writeBytes(server2GatewayMessage.getData());
         message.read(buf, buf.writerIndex());
-        CountDownLatch countDownLatch = waitRelationMap.get(message.getOnceToken());
-        if (countDownLatch != null) {
-            countDownLatch.countDown();
+    }
+
+    /**
+     * 处具体服务器返回的关联用户信息
+     *
+     * @param channel
+     * @param server2GatewayMessage
+     */
+    public void relationMessage(Channel channel, Server2GatewayMessage server2GatewayMessage) {
+        SCRelationUserGatewayMessage message = new SCRelationUserGatewayMessage();
+        readMessage(message, server2GatewayMessage);
+        WaitRelationTask waitRelationTask = waitRelationMap.get(message.getRelationToken());
+        if (waitRelationTask != null) {
+            waitRelationTask.setRelationTime(System.currentTimeMillis());
+            waitRelationTask.setRelation(true);
         } else {
             CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
             breakUserGatewayMessage.setToken(message.getToken());
             breakUserGatewayMessage.setUserId(message.getUserId());
             Client2GatewayMessage toMessage = new Client2GatewayMessage();
-            toMessage.setMessageId(csBreakUserGatewayMessageId);
+            toMessage.setMessageId(breakUserGatewayMessage.getMessageId());
             ByteBuf bf = Unpooled.buffer();
             message.write(bf);
             toMessage.setData(bf.array());
@@ -243,13 +258,17 @@ public class GatewayMessageExecuter {
                 break;
             }
         }
-
         ServerChannelManager serverChannelManager = serverManager.getChannelServer(serverKey);
-
         serverChannelManager.addChannel(channel);
         serverManager.checkChannelServer(serverKey, serverChannelManager);
         for (HandleMessage handleMessage : handleMessages) {
-            ServerHandleMessageInfo messageInfo = new  ServerHandleMessageInfo();
+            HandleMessageManager handleMessageManager = handleMessageManagerMap.get(handleMessage.getHandleMessageId());
+            if (handleMessageManager == null) {
+                handleMessageManager = new HandleMessageManager(handleMessage.getHandleMessageId(), true, false, this);
+                handleMessageManagerMap.put(handleMessage.getHandleMessageId(), handleMessageManager);
+            }
+            handleMessageManager.addServerManager(handleMessage.getHandleMessageId(), serverManager);
+
         }
     }
 
@@ -257,5 +276,48 @@ public class GatewayMessageExecuter {
         askMap.put(askMessage.getToken(), askMessage);
     }
 
+    public void sendMessage(ServerChannelManager serverChannelManager, Message message) {
+        Client2GatewayMessage toMessage = new Client2GatewayMessage();
+        toMessage.setMessageId(message.getMessageId());
+        ByteBuf bf = Unpooled.buffer();
+        message.write(bf);
+        toMessage.setData(bf.array());
+        serverChannelManager.nextChannel().writeAndFlush(toMessage);
+    }
 
+    private void checkWaitRelationTask() {
+        List<Long> tokens = new ArrayList<>();
+        for (Map.Entry<Long, WaitRelationTask> entry : waitRelationMap.entrySet()) {
+            WaitRelationTask task = entry.getValue();
+            if (task.check()) {
+                tokens.add(entry.getKey());
+                service.execute(task.getRunnable());
+            } else {
+                if (task.cancel()) {
+                    tokens.add(entry.getKey());
+                    if (task.afterCancel() != null) {
+                        service.execute(task.afterCancel());
+                    }
+                }
+            }
+        }
+        for (Long token : tokens) {
+            waitRelationMap.remove(token);
+        }
+    }
+
+    private void startCheck() {
+
+        service.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+
+                checkWaitRelationTask();
+            }
+        }, 0, 20, TimeUnit.MILLISECONDS);
+    }
+
+    public void destroy() {
+        service.shutdown();
+    }
 }

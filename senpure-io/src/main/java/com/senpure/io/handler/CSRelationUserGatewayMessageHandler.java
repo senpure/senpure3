@@ -23,13 +23,13 @@ public class CSRelationUserGatewayMessageHandler extends AbstractInnerMessageHan
         String gatewayKey = ChannelAttributeUtil.getIpAndPort(channel);
         logger.debug("关联网关 与用户 gatewayKey :{}  token :{}  userId :{}", gatewayKey, message.getToken(), message.getUserId());
         if (message.getUserId() > 0) {
-            gatewayManager.relationUser(gatewayKey, message.getUserId());
+            gatewayManager.relationUser(gatewayKey, message.getUserId(),message.getRelationToken());
         }
         if (message.getToken() != 0) {
-            gatewayManager.relationToken(gatewayKey, message.getToken());
+            gatewayManager.relationToken(gatewayKey, message.getToken(),message.getRelationToken());
         }
         SCRelationUserGatewayMessage scMessage = new SCRelationUserGatewayMessage();
-        scMessage.setOnceToken(message.getOnceToken());
+        scMessage.setRelationToken(message.getRelationToken());
         scMessage.setToken(message.getToken());
         scMessage.setUserId(message.getUserId());
         if (message.getUserId() > 0) {

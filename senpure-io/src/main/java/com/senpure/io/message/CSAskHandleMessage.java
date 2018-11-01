@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
  * 询问服务器是否可以处理该值得请求
  * 
  * @author senpure
- * @time 2018-10-19 16:14:32
+ * @time 2018-11-1 15:06:13
  */
 public class CSAskHandleMessage extends  Message {
     //token

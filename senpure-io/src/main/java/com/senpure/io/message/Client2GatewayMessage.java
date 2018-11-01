@@ -44,9 +44,7 @@ public class Client2GatewayMessage {
         this.data = data;
     }
 
-    public void setToken(int token) {
-        this.token = token;
-    }
+
 
     @Override
     public String toString() {

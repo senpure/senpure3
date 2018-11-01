@@ -1,6 +1,7 @@
 package com.senpure.io.gateway;
 
 
+import com.senpure.io.message.CSBreakUserGatewayMessage;
 import com.senpure.io.message.CSRelationUserGatewayMessage;
 import com.senpure.io.message.Client2GatewayMessage;
 import io.netty.buffer.ByteBuf;
@@ -48,17 +49,17 @@ public class ServerManager {
     private int waitTimeFailCount = 0;
 
     //不用等待返回
-    public Channel channel2(Long userId, Long token) {
+    public Channel channel2(Long token, Long userId) {
         Channel channel = null;
         ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(userId);
         if (serverChannelManager == null) {
             serverChannelManager = nextServerChannelManager();
             channel = serverChannelManager.nextChannel();
-            Long onceToken = messageExecuter.idGenerator.nextId();
+            Long relationToken = messageExecuter.idGenerator.nextId();
             CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
             message.setToken(token);
             message.setUserId(userId);
-            message.setOnceToken(onceToken);
+            message.setRelationToken(relationToken);
             Client2GatewayMessage toMessage = new Client2GatewayMessage();
             toMessage.setMessageId(csRelationMessageId);
             ByteBuf buf = Unpooled.buffer();
@@ -72,19 +73,20 @@ public class ServerManager {
         return channel;
     }
 
-    public Channel channel(Long userId, Long token) {
+    public Channel channel(Long token, Long userId) {
         Channel channel = null;
         ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(userId);
         if (serverChannelManager == null) {
             serverChannelManager = nextServerChannelManager();
             channel = serverChannelManager.nextChannel();
-            Long onceToken = messageExecuter.idGenerator.nextId();
+            Long relationToken = messageExecuter.idGenerator.nextId();
             CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
             message.setToken(token);
             message.setUserId(userId);
-            message.setOnceToken(onceToken);
+            message.setRelationToken(relationToken);
+
             CountDownLatch countDownLatch = new CountDownLatch(1);
-            messageExecuter.waitRelationMap.put(onceToken, countDownLatch);
+            //messageExecuter.waitRelationMap.put(relationToken, countDownLatch);
             Client2GatewayMessage toMessage = new Client2GatewayMessage();
             toMessage.setMessageId(csRelationMessageId);
             ByteBuf buf = Unpooled.buffer();
@@ -100,7 +102,7 @@ public class ServerManager {
                         waitTimeFailCount = 0;
                     }
                     logger.warn("等待真实服务器返回关联结果过长 relationWaitTime {}  waitTimeFailCount {}", relationWaitTime, waitTimeFailCount);
-                    messageExecuter.waitRelationMap.remove(onceToken);
+                    messageExecuter.waitRelationMap.remove(relationToken);
                     return null;
                 }
                 userServerChannelManagerMap.put(userId, serverChannelManager);
@@ -115,7 +117,54 @@ public class ServerManager {
     }
 
 
-    private ServerChannelManager nextServerChannelManager() {
+    public void sendMessage(Client2GatewayMessage client2GatewayMessage) {
+        ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(client2GatewayMessage.getUserId());
+        if (serverChannelManager == null) {
+            serverChannelManager = nextServerChannelManager();
+            Long relationToken = messageExecuter.idGenerator.nextId();
+            CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
+            message.setToken(client2GatewayMessage.getToken());
+            message.setUserId(client2GatewayMessage.getUserId());
+            message.setRelationToken(relationToken);
+            Client2GatewayMessage toMessage = new Client2GatewayMessage();
+            toMessage.setMessageId(csRelationMessageId);
+            ByteBuf buf = Unpooled.buffer();
+            message.write(buf);
+            toMessage.setData(buf.array());
+            ServerChannelManager finalServerChannelManager = serverChannelManager;
+            WaitRelationTask waitRelationTask = new WaitRelationTask(relationToken, () -> {
+                userServerChannelManagerMap.put(client2GatewayMessage.getUserId(), finalServerChannelManager);
+                Channel channel = finalServerChannelManager.nextChannel();
+                if (channel == null) {
+                    logger.warn("{} 没有可用的channel",serverName);
+                    return;
+                }
+                channel.writeAndFlush(client2GatewayMessage);
+            }, () -> {
+                CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
+                breakUserGatewayMessage.setToken(message.getToken());
+                breakUserGatewayMessage.setUserId(message.getUserId());
+                breakUserGatewayMessage.setRelationToken(relationToken);
+                messageExecuter.sendMessage(finalServerChannelManager, breakUserGatewayMessage);
+            });
+            messageExecuter.waitRelationMap.put(relationToken, waitRelationTask);
+            Channel channel = serverChannelManager.nextChannel();
+            if (channel == null) {
+                logger.warn("{} 没有可用的channel",serverName);
+                return;
+            }
+            channel.writeAndFlush(toMessage);
+        } else {
+            Channel channel = serverChannelManager.nextChannel();
+            if (channel == null) {
+                logger.warn("{} 没有可用的channel",serverName);
+                return;
+            }
+            channel.writeAndFlush(client2GatewayMessage);
+        }
+    }
+
+    protected ServerChannelManager nextServerChannelManager() {
         ServerChannelManager manager = useChannelManagers.get(nextIndex());
         return manager;
     }

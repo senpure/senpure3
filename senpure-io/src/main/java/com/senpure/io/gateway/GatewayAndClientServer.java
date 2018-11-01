@@ -58,10 +58,8 @@ public class GatewayAndClientServer {
             // Configure the server.
             bossGroup = new NioEventLoopGroup(1);
             workerGroup = new NioEventLoopGroup();
-
             try {
                 ServerBootstrap b = new ServerBootstrap();
-
                 b.group(bossGroup, workerGroup)
                         .channel(NioServerSocketChannel.class)
                         .option(ChannelOption.SO_BACKLOG, 100)
@@ -84,7 +82,6 @@ public class GatewayAndClientServer {
                             }
                         });
                 // Start the server.
-
                 channelFuture = b.bind(properties.getCsPort()).sync();
                 logger.info("{}启动完成", getReadableServerName());
             } catch (Exception e) {

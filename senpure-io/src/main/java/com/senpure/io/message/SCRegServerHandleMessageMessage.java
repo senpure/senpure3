@@ -11,12 +11,12 @@ import java.util.ArrayList;
  * 服务器注册消息处理器到网关
  * 
  * @author senpure
- * @time 2018-10-19 16:14:32
+ * @time 2018-11-1 15:06:13
  */
 public class SCRegServerHandleMessageMessage extends  Message {
     //服务器名
     private String serverName;
-    //ip和端口号
+    //ip和第一个实例端口号
     private String ipAndFirstPort;
     //服务器名
     private String readableServerName;
@@ -32,7 +32,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
         if (serverName != null){
             writeString(buf,8,serverName);
         }
-        //ip和端口号
+        //ip和第一个实例端口号
         if (ipAndFirstPort != null){
             writeString(buf,16,ipAndFirstPort);
         }
@@ -60,7 +60,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
                 case 8:// 1 << 3 | 0
                         serverName = readString(buf);
                     break;
-                //ip和端口号
+                //ip和第一个实例端口号
                 case 16:// 2 << 3 | 0
                         ipAndFirstPort = readString(buf);
                     break;
@@ -94,7 +94,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
         if (serverName != null){
             size += computeStringSize(1,serverName);
         }
-        //ip和端口号
+        //ip和第一个实例端口号
         if (ipAndFirstPort != null){
             size += computeStringSize(1,ipAndFirstPort);
         }
@@ -126,7 +126,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
         return this;
     }
     /**
-     * get ip和端口号
+     * get ip和第一个实例端口号
      * @return
      */
     public  String getIpAndFirstPort() {
@@ -134,7 +134,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
     }
 
     /**
-     * set ip和端口号
+     * set ip和第一个实例端口号
      */
     public SCRegServerHandleMessageMessage setIpAndFirstPort(String ipAndFirstPort) {
         this.ipAndFirstPort=ipAndFirstPort;
@@ -203,7 +203,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
         //服务器名
         sb.append("\n");
         sb.append(indent).append(rightPad("serverName", filedPad)).append(" = ").append(serverName);
-        //ip和端口号
+        //ip和第一个实例端口号
         sb.append("\n");
         sb.append(indent).append(rightPad("ipAndFirstPort", filedPad)).append(" = ").append(ipAndFirstPort);
         //服务器名
