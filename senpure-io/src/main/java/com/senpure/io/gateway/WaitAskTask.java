@@ -23,25 +23,27 @@ public class WaitAskTask {
 
     private ServerChannelManager serverChannelManager;
 
+    private ServerManager serverManager;
     private Client2GatewayMessage message;
 
     public WaitAskTask() {
         startTime = System.currentTimeMillis();
     }
 
-    public synchronized void answer(ServerChannelManager serverChannelManager, boolean canHandle) {
+    public synchronized void answer(ServerManager serverManager,ServerChannelManager serverChannelManager, boolean canHandle) {
         answerTimes++;
         if (canHandle) {
             if (this.serverChannelManager != null) {
                 return;
             }
+            this.serverManager = serverManager;
             this.serverChannelManager = serverChannelManager;
 
             return;
         }
     }
 
-    public void sendMessage(ServerManager serverManager) {
+    public void sendMessage() {
         serverManager.bindAndSendMessage(serverChannelManager, message);
 
     }
@@ -93,6 +95,14 @@ public class WaitAskTask {
         this.startTime = startTime;
     }
 
+
+    public Client2GatewayMessage getMessage() {
+        return message;
+    }
+
+    public void setMessage(Client2GatewayMessage message) {
+        this.message = message;
+    }
 
     public int getAnswerTimes() {
         return answerTimes;

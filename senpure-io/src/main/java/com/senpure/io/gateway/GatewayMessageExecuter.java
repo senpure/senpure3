@@ -159,13 +159,13 @@ public class GatewayMessageExecuter {
                 ServerManager serverManager = serverInstanceMap.get(serverName);
                 for (ServerChannelManager useChannelManager : serverManager.getUseChannelManagers()) {
                     if (useChannelManager.getServerKey().equalsIgnoreCase(serverKey)) {
-                        waitAskTask.answer(useChannelManager, true);
+                        waitAskTask.answer(serverManager,useChannelManager, true);
                         return;
                     }
                 }
-                waitAskTask.answer(null, false);
+                waitAskTask.answer(null,null, false);
             } else {
-                waitAskTask.answer(null, false);
+                waitAskTask.answer(null,null, false);
             }
 
             // waitAskTask.answer(channel, message.isHandle());
@@ -330,6 +330,7 @@ public class GatewayMessageExecuter {
             WaitAskTask waitAskTask = entry.getValue();
             if (waitAskTask.getServerChannelManager() != null) {
                 tokens.add(entry.getKey());
+
                 waitAskTask.sendMessage();
             }
             else {

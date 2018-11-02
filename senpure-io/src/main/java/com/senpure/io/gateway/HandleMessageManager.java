@@ -88,6 +88,8 @@ public class HandleMessageManager {
                 askTimes += serverManager.getUseChannelManagers().size();
             }
             waitAskTask.setAskTimes(askTimes);
+            waitAskTask.setMessage(message);
+
             messageExecuter.waitAskMap.put(waitAskTask.getAskToken(), waitAskTask);
             for (ServerManager serverManager : serverManagers) {
                 for (ServerChannelManager channelManager : serverManager.getUseChannelManagers()) {
