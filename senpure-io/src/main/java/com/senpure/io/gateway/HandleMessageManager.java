@@ -24,6 +24,7 @@ public class HandleMessageManager {
     private List<ServerManager> serverManagers = new ArrayList<>();
     private ServerManager serverManager;
     private GatewayMessageExecuter messageExecuter;
+    private int csAskHandleMessageId = new CSAskHandleMessage().getMessageId();
     private AtomicInteger atomicIndex = new AtomicInteger(-1);
     private int handId = 0;
 
@@ -73,15 +74,27 @@ public class HandleMessageManager {
             askHandleMessage.setToken(messageExecuter.idGenerator.nextId());
             askHandleMessage.setValue(value);
             Client2GatewayMessage temp = new Client2GatewayMessage();
+            temp.setMessageId(csAskHandleMessageId);
             temp.setToken(message.getToken());
             temp.setUserId(message.getUserId());
             buf = Unpooled.buffer();
             askHandleMessage.write(buf);
             temp.setData(buf.array());
+
+            WaitAskTask waitAskTask = new WaitAskTask();
+            waitAskTask.setAskToken(askHandleMessage.getToken());
+            int askTimes=0;
             for (ServerManager serverManager : serverManagers) {
-                Channel channel = serverManager.nextServerChannelManager().nextChannel();
-                if (channel != null) {
-                    channel.writeAndFlush(temp);
+                askTimes += serverManager.getUseChannelManagers().size();
+            }
+            waitAskTask.setAskTimes(askTimes);
+            messageExecuter.waitAskMap.put(waitAskTask.getAskToken(), waitAskTask);
+            for (ServerManager serverManager : serverManagers) {
+                for (ServerChannelManager channelManager : serverManager.getUseChannelManagers()) {
+                    Channel channel = channelManager.nextChannel();
+                    if (channel != null) {
+                        channel.writeAndFlush(temp);
+                    }
                 }
             }
         }

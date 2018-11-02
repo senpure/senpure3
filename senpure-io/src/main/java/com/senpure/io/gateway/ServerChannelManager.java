@@ -1,6 +1,9 @@
 package com.senpure.io.gateway;
 
+import com.senpure.io.message.Client2GatewayMessage;
 import io.netty.channel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,7 +16,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerChannelManager {
 
-   // private ConcurrentMap<Integer, Channel> serverChannels = new ConcurrentHashMap<>();
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
+    // private ConcurrentMap<Integer, Channel> serverChannels = new ConcurrentHashMap<>();
     private List<Channel> channels = new ArrayList<>(16);
 
     private AtomicInteger atomicIndex = new AtomicInteger(-1);
@@ -26,6 +31,16 @@ public class ServerChannelManager {
 
     private String serverKey;
 
+
+    public void sendMessage(Client2GatewayMessage message) {
+        Channel channel = nextChannel();
+        if (channel == null) {
+            logger.warn("{} 没有可用得channel", serverKey);
+            return;
+        }
+        channel.writeAndFlush(message);
+
+    }
 
     public boolean handleRange(long num) {
         return num >= start && num <= end;
@@ -75,7 +90,7 @@ public class ServerChannelManager {
 //            }
 //            return 0;
 //        }
-      //  return index;
+        //  return index;
     }
 
 
@@ -94,7 +109,6 @@ public class ServerChannelManager {
     public void setEnd(long end) {
         this.end = end;
     }
-
 
 
     public static void main(String[] args) {

@@ -30,9 +30,9 @@ public class GatewayMessageExecuter {
     private int scrRelationUserGatewayMessageId = new SCRelationUserGatewayMessage().getMessageId();
     private int scBreakUserGatewayMessageId = new SCBreakUserGatewayMessage().getMessageId();
     private int csBreakUserGatewayMessageId = new CSBreakUserGatewayMessage().getMessageId();
-    private Message askMessage = new SCAskHandleMessage();
 
-    private int askMessageId = askMessage.getMessageId();
+
+    private int scAskMessageId = new SCAskHandleMessage().getMessageId();
 
     private ConcurrentMap<Long, Channel> prepLoginChannels = new ConcurrentHashMap<>(2048);
 
@@ -48,6 +48,7 @@ public class GatewayMessageExecuter {
 
     protected IDGenerator idGenerator = new IDGenerator(0, 0);
     protected ConcurrentHashMap<Long, WaitRelationTask> waitRelationMap = new ConcurrentHashMap(16);
+    protected ConcurrentHashMap<Long, WaitAskTask> waitAskMap = new ConcurrentHashMap(16);
 
     public GatewayMessageExecuter() {
 
@@ -113,7 +114,7 @@ public class GatewayMessageExecuter {
 
             relationMessage(channel, message);
             return;
-        } else if (message.getMessageId() == askMessageId) {
+        } else if (message.getMessageId() == scAskMessageId) {
             askMessage(channel, message);
             return;
         }
@@ -148,12 +149,28 @@ public class GatewayMessageExecuter {
 
     public void askMessage(Channel channel, Server2GatewayMessage server2GatewayMessage) {
         SCAskHandleMessage message = new SCAskHandleMessage();
-        ByteBuf buf = Unpooled.buffer();
-        buf.writeBytes(server2GatewayMessage.getData());
-        message.read(buf, buf.writerIndex());
-        if (message.isHandle()) {
+        readMessage(message, server2GatewayMessage);
+        WaitAskTask waitAskTask = waitAskMap.get(message.getToken());
+        if (waitAskTask != null) {
 
+            if (message.isHandle()) {
+                String serverName = ChannelAttributeUtil.getServerName(channel);
+                String serverKey = ChannelAttributeUtil.getServerKey(channel);
+                ServerManager serverManager = serverInstanceMap.get(serverName);
+                for (ServerChannelManager useChannelManager : serverManager.getUseChannelManagers()) {
+                    if (useChannelManager.getServerKey().equalsIgnoreCase(serverKey)) {
+                        waitAskTask.answer(useChannelManager, true);
+                        return;
+                    }
+                }
+                waitAskTask.answer(null, false);
+            } else {
+                waitAskTask.answer(null, false);
+            }
+
+            // waitAskTask.answer(channel, message.isHandle());
         }
+
     }
 
     private void readMessage(Message message, Server2GatewayMessage server2GatewayMessage) {
@@ -198,6 +215,8 @@ public class GatewayMessageExecuter {
         message.read(buf, buf.writerIndex());
         List<HandleMessage> handleMessages = message.getMessages();
         String serverKey = message.getServerName() + message.getIpAndFirstPort();
+        ChannelAttributeUtil.setServerName(channel, message.getServerName());
+        ChannelAttributeUtil.setServerKey(channel, serverKey);
         logger.info("服务注册:{}:{} [{}]", message.getServerName(), message.getIpAndFirstPort(), message.getReadableServerName());
         for (HandleMessage handleMessage : handleMessages) {
             logger.info("{}", handleMessage);
@@ -282,7 +301,7 @@ public class GatewayMessageExecuter {
         ByteBuf bf = Unpooled.buffer();
         message.write(bf);
         toMessage.setData(bf.array());
-        serverChannelManager.nextChannel().writeAndFlush(toMessage);
+        serverChannelManager.sendMessage(toMessage);
     }
 
     private void checkWaitRelationTask() {
@@ -291,13 +310,12 @@ public class GatewayMessageExecuter {
             WaitRelationTask task = entry.getValue();
             if (task.check()) {
                 tokens.add(entry.getKey());
-                service.execute(task.getRunnable());
+                service.execute(() -> task.sendMessage());
             } else {
                 if (task.cancel()) {
                     tokens.add(entry.getKey());
-                    if (task.afterCancel() != null) {
-                        service.execute(task.afterCancel());
-                    }
+                    service.execute(() -> task.sendCancelMessage(this));
+
                 }
             }
         }
@@ -306,15 +324,31 @@ public class GatewayMessageExecuter {
         }
     }
 
+    private void checkWaitAskTask() {
+        List<Long> tokens = new ArrayList<>();
+        for (Map.Entry<Long, WaitAskTask> entry : waitAskMap.entrySet()) {
+            WaitAskTask waitAskTask = entry.getValue();
+            if (waitAskTask.getServerChannelManager() != null) {
+                tokens.add(entry.getKey());
+                waitAskTask.sendMessage();
+            }
+            else {
+
+            }
+        }
+        for (Long token : tokens) {
+            waitAskMap.remove(token);
+        }
+    }
+
     private void startCheck() {
 
-        service.scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
+        service.scheduleWithFixedDelay(() -> {
 
-                checkWaitRelationTask();
-            }
-        }, 0, 20, TimeUnit.MILLISECONDS);
+            checkWaitRelationTask();
+            checkWaitAskTask();
+
+        }, 0, 10, TimeUnit.MILLISECONDS);
     }
 
     public void destroy() {

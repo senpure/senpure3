@@ -1,50 +1,97 @@
 package com.senpure.io.gateway;
 
+import com.senpure.io.message.CSBreakUserGatewayMessage;
+import com.senpure.io.message.Client2GatewayMessage;
+
 /**
  * WaitRelationTask
  *
  * @author senpure
  * @time 2018-11-01 14:04:52
  */
-public class WaitRelationTask extends  AbstractWaitTask {
+public class WaitRelationTask  {
 
     private boolean relation = false;
-
+    protected long startTime;
     private long relationTime;
     private long maxDelay = 5000;
 
+    private Client2GatewayMessage message;
 
-    public WaitRelationTask(Long token, Runnable runnable,Runnable cancelRunnable) {
+    private ServerChannelManager serverChannelManager;
 
-        super(token,runnable,cancelRunnable);
+    private ServerManager serverManager;
+    private Long relationToken;
+
+
+    public WaitRelationTask() {
+        startTime = System.currentTimeMillis();
     }
 
-    public WaitRelationTask(Long token, Runnable runnable,Runnable cancelRunnable, long maxDelay) {
-        super(token,runnable,cancelRunnable,maxDelay);
-    }
-
-    @Override
     public boolean check() {
-        if (relation) {
-            return relationTime - startTime <= maxDelay;
-        }
-        return false;
+
+        return relation;
     }
 
-
-
-    public void setCancelRunnable(Runnable cancelRunnable) {
-        this.cancelRunnable = cancelRunnable;
-    }
-
-    @Override
     public boolean cancel() {
         if (relation) {
-            return relationTime - startTime > maxDelay;
+            return false;
         }
         return System.currentTimeMillis() - startTime > maxDelay;
     }
 
+
+    public void sendMessage() {
+        serverManager.bind(message.getUserId(), serverChannelManager);
+        serverManager.sendMessage(message);
+    }
+
+    public void sendCancelMessage(GatewayMessageExecuter messageExecuter) {
+        CSBreakUserGatewayMessage breakMessage = new CSBreakUserGatewayMessage();
+        breakMessage.setRelationToken(relationToken);
+        breakMessage.setToken(message.getToken());
+        breakMessage.setUserId(message.getUserId());
+        messageExecuter.sendMessage(serverChannelManager, breakMessage);
+
+    }
+
+
+    public Client2GatewayMessage getMessage() {
+        return message;
+    }
+
+    public void setMessage(Client2GatewayMessage message) {
+        this.message = message;
+    }
+
+    public ServerChannelManager getServerChannelManager() {
+        return serverChannelManager;
+    }
+
+    public ServerManager getServerManager() {
+        return serverManager;
+    }
+
+    public void setServerManager(ServerManager serverManager) {
+        this.serverManager = serverManager;
+    }
+
+    public void setServerChannelManager(ServerChannelManager serverChannelManager) {
+        this.serverChannelManager = serverChannelManager;
+    }
+
+
+
+
+
+
+    public Long getRelationToken() {
+        return relationToken;
+    }
+
+    public void setRelationToken(Long relationToken) {
+        this.relationToken = relationToken;
+    }
 
     public boolean isRelation() {
         return relation;
@@ -54,13 +101,7 @@ public class WaitRelationTask extends  AbstractWaitTask {
         this.relation = relation;
     }
 
-    public Runnable getRunnable() {
-        return runnable;
-    }
 
-    public void setRunnable(Runnable runnable) {
-        this.runnable = runnable;
-    }
 
     public long getRelationTime() {
         return relationTime;

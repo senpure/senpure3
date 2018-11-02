@@ -1,7 +1,6 @@
 package com.senpure.io.gateway;
 
 
-import com.senpure.io.message.CSBreakUserGatewayMessage;
 import com.senpure.io.message.CSRelationUserGatewayMessage;
 import com.senpure.io.message.Client2GatewayMessage;
 import io.netty.buffer.ByteBuf;
@@ -73,6 +72,11 @@ public class ServerManager {
         return channel;
     }
 
+    public void bind(Long userId, ServerChannelManager serverChannelManager) {
+        userServerChannelManagerMap.put(userId, serverChannelManager);
+
+    }
+
     public Channel channel(Long token, Long userId) {
         Channel channel = null;
         ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(userId);
@@ -121,47 +125,31 @@ public class ServerManager {
         ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(client2GatewayMessage.getUserId());
         if (serverChannelManager == null) {
             serverChannelManager = nextServerChannelManager();
-            Long relationToken = messageExecuter.idGenerator.nextId();
-            CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
-            message.setToken(client2GatewayMessage.getToken());
-            message.setUserId(client2GatewayMessage.getUserId());
-            message.setRelationToken(relationToken);
-            Client2GatewayMessage toMessage = new Client2GatewayMessage();
-            toMessage.setMessageId(csRelationMessageId);
-            ByteBuf buf = Unpooled.buffer();
-            message.write(buf);
-            toMessage.setData(buf.array());
-            ServerChannelManager finalServerChannelManager = serverChannelManager;
-            WaitRelationTask waitRelationTask = new WaitRelationTask(relationToken, () -> {
-                userServerChannelManagerMap.put(client2GatewayMessage.getUserId(), finalServerChannelManager);
-                Channel channel = finalServerChannelManager.nextChannel();
-                if (channel == null) {
-                    logger.warn("{} 没有可用的channel",serverName);
-                    return;
-                }
-                channel.writeAndFlush(client2GatewayMessage);
-            }, () -> {
-                CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
-                breakUserGatewayMessage.setToken(message.getToken());
-                breakUserGatewayMessage.setUserId(message.getUserId());
-                breakUserGatewayMessage.setRelationToken(relationToken);
-                messageExecuter.sendMessage(finalServerChannelManager, breakUserGatewayMessage);
-            });
-            messageExecuter.waitRelationMap.put(relationToken, waitRelationTask);
-            Channel channel = serverChannelManager.nextChannel();
-            if (channel == null) {
-                logger.warn("{} 没有可用的channel",serverName);
-                return;
-            }
-            channel.writeAndFlush(toMessage);
+            bindAndSendMessage(serverChannelManager, client2GatewayMessage);
+
         } else {
-            Channel channel = serverChannelManager.nextChannel();
-            if (channel == null) {
-                logger.warn("{} 没有可用的channel",serverName);
-                return;
-            }
-            channel.writeAndFlush(client2GatewayMessage);
+            serverChannelManager.sendMessage(client2GatewayMessage);
         }
+    }
+
+    public void bindAndSendMessage(ServerChannelManager serverChannelManager , Client2GatewayMessage client2GatewayMessage) {
+        Long relationToken = messageExecuter.idGenerator.nextId();
+        CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
+        message.setToken(client2GatewayMessage.getToken());
+        message.setUserId(client2GatewayMessage.getUserId());
+        message.setRelationToken(relationToken);
+        Client2GatewayMessage toMessage = new Client2GatewayMessage();
+        toMessage.setMessageId(csRelationMessageId);
+        ByteBuf buf = Unpooled.buffer();
+        message.write(buf);
+        toMessage.setData(buf.array());
+        WaitRelationTask waitRelationTask = new WaitRelationTask();
+        waitRelationTask.setRelationToken(relationToken);
+        waitRelationTask.setMessage(client2GatewayMessage);
+        waitRelationTask.setServerChannelManager(serverChannelManager);
+        waitRelationTask.setServerManager(this);
+        messageExecuter.waitRelationMap.put(relationToken, waitRelationTask);
+        serverChannelManager.sendMessage(toMessage);
     }
 
     protected ServerChannelManager nextServerChannelManager() {

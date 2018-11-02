@@ -1,6 +1,6 @@
 package com.senpure.io.gateway;
 
-import io.netty.channel.Channel;
+import com.senpure.io.message.Client2GatewayMessage;
 
 /**
  * WaitAskTask
@@ -8,33 +8,105 @@ import io.netty.channel.Channel;
  * @author senpure
  * @time 2018-11-01 18:03:18
  */
-public class WaitAskTask extends AbstractWaitTask {
+public class WaitAskTask {
 
-    private Channel firstChannel;
-    private long firstTime;
 
-    public WaitAskTask(Long token, Runnable runnable, Runnable cancelRunnable) {
-        super(token, runnable, cancelRunnable);
+    private long askToken;
+
+    private String value;
+
+    private long startTime;
+    private long answerTime;
+    private int askTimes;
+    private int answerTimes;
+    private long maxDelay = 5000;
+
+    private ServerChannelManager serverChannelManager;
+
+    private Client2GatewayMessage message;
+
+    public WaitAskTask() {
+        startTime = System.currentTimeMillis();
     }
 
-    public WaitAskTask(Long token, Runnable runnable, Runnable cancelRunnable, long maxDelay) {
-        super(token, runnable, cancelRunnable, maxDelay);
-    }
+    public synchronized void answer(ServerChannelManager serverChannelManager, boolean canHandle) {
+        answerTimes++;
+        if (canHandle) {
+            if (this.serverChannelManager != null) {
+                return;
+            }
+            this.serverChannelManager = serverChannelManager;
 
-    @Override
-    public boolean check() {
-        if (firstChannel != null) {
-
+            return;
         }
-        return false;
     }
 
+    public void sendMessage(ServerManager serverManager) {
+        serverManager.bindAndSendMessage(serverChannelManager, message);
 
-    @Override
+    }
+
     public boolean cancel() {
+        if (serverChannelManager != null) {
+            return false;
+        }
+        return System.currentTimeMillis() - startTime > maxDelay;
+    }
 
-        return false;
+    public ServerChannelManager getServerChannelManager() {
+        return serverChannelManager;
+    }
+
+    public void setServerChannelManager(ServerChannelManager serverChannelManager) {
+        this.serverChannelManager = serverChannelManager;
+    }
+
+    public long getAnswerTime() {
+        return answerTime;
+    }
+
+    public void setAnswerTime(long answerTime) {
+        this.answerTime = answerTime;
+    }
+
+    public long getAskToken() {
+        return askToken;
+    }
+
+    public void setAskToken(long askToken) {
+        this.askToken = askToken;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
     }
 
 
+    public int getAnswerTimes() {
+        return answerTimes;
+    }
+
+    public void setAnswerTimes(int answerTimes) {
+        this.answerTimes = answerTimes;
+    }
+
+    public int getAskTimes() {
+        return askTimes;
+    }
+
+    public void setAskTimes(int askTimes) {
+        this.askTimes = askTimes;
+    }
 }

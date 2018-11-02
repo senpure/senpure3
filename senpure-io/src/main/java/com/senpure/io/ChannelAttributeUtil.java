@@ -14,10 +14,14 @@ public class ChannelAttributeUtil {
     private static String CHANNEL_USER = "channelUser";
 
     private static String IP_AND_PORT = "ipAndPort";
+    private static String SERVER_NAME = "serverName";
+    private static String SERVER_KEY = "serverKey";
     public static AttributeKey<Long> userIdKey = AttributeKey.valueOf(USER_ID);
     public static AttributeKey<Long> tokenKey = AttributeKey.valueOf(TOKEN);
     public static AttributeKey<String> userNameKey = AttributeKey.valueOf(USER_NAME);
     public static AttributeKey<String> ipAndPortKey = AttributeKey.valueOf(IP_AND_PORT);
+    public static AttributeKey<String> serverNameKey = AttributeKey.valueOf(SERVER_NAME);
+    public static AttributeKey<String> serverKeyKey = AttributeKey.valueOf(SERVER_KEY);
     public static AttributeKey<ChannelPlayer> channelPlayerKey = AttributeKey.valueOf(CHANNEL_USER);
     public static AttributeKey<OffLineHandler> offlineHandlerKey = AttributeKey.valueOf(OFFLINE_HANDLER);
 
@@ -83,6 +87,29 @@ public class ChannelAttributeUtil {
 
     }
 
+    public static void setServerName(Channel channel, String name) {
+
+        channel.attr(serverNameKey).set(name);
+
+    }
+
+    public static String getServerName(Channel channel) {
+
+        return channel.attr(serverNameKey).get();
+
+    }
+
+    public static void setServerKey(Channel channel, String key) {
+
+        channel.attr(serverKeyKey).set(key);
+
+    }
+
+    public static String getServerKey(Channel channel) {
+
+        return channel.attr(serverKeyKey).get();
+
+    }
 
     public static String getIpAndPort(Channel channel) {
 
