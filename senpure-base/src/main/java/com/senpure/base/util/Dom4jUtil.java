@@ -145,6 +145,7 @@ public class Dom4jUtil {
 
 	public static void main(String[] args) throws Exception {
 
+
 		SAXReader reader = new SAXReader();
 
 		try {
@@ -152,9 +153,11 @@ public class Dom4jUtil {
 
 			System.out.println(document.getRootElement().elements());
 
+			System.out.println("------------------");
 			Map<String, Object> map = xmlToMap(document.getRootElement(), false);
 			System.out.println(map);
 
+			System.out.println("----------------");
 			System.out.println(mapToXmlString(map));
 
 		} catch (DocumentException e) {

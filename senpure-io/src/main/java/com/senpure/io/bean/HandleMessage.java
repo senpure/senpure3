@@ -4,10 +4,8 @@ import com.senpure.io.protocol.Bean;
 import io.netty.buffer.ByteBuf;
 
 /**
- * <br><b>index start:1 end:7</b>
- * 
  * @author senpure
- * @time 2018-11-1 15:06:13
+ * @time 2018-11-5 18:06:48
  */
 public class HandleMessage extends  Bean {
     //可以处理的消息ID
@@ -16,14 +14,8 @@ public class HandleMessage extends  Bean {
     private String messageClasses;
     //是否共享messageId 不同的服务都可以处理
     private boolean serverShare;
-    //消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
-    private int messageType;
-    //数字类型 0int 1 long
-    private int valueType;
-    //范围开始
-    private long numStart;
-    //范围结束
-    private long numEnd;
+    //true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
+    private boolean direct;
     /**
      * 写入字节缓存
      */
@@ -38,14 +30,8 @@ public class HandleMessage extends  Bean {
         }
         //是否共享messageId 不同的服务都可以处理
         writeBoolean(buf,24,serverShare);
-        //消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
-        writeVar32(buf,32,messageType);
-        //数字类型 0int 1 long
-        writeVar32(buf,40,valueType);
-        //范围开始
-        writeVar64(buf,48,numStart);
-        //范围结束
-        writeVar64(buf,56,numEnd);
+        //true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
+        writeBoolean(buf,32,direct);
     }
 
     /**
@@ -70,21 +56,9 @@ public class HandleMessage extends  Bean {
                 case 24:// 3 << 3 | 0
                         serverShare = readBoolean(buf);
                     break;
-                //消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
+                //true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
                 case 32:// 4 << 3 | 0
-                        messageType = readVar32(buf);
-                    break;
-                //数字类型 0int 1 long
-                case 40:// 5 << 3 | 0
-                        valueType = readVar32(buf);
-                    break;
-                //范围开始
-                case 48:// 6 << 3 | 0
-                        numStart = readVar64(buf);
-                    break;
-                //范围结束
-                case 56:// 7 << 3 | 0
-                        numEnd = readVar64(buf);
+                        direct = readBoolean(buf);
                     break;
                 default://skip
                     skip(buf, tag);
@@ -110,14 +84,8 @@ public class HandleMessage extends  Bean {
         }
         //是否共享messageId 不同的服务都可以处理
         size += computeBooleanSize(1,serverShare);
-        //消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
-        size += computeVar32Size(1,messageType);
-        //数字类型 0int 1 long
-        size += computeVar32Size(1,valueType);
-        //范围开始
-        size += computeVar64Size(1,numStart);
-        //范围结束
-        size += computeVar64Size(1,numEnd);
+        //true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
+        size += computeBooleanSize(1,direct);
         serializedSize = size ;
         return size ;
     }
@@ -168,119 +136,18 @@ public class HandleMessage extends  Bean {
         return this;
     }
     /**
-     * get 消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
+     *  is true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
      * @return
      */
-    public  int getMessageType() {
-        return messageType;
+    public  boolean  isDirect() {
+        return direct;
     }
 
     /**
-     * set 消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
+     * set true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
      */
-    public HandleMessage setMessageType(int messageType) {
-        this.messageType=messageType;
-        return this;
-    }
-    /**
-     * get 数字类型 0int 1 long
-     * @return
-     */
-    public  int getValueType() {
-        return valueType;
-    }
-
-    /**
-     * set 数字类型 0int 1 long
-     */
-    public HandleMessage setValueType(int valueType) {
-        this.valueType=valueType;
-        return this;
-    }
-    /**
-     * get 范围开始
-     * @return
-     */
-    public  long getNumStart() {
-        return numStart;
-    }
-
-    /**
-     * set 范围开始
-     */
-    public HandleMessage setNumStart(long numStart) {
-        this.numStart=numStart;
-        return this;
-    }
-    /**
-     * get 范围结束
-     * @return
-     */
-    public  long getNumEnd() {
-        return numEnd;
-    }
-
-    /**
-     * set 范围结束
-     */
-    public HandleMessage setNumEnd(long numEnd) {
-        this.numEnd=numEnd;
-        return this;
-    }
-
-    /**
-     * set 可以处理的消息ID
-     */
-    public HandleMessage set1HandleMessageId(int handleMessageId) {
-        this.handleMessageId=handleMessageId;
-        return this;
-    }
-
-    /**
-     * set 消息类名
-     */
-    public HandleMessage set2MessageClasses(String messageClasses) {
-        this.messageClasses=messageClasses;
-        return this;
-    }
-
-    /**
-     * set 是否共享messageId 不同的服务都可以处理
-     */
-    public HandleMessage set3ServerShare(boolean serverShare) {
-        this.serverShare=serverShare;
-        return this;
-    }
-
-    /**
-     * set 消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
-     */
-    public HandleMessage set4MessageType(int messageType) {
-        this.messageType=messageType;
-        return this;
-    }
-
-    /**
-     * set 数字类型 0int 1 long
-     */
-    public HandleMessage set5ValueType(int valueType) {
-        this.valueType=valueType;
-        return this;
-    }
-
-    /**
-     * set 范围开始
-     */
-    public HandleMessage set6NumStart(long numStart) {
-        this.numStart=numStart;
-        return this;
-    }
-
-    /**
-     * set 范围结束
-     */
-    public HandleMessage set7NumEnd(long numEnd) {
-        this.numEnd=numEnd;
+    public HandleMessage setDirect(boolean direct) {
+        this.direct=direct;
         return this;
     }
 
@@ -290,10 +157,7 @@ public class HandleMessage extends  Bean {
                 +"handleMessageId=" + handleMessageId
                 +",messageClasses=" + messageClasses
                 +",serverShare=" + serverShare
-                +",messageType=" + messageType
-                +",valueType=" + valueType
-                +",numStart=" + numStart
-                +",numEnd=" + numEnd
+                +",direct=" + direct
                 + "}";
    }
 
@@ -314,18 +178,9 @@ public class HandleMessage extends  Bean {
         //是否共享messageId 不同的服务都可以处理
         sb.append("\n");
         sb.append(indent).append(rightPad("serverShare", filedPad)).append(" = ").append(serverShare);
-        //消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
+        //true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
         sb.append("\n");
-        sb.append(indent).append(rightPad("messageType", filedPad)).append(" = ").append(messageType);
-        //数字类型 0int 1 long
-        sb.append("\n");
-        sb.append(indent).append(rightPad("valueType", filedPad)).append(" = ").append(valueType);
-        //范围开始
-        sb.append("\n");
-        sb.append(indent).append(rightPad("numStart", filedPad)).append(" = ").append(numStart);
-        //范围结束
-        sb.append("\n");
-        sb.append(indent).append(rightPad("numEnd", filedPad)).append(" = ").append(numEnd);
+        sb.append(indent).append(rightPad("direct", filedPad)).append(" = ").append(direct);
         sb.append("\n");
         sb.append(indent).append("}");
         return sb.toString();

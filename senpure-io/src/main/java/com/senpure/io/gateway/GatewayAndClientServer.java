@@ -24,7 +24,6 @@ public class GatewayAndClientServer {
 
     private IOServerProperties properties;
 
-    private IOMessageProperties ioMessageProperties;
     private ChannelFuture channelFuture;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -38,11 +37,6 @@ public class GatewayAndClientServer {
         Assert.notNull(messageExecuter);
             if (properties == null) {
                 properties = new IOServerProperties();
-            }
-            if (ioMessageProperties == null) {
-                ioMessageProperties = new IOMessageProperties();
-                ioMessageProperties.setInFormat(properties.isCsInFormat());
-                ioMessageProperties.setOutFormat(properties.isCsOutFormat());
             }
 
             logger.info("启动{}，监听端口号 {}", getReadableServerName(), properties.getCsPort());
@@ -73,7 +67,7 @@ public class GatewayAndClientServer {
                                 }
                                 p.addLast(new GatewayAndClientMessageDecoder());
                                 p.addLast(new GatewayAndClientMessageEncoder());
-                                p.addLast(new MessageLoggingHandler(LogLevel.DEBUG, ioMessageProperties));
+                                p.addLast(new LoggingHandler(LogLevel.DEBUG));
                                 OffLineHandler offLineHandler = new OffLineHandler();
                                 ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
                                 p.addLast(offLineHandler);

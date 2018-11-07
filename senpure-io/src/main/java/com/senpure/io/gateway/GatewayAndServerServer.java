@@ -22,7 +22,6 @@ import java.security.cert.CertificateException;
 public class GatewayAndServerServer {
     protected Logger logger = LoggerFactory.getLogger(getClass());
     private IOServerProperties properties;
-    private IOMessageProperties ioMessageProperties;
     private ChannelFuture channelFuture;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -36,11 +35,7 @@ public class GatewayAndServerServer {
         if (properties == null) {
             properties = new IOServerProperties();
         }
-        if (ioMessageProperties == null) {
-            ioMessageProperties = new IOMessageProperties();
-            ioMessageProperties.setInFormat(properties.isScInFormat());
-            ioMessageProperties.setOutFormat(properties.isScOutFormat());
-        }
+
         logger.debug("启动{}，监听端口号 {}", getReadableServerName(), properties.getScPort());
         readableServerName = readableServerName + "[" + properties.getScPort() + "]";
         final SslContext sslCtx;
@@ -71,7 +66,7 @@ public class GatewayAndServerServer {
                             }
                             p.addLast(new GatewayAndServerMessageDecoder());
                             p.addLast(new GatewayAndServerMessageEncoder());
-                            p.addLast(new MessageLoggingHandler(LogLevel.DEBUG, ioMessageProperties));
+                            p.addLast(new LoggingHandler(LogLevel.DEBUG));
                             OffLineHandler offLineHandler = new OffLineHandler();
                             ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
                             p.addLast(offLineHandler);

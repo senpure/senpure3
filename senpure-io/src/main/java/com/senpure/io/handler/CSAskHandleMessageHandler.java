@@ -4,9 +4,7 @@ import com.senpure.io.RealityMessageHandlerUtil;
 import com.senpure.io.message.CSAskHandleMessage;
 import com.senpure.io.message.SCAskHandleMessage;
 import com.senpure.io.message.Server2GatewayMessage;
-import com.senpure.io.server.GatewayManager;
 import io.netty.channel.Channel;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 询问服务器是否可以处理该值得请求处理器
@@ -16,22 +14,26 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CSAskHandleMessageHandler extends AbstractInnerMessageHandler<CSAskHandleMessage> {
 
-    @Autowired
-    private GatewayManager gatewayManager;
     @Override
     public void execute(Channel channel, long token, long userId, CSAskHandleMessage message) {
         RealityMessageHandler realityMessageHandler = RealityMessageHandlerUtil.getHandler(message.getFromMessageId());
         RealityAskMessageHandler askMessageHandler = (RealityAskMessageHandler) realityMessageHandler;
 
         SCAskHandleMessage scAskHandleMessage = askMessageHandler.ask(message);
-        if (scAskHandleMessage != null) {
-            Server2GatewayMessage toGateway = new Server2GatewayMessage();
-            toGateway.setToken(token);
-            toGateway.setUserIds(new Long[0]);
-            toGateway.setMessage(message);
-            toGateway.setMessageId(message.getMessageId());
-            channel.writeAndFlush(toGateway);
+        if (scAskHandleMessage == null) {
+            scAskHandleMessage = new SCAskHandleMessage();
+            scAskHandleMessage.setFromMessageId(message.getFromMessageId());
+            scAskHandleMessage.setHandle(false);
+            scAskHandleMessage.setToken(message.getToken());
+            scAskHandleMessage.setValue(message.getValue());
         }
+        Server2GatewayMessage toGateway = new Server2GatewayMessage();
+        toGateway.setToken(token);
+        toGateway.setUserIds(new Long[0]);
+        toGateway.setMessage(scAskHandleMessage);
+        toGateway.setMessageId(scAskHandleMessage.getMessageId());
+        channel.writeAndFlush(toGateway);
+
     }
 
     @Override

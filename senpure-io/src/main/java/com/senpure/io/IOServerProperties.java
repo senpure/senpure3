@@ -3,7 +3,7 @@ package com.senpure.io;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 
-@ConfigurationProperties("game")
+@ConfigurationProperties("server.io")
 public class IOServerProperties {
 
     private boolean ssl = false;
@@ -12,10 +12,7 @@ public class IOServerProperties {
     private boolean inFormat = false;
     private boolean outFormat = false;
 
-    private boolean csInFormat = false;
-    private boolean csOutFormat = false;
-    private boolean scInFormat = false;
-    private boolean scOutFormat = false;
+
     private int csPort = 2222;
     private int scPort = 3333;
 
@@ -53,37 +50,6 @@ public class IOServerProperties {
         this.outFormat = outFormat;
     }
 
-    public boolean isCsInFormat() {
-        return csInFormat;
-    }
-
-    public void setCsInFormat(boolean csInFormat) {
-        this.csInFormat = csInFormat;
-    }
-
-    public boolean isCsOutFormat() {
-        return csOutFormat;
-    }
-
-    public void setCsOutFormat(boolean csOutFormat) {
-        this.csOutFormat = csOutFormat;
-    }
-
-    public boolean isScInFormat() {
-        return scInFormat;
-    }
-
-    public void setScInFormat(boolean scInFormat) {
-        this.scInFormat = scInFormat;
-    }
-
-    public boolean isScOutFormat() {
-        return scOutFormat;
-    }
-
-    public void setScOutFormat(boolean scOutFormat) {
-        this.scOutFormat = scOutFormat;
-    }
 
     public int getCsPort() {
         return csPort;

@@ -42,32 +42,16 @@ public abstract class AbstractRealityMessageHandler<T extends Message> implement
 
     }
 
+
     @Override
-    public int messageType() {
-        return 0;
+    public boolean direct() {
+        return true;
     }
 
     @Override
     public boolean serverShare() {
         return false;
     }
-
-
-    @Override
-    public int valueType() {
-        return 0;
-    }
-
-    @Override
-    public long numStart() {
-        return 0;
-    }
-
-    @Override
-    public long numEnd() {
-        return 0;
-    }
-
 
     @Override
     public boolean regToGateway() {

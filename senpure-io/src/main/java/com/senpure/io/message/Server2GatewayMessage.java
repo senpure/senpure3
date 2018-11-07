@@ -59,6 +59,14 @@ public class Server2GatewayMessage {
 
 
     public String toString() {
+        if (message != null) {
+            return "Server2GatewayMessage{" +
+                    "messageId=" + messageId +
+                    ", token=" + token +
+                    ", userIds=" + Arrays.toString(userIds) +
+                    ", message=" + message +
+                    '}';
+        }
         return "Server2GatewayMessage{" +
                 "messageId=" + messageId +
                 ", token=" + token +
@@ -67,5 +75,16 @@ public class Server2GatewayMessage {
                 '}';
     }
 
+    public String toString(String indent) {
+        if (message == null) {
+            return toString();
+        }
+        return "Server2GatewayMessage{" +
+                "messageId=" + messageId +
+                ", token=" + token +
+                ", userIds=" + Arrays.toString(userIds) +
+                "\n" + message.toString(indent==null?"    ":indent) +
+                '}';
+    }
 
 }

@@ -5,10 +5,8 @@
         <field type="int" name="handleMessageId" explain="可以处理的消息ID"></field>
         <field type="String" name="messageClasses" explain="消息类名"></field>
         <field type="boolean" name="serverShare" explain="是否共享messageId 不同的服务都可以处理"></field>
-        <field type="int" name="messageType" explain="消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问"></field>
-        <field type="int" name="valueType" explain="数字类型 0int 1 long"></field>
-        <field type="long" name="numStart" explain="范围开始"></field>
-        <field type="long" name="numEnd" explain="范围结束"></field>
+        <field type="boolean" name="direct" explain="true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问"></field>
+
     </bean>
 
     <message id="104" type="SC" name="RegServerHandleMessage" explain="服务器注册消息处理器到网关">

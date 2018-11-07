@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
  * 关联用户与网关
  * 
  * @author senpure
- * @time 2018-11-1 15:06:13
+ * @time 2018-11-5 18:06:48
  */
 public class SCRelationUserGatewayMessage extends  Message {
     //channel token

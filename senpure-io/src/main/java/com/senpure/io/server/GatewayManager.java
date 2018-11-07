@@ -50,7 +50,7 @@ public class GatewayManager {
             GatewayRelation relation = new GatewayRelation();
             relation.relationToken = relationToken;
             relation.gatewayChannelManager = channelManager;
-            userGatewayMap.put(token, relation);
+            tokenGatewayMap.put(token, relation);
         }
     }
 

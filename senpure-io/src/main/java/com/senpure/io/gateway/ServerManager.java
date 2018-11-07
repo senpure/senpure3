@@ -72,11 +72,12 @@ public class ServerManager {
         return channel;
     }
 
-    public void bind(Long userId, ServerChannelManager serverChannelManager) {
-        userServerChannelManagerMap.put(userId, serverChannelManager);
+    public void bind(Long token, ServerChannelManager serverChannelManager) {
+        userServerChannelManagerMap.put(token, serverChannelManager);
 
     }
 
+    @Deprecated
     public Channel channel(Long token, Long userId) {
         Channel channel = null;
         ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(userId);
@@ -122,17 +123,17 @@ public class ServerManager {
 
 
     public void sendMessage(Client2GatewayMessage client2GatewayMessage) {
-        ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(client2GatewayMessage.getUserId());
+        ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(client2GatewayMessage.getToken());
         if (serverChannelManager == null) {
             serverChannelManager = nextServerChannelManager();
-            bindAndSendMessage(serverChannelManager, client2GatewayMessage);
+            bindAndWaitSendMessage(serverChannelManager, client2GatewayMessage);
 
         } else {
             serverChannelManager.sendMessage(client2GatewayMessage);
         }
     }
 
-    public void bindAndSendMessage(ServerChannelManager serverChannelManager , Client2GatewayMessage client2GatewayMessage) {
+    public void bindAndWaitSendMessage(ServerChannelManager serverChannelManager , Client2GatewayMessage client2GatewayMessage) {
         Long relationToken = messageExecuter.idGenerator.nextId();
         CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
         message.setToken(client2GatewayMessage.getToken());

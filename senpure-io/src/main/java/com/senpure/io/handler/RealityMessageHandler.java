@@ -15,9 +15,10 @@ public interface RealityMessageHandler<T extends Message> {
     int handlerId();
 
     /**
-     * 消息类型 0 可以直接转发过来 1 网关读取范围  2 网关询问
+     * 是否直接转发，false 网关会进行一次询问
+     * @return
      */
-    int messageType();
+    boolean  direct();
 
 
     /**
@@ -27,15 +28,9 @@ public interface RealityMessageHandler<T extends Message> {
 
 
     /**
-     * 类型 0int 1 long 2 String
+     * 内部请求不要注册到网关
+     * @return
      */
-
-    int valueType();
-
-    long numStart();
-
-    long numEnd();
-
     boolean regToGateway();
 
 }

@@ -43,39 +43,37 @@ public class GatewayMessageExecuter {
     private ConcurrentMap<Integer, ServerManager> messageHandleMap = new ConcurrentHashMap<>(2048);
     private ConcurrentMap<Integer, HandleMessageManager> handleMessageManagerMap = new ConcurrentHashMap<>(2048);
 
-    private ConcurrentMap<Long, AskMessage> askMap = new ConcurrentHashMap<>();
-
 
     protected IDGenerator idGenerator = new IDGenerator(0, 0);
     protected ConcurrentHashMap<Long, WaitRelationTask> waitRelationMap = new ConcurrentHashMap(16);
     protected ConcurrentHashMap<Long, WaitAskTask> waitAskMap = new ConcurrentHashMap(16);
 
     public GatewayMessageExecuter() {
-
-        service = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() * 2,
-                new NameThreadFactory("gateway-executor"));
+        this(Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() * 2,
+                new NameThreadFactory("gateway-executor")));
 
     }
 
     public GatewayMessageExecuter(ScheduledExecutorService service) {
         this.service = service;
+        startCheck();
     }
 
     public void channelActive(Channel channel) {
         Long token = idGenerator.nextId();
         ChannelAttributeUtil.setToken(channel, token);
         tokenChannel.putIfAbsent(token, channel);
-        logger.debug(" {} 绑定 token {}", channel, token);
+        logger.debug("{} 绑定 token {}", channel, token);
     }
 
     //将客户端消息转发给具体的服务器
     public void execute(final Channel channel, final Client2GatewayMessage message) {
 
         service.execute(() -> {
-            logger.info("messageId {} data {}", message.getMessageId(), message.getData()[0]);
+            logger.debug("{} messageId {} data {}",channel, message.getMessageId(), message.getData().length);
             //登录
             if (message.getMessageId() == csLoginMessageId) {
-                prepLoginChannels.putIfAbsent(ChannelAttributeUtil.getToken(channel), channel);
+                prepLoginChannels.put(ChannelAttributeUtil.getToken(channel), channel);
             }
             message.setToken(ChannelAttributeUtil.getToken(channel));
             //转发到具体的子服务器
@@ -93,6 +91,7 @@ public class GatewayMessageExecuter {
         });
     }
 
+    @Deprecated
     public Channel getChannel(Client2GatewayMessage message) {
         ServerManager serverManager = messageHandleMap.get(message.getMessageId());
         if (serverManager != null) {
@@ -152,20 +151,19 @@ public class GatewayMessageExecuter {
         readMessage(message, server2GatewayMessage);
         WaitAskTask waitAskTask = waitAskMap.get(message.getToken());
         if (waitAskTask != null) {
-
             if (message.isHandle()) {
                 String serverName = ChannelAttributeUtil.getServerName(channel);
                 String serverKey = ChannelAttributeUtil.getServerKey(channel);
                 ServerManager serverManager = serverInstanceMap.get(serverName);
                 for (ServerChannelManager useChannelManager : serverManager.getUseChannelManagers()) {
                     if (useChannelManager.getServerKey().equalsIgnoreCase(serverKey)) {
-                        waitAskTask.answer(serverManager,useChannelManager, true);
+                        waitAskTask.answer(serverManager, useChannelManager, true);
                         return;
                     }
                 }
-                waitAskTask.answer(null,null, false);
+                waitAskTask.answer(null, null, false);
             } else {
-                waitAskTask.answer(null,null, false);
+                waitAskTask.answer(null, null, false);
             }
 
             // waitAskTask.answer(channel, message.isHandle());
@@ -207,6 +205,7 @@ public class GatewayMessageExecuter {
 
     }
 
+    //todo 一个服务只允许一个ask id
     public synchronized void regServerInstance(Channel channel, Server2GatewayMessage server2GatewayMessage) {
         SCRegServerHandleMessageMessage message = new SCRegServerHandleMessageMessage();
         ByteBuf buf = Unpooled.buffer();
@@ -291,9 +290,7 @@ public class GatewayMessageExecuter {
         }
     }
 
-    public void addAskMessage(AskMessage askMessage) {
-        askMap.put(askMessage.getToken(), askMessage);
-    }
+
 
     public void sendMessage(ServerChannelManager serverChannelManager, Message message) {
         Client2GatewayMessage toMessage = new Client2GatewayMessage();
@@ -330,10 +327,8 @@ public class GatewayMessageExecuter {
             WaitAskTask waitAskTask = entry.getValue();
             if (waitAskTask.getServerChannelManager() != null) {
                 tokens.add(entry.getKey());
-
                 waitAskTask.sendMessage();
-            }
-            else {
+            } else {
 
             }
         }

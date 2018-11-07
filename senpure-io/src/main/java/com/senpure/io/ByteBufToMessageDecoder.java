@@ -56,7 +56,7 @@ public class ByteBufToMessageDecoder extends ByteToMessageDecoder {
                     logger.debug("二进制转换为消息失败 messageId {}, message{}", messageId, message);
                     logger.error("error",e);
                 }
-                in.skipBytes(messageLengh);
+               // in.skipBytes(messageLengh);
 
             }
 

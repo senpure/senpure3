@@ -79,7 +79,7 @@ public class RealityServer {
                         }
                         p.addLast(new RealityMessageDecoder());
                         p.addLast(new RealityMessageEncoder());
-                        p.addLast(new MessageLoggingHandler(LogLevel.DEBUG, ioMessageProperties));
+                        p.addLast(new RealityMessageLoggingHandler(LogLevel.DEBUG, ioMessageProperties));
                         p.addLast(new RealityServerHandler(messageExecuter));
                     }
                 });
