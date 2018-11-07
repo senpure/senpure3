@@ -3,7 +3,6 @@ package com.senpure.io.server;
 
 import com.senpure.io.message.Server2GatewayMessage;
 import com.senpure.io.protocol.Message;
-import io.netty.channel.Channel;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class GatewayManager {
 
         GatewayChannelManager manager = gatewayChannelMap.get(serverKey);
         if (manager == null) {
-            manager = new GatewayChannelManager();
+            manager = new GatewayChannelManager(serverKey);
             gatewayChannelMap.put(serverKey, manager);
             return gatewayChannelMap.get(serverKey);
         }
@@ -58,6 +57,7 @@ public class GatewayManager {
         GatewayRelation relation = userGatewayMap.get(userId);
         if (relation != null) {
             if (relation.relationToken == relationToken) {
+                logger.debug("{} 取消关联user {}", relation.gatewayChannelManager.getGatewayKey(), userId);
                 userGatewayMap.remove(userId);
             }
         }
@@ -65,10 +65,10 @@ public class GatewayManager {
     }
 
     public void breakToken(Long token, long relationToken) {
-
         GatewayRelation relation = tokenGatewayMap.get(token);
         if (relation != null) {
             if (relation.relationToken == relationToken) {
+                logger.debug("{} 取消关联token {}", relation.gatewayChannelManager.getGatewayKey(), token);
                 tokenGatewayMap.remove(token);
             }
         }
@@ -96,7 +96,7 @@ public class GatewayManager {
      */
     public void dispatchMessage2Gateway(Server2GatewayMessage message) {
         for (GatewayChannelManager value : gatewayChannelMap.values()) {
-            value.nextChannel().writeAndFlush(message);
+            value.sendMessage(message);
         }
 
     }
@@ -108,8 +108,8 @@ public class GatewayManager {
         toGateway.setMessage(message);
         toGateway.setMessageId(message.getMessageId());
         GatewayChannelManager channelServer = tokenGatewayMap.get(token).gatewayChannelManager;
-        Channel channel = channelServer.nextChannel();
-        channel.writeAndFlush(toGateway);
+        channelServer.sendMessage(toGateway);
+
     }
 
     public void sendMessage2Gateway(Long userId, Message message) {
@@ -117,7 +117,7 @@ public class GatewayManager {
         toGateway.setUserIds(new Long[]{userId});
         toGateway.setMessage(message);
         toGateway.setMessageId(message.getMessageId());
-        userGatewayMap.get(userId).gatewayChannelManager.nextChannel().writeAndFlush(toGateway);
+        userGatewayMap.get(userId).gatewayChannelManager.sendMessage(toGateway);
 
     }
 
@@ -140,7 +140,7 @@ public class GatewayManager {
             toGateway.setMessageId(message.getMessageId());
             Long[] users = new Long[gatewayUsers.userIds.size()];
             gatewayUsers.userIds.toArray(users);
-            gatewayUsers.gatewayChannelManager.nextChannel().writeAndFlush(toGateway);
+            gatewayUsers.gatewayChannelManager.sendMessage(toGateway);
         });
     }
 

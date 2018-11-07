@@ -2,12 +2,16 @@ package com.senpure.io.gateway;
 
 
 import com.senpure.io.message.Client2GatewayMessage;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class GatewayAndClientServerHandler extends SimpleChannelInboundHandler<Client2GatewayMessage> {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private GatewayMessageExecuter messageExecuter;
 
@@ -27,4 +31,11 @@ public class GatewayAndClientServerHandler extends SimpleChannelInboundHandler<C
         messageExecuter.execute(ctx.channel(), msg);
     }
 
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Channel channel = ctx.channel();
+        logger.debug("客户端{} 断开连接", channel);
+        messageExecuter.clientOffline(channel);
+
+    }
 }

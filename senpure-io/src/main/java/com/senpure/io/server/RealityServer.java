@@ -31,7 +31,7 @@ public class RealityServer {
     private EventLoopGroup group;
     private String serverName = "realityServer";
     private String readableServerName = "realityServer";
-    private boolean setReadbleServerName = false;
+    private boolean setReadableServerName = false;
     private RealityMessageExecuter messageExecuter;
 
     private static Map<String, Integer> firstPortMap = new ConcurrentHashMap<>();
@@ -53,7 +53,7 @@ public class RealityServer {
             ioMessageProperties.setOutFormat(properties.isOutFormat());
         }
         logger.debug("启动{}，网关地址 {}", getReadableServerName(), host + ":" + port);
-        if (!setReadbleServerName) {
+        if (!setReadableServerName) {
             readableServerName = readableServerName + "[" + host + ":" + port + "]";
         }
         // Configure SSL.
@@ -160,7 +160,7 @@ public class RealityServer {
 
     public void setServerName(String serverName) {
         this.serverName = serverName;
-        if (!setReadbleServerName) {
+        if (!setReadableServerName) {
             readableServerName = serverName;
         }
     }
@@ -168,6 +168,6 @@ public class RealityServer {
 
     public void setReadableServerName(String readableServerName) {
         this.readableServerName = readableServerName;
-        setReadbleServerName = true;
+        setReadableServerName = true;
     }
 }

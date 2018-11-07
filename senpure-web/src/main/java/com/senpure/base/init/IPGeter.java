@@ -47,10 +47,10 @@ public class IPGeter extends SpringContextRefreshEvent {
             ip = result.substring(i + 8, j);
             logger.debug("本机IP is {}", ip);
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
         }
 

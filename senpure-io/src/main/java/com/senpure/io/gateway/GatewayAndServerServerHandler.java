@@ -33,7 +33,8 @@ public class GatewayAndServerServerHandler extends SimpleChannelInboundHandler<S
         logger.debug("{} {} {} 断开连接", serverName, ChannelAttributeUtil.getServerKey(channel), channel);
         if (serverName != null) {
             ServerManager serverManager = messageExecuter.serverInstanceMap.get(serverName);
-            serverManager.offLine(channel);
+            messageExecuter.execute(() -> serverManager.serverOffLine(channel));
+
         }
 
 

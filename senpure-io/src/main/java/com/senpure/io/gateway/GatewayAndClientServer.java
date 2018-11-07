@@ -32,7 +32,7 @@ public class GatewayAndClientServer {
     private String serverName = "gatewayServer[cs]";
     private String readableServerName = "网关[CS]服务器";
 
-    public void start() throws CertificateException, SSLException {
+    public boolean start() throws CertificateException, SSLException {
 
         Assert.notNull(messageExecuter);
         if (properties == null) {
@@ -68,9 +68,9 @@ public class GatewayAndClientServer {
                             p.addLast(new GatewayAndClientMessageDecoder());
                             p.addLast(new GatewayAndClientMessageEncoder());
                             p.addLast(new LoggingHandler(LogLevel.DEBUG));
-                            OffLineHandler offLineHandler = new OffLineHandler();
-                            ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
-                            p.addLast(offLineHandler);
+                            //  OffLineHandler offLineHandler = new OffLineHandler();
+                            //  ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
+                            //  p.addLast(offLineHandler);
                             p.addLast(new GatewayAndClientServerHandler(messageExecuter));
 
                         }
@@ -82,9 +82,10 @@ public class GatewayAndClientServer {
 
             logger.error("启动" + getReadableServerName() + " 失败", e);
             destroy();
+            return false;
         }
 
-
+        return true;
     }
 
 

@@ -1,6 +1,8 @@
 package com.senpure.io.gateway;
 
 
+import com.senpure.io.ChannelAttributeUtil;
+import com.senpure.io.message.CSBreakUserGatewayMessage;
 import com.senpure.io.message.CSRelationUserGatewayMessage;
 import com.senpure.io.message.Client2GatewayMessage;
 import io.netty.buffer.ByteBuf;
@@ -15,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -36,7 +36,7 @@ public class ServerManager {
 
     private int csRelationMessageId = new CSRelationUserGatewayMessage().getMessageId();
 
-    private ConcurrentMap<Long, ServerChannelManager> tokenServerChannelManagerMap = new ConcurrentHashMap<>();
+    private ConcurrentMap<Long, ServerRelation> tokenServerChannelManagerMap = new ConcurrentHashMap<>();
 
     private List<ServerChannelManager> useChannelManagers = new ArrayList<>();
 
@@ -48,74 +48,34 @@ public class ServerManager {
     private int waitTimeFailCount = 0;
 
 
-    public void bind(Long token, ServerChannelManager serverChannelManager) {
-        tokenServerChannelManagerMap.put(token, serverChannelManager);
+    public void bind(Long token, Long relationToken, ServerChannelManager serverChannelManager) {
+        ServerRelation serverRelation = new ServerRelation();
+        serverRelation.serverChannelManager = serverChannelManager;
+        serverRelation.relationToken = relationToken;
+        tokenServerChannelManagerMap.put(token, serverRelation);
 
-    }
-
-    @Deprecated
-    public Channel channel(Long token, Long userId) {
-        Channel channel = null;
-        ServerChannelManager serverChannelManager = tokenServerChannelManagerMap.get(userId);
-        if (serverChannelManager == null) {
-            serverChannelManager = nextServerChannelManager();
-            channel = serverChannelManager.nextChannel();
-            Long relationToken = messageExecuter.idGenerator.nextId();
-            CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
-            message.setToken(token);
-            message.setUserId(userId);
-            message.setRelationToken(relationToken);
-
-            CountDownLatch countDownLatch = new CountDownLatch(1);
-            //messageExecuter.waitRelationMap.put(relationToken, countDownLatch);
-            Client2GatewayMessage toMessage = new Client2GatewayMessage();
-            toMessage.setMessageId(csRelationMessageId);
-            ByteBuf buf = Unpooled.buffer();
-            message.write(buf);
-            toMessage.setData(buf.array());
-            channel.writeAndFlush(toMessage);
-            try {
-                boolean result = countDownLatch.await(relationWaitTime, TimeUnit.MILLISECONDS);
-                if (!result) {
-                    waitTimeFailCount++;
-                    if (waitTimeFailCount >= 10) {
-                        relationWaitTime += 10;
-                        waitTimeFailCount = 0;
-                    }
-                    logger.warn("等待真实服务器返回关联结果过长 relationWaitTime {}  waitTimeFailCount {}", relationWaitTime, waitTimeFailCount);
-                    messageExecuter.waitRelationMap.remove(relationToken);
-                    return null;
-                }
-                tokenServerChannelManagerMap.put(userId, serverChannelManager);
-                return channel;
-            } catch (InterruptedException e) {
-                logger.error("等待关联用户与网关出错", e);
-            }
-
-        }
-        channel = serverChannelManager.nextChannel();
-        return channel;
     }
 
 
     public void sendMessage(Client2GatewayMessage client2GatewayMessage) {
-        ServerChannelManager serverChannelManager = tokenServerChannelManagerMap.get(client2GatewayMessage.getToken());
-        if (serverChannelManager == null) {
+        ServerRelation serverRelation = tokenServerChannelManagerMap.get(client2GatewayMessage.getToken());
+        ServerChannelManager serverChannelManager;
+        if (serverRelation == null) {
             serverChannelManager = nextServerChannelManager();
             if (serverChannelManager == null) {
 
                 logger.warn("{}没有服务实例可以使用", serverName);
             } else {
-                bindAndWaitSendMessage(serverChannelManager, client2GatewayMessage);
+                relationAndWaitSendMessage(serverChannelManager, client2GatewayMessage);
             }
 
         } else {
-            serverChannelManager.sendMessage(client2GatewayMessage);
+            serverRelation.serverChannelManager.sendMessage(client2GatewayMessage);
 
         }
     }
 
-    public void bindAndWaitSendMessage(ServerChannelManager serverChannelManager, Client2GatewayMessage client2GatewayMessage) {
+    public void relationAndWaitSendMessage(ServerChannelManager serverChannelManager, Client2GatewayMessage client2GatewayMessage) {
         Long relationToken = messageExecuter.idGenerator.nextId();
         CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
         message.setToken(client2GatewayMessage.getToken());
@@ -156,13 +116,17 @@ public class ServerManager {
         useChannelManagers.clear();
     }
 
-
-    public synchronized void offLine(Channel channel) {
-        offline(channel, prepStopOldInstance);
-        offline(channel, useChannelManagers);
+    /**
+     * 服务器掉线
+     *
+     * @param channel
+     */
+    public synchronized void serverOffLine(Channel channel) {
+        serverOffLine(channel, prepStopOldInstance);
+        serverOffLine(channel, useChannelManagers);
     }
 
-    private void offline(Channel channel, List<ServerChannelManager> channelManagers) {
+    private void serverOffLine(Channel channel, List<ServerChannelManager> channelManagers) {
         for (int i = 0; i < channelManagers.size(); i++) {
             ServerChannelManager serverChannelManager = channelManagers.get(i);
             if (serverChannelManager.offline(channel)) {
@@ -175,16 +139,42 @@ public class ServerManager {
 
     }
 
+
+    public void clientOffLine(Channel channel) {
+        Long token = ChannelAttributeUtil.getToken(channel);
+        Long userId = ChannelAttributeUtil.getUserId(channel);
+        userId = userId == null ? 0 : userId;
+        ServerRelation serverRelation = tokenServerChannelManagerMap.remove(token);
+        if (serverRelation != null) {
+            logger.info("{}{} 取消 对{} :token{} userId:{}的 关联",
+                    serverName, serverRelation.serverChannelManager.getServerKey(), channel, token, userId);
+            CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
+            breakUserGatewayMessage.setRelationToken(serverRelation.relationToken);
+            breakUserGatewayMessage.setUserId(userId);
+            breakUserGatewayMessage.setToken(token);
+            Client2GatewayMessage client2GatewayMessage = new Client2GatewayMessage();
+            client2GatewayMessage.setMessageId(breakUserGatewayMessage.getMessageId());
+            client2GatewayMessage.setUserId(breakUserGatewayMessage.getUserId());
+            client2GatewayMessage.setToken(breakUserGatewayMessage.getToken());
+            ByteBuf bf = Unpooled.buffer();
+            bf.ensureWritable(breakUserGatewayMessage.getSerializedSize());
+            breakUserGatewayMessage.write(bf);
+            client2GatewayMessage.setData(bf.array());
+            serverRelation.serverChannelManager.sendMessage(client2GatewayMessage);
+        }
+    }
+
+
     private void clearRelation(ServerChannelManager serverChannelManager) {
-        logger.warn("{} {} 全部channel已经下线 切换 清空关联列表");
+        logger.warn("{} {} 全部channel已经下线 清空关联列表", serverName, serverChannelManager.getServerKey());
         List<Long> tokens = new ArrayList<>();
-        for (Map.Entry<Long, ServerChannelManager> entry : tokenServerChannelManagerMap.entrySet()) {
-            if (serverChannelManager == entry.getValue()) {
+        for (Map.Entry<Long, ServerRelation> entry : tokenServerChannelManagerMap.entrySet()) {
+            if (serverChannelManager == entry.getValue().serverChannelManager) {
                 tokens.add(entry.getKey());
             }
         }
         for (Long token : tokens) {
-            logger.info("{} 取消关联 {} ", token, serverChannelManager.getServerKey());
+            logger.info("{} 取消关联 {} {} ", token, serverName, serverChannelManager.getServerKey());
             tokenServerChannelManagerMap.remove(token);
         }
     }
@@ -234,6 +224,11 @@ public class ServerManager {
 
     public boolean handleId(int messageId) {
         return handleIdsMap.get(messageId) != null;
+    }
+
+    class ServerRelation {
+        ServerChannelManager serverChannelManager;
+        Long relationToken;
     }
 
     public static void main(String[] args) {

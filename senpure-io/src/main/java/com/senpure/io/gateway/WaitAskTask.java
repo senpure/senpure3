@@ -44,7 +44,7 @@ public class WaitAskTask {
     }
 
     public void sendMessage() {
-        serverManager.bindAndWaitSendMessage(serverChannelManager, message);
+        serverManager.relationAndWaitSendMessage(serverChannelManager, message);
 
     }
 

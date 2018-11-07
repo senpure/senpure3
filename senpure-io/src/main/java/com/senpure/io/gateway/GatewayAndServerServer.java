@@ -30,7 +30,7 @@ public class GatewayAndServerServer {
 
     private GatewayMessageExecuter messageExecuter;
 
-    public void start() throws CertificateException, SSLException {
+    public boolean start() throws CertificateException, SSLException {
         Assert.notNull(messageExecuter);
         if (properties == null) {
             properties = new IOServerProperties();
@@ -49,8 +49,6 @@ public class GatewayAndServerServer {
         // Configure the server.
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup();
-
-
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
@@ -80,9 +78,10 @@ public class GatewayAndServerServer {
         } catch (Exception e) {
             logger.error("启动" + getReadableServerName() + " 失败", e);
             destroy();
+            return false;
         }
 
-
+        return true;
     }
 
 

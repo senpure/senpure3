@@ -42,7 +42,7 @@ public class WaitRelationTask {
 
 
     public void sendMessage() {
-        serverManager.bind(message.getToken(), serverChannelManager);
+        serverManager.bind(message.getToken(),relationToken, serverChannelManager);
         serverManager.sendMessage(message);
     }
 
