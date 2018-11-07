@@ -13,7 +13,7 @@ public class CSChannelOfflineMessageHandler extends AbstractRealityMessageHandle
 
     @Override
     public void execute(Channel channel, long token, long userId, CSChannelOfflineMessage message) {
-        //TODO 请在这里写下你的代码
+
 
     }
 

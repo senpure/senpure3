@@ -11,7 +11,6 @@ import java.util.List;
 
 /**
  * 处理网络断开(正常断开，与非正常断开)
- *
  */
 public class OffLineHandler extends ChannelInboundHandlerAdapter {
 
@@ -57,7 +56,7 @@ public class OffLineHandler extends ChannelInboundHandlerAdapter {
 
         MessageHandlerUtil.execute(() -> {
             String channelStr = ChannelAttributeUtil.getChannelLogStr(channel);
-            logger.info("{}断开网络进处理",channelStr);
+            logger.info("{}断开网络进处理", channelStr);
             int size = offLines.size();
 
             for (int i = size - 1; i > -1; i--) {

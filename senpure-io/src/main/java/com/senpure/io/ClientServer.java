@@ -74,7 +74,7 @@ public class ClientServer {
         try {
             logger.info("{}启动完成", getServerName());
             channelFuture = b.connect(host, port).sync();
-            channel=channelFuture.channel();
+            channel = channelFuture.channel();
         } catch (Exception e) {
             logger.error("启动" + getServerName() + " 失败", e);
             destroy();
@@ -83,6 +83,7 @@ public class ClientServer {
         return true;
 
     }
+
     public void destroy() {
         if (channelFuture != null) {
             channelFuture.channel().close();

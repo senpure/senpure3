@@ -16,7 +16,6 @@ public class ByteBufToMessageDecoder extends ByteToMessageDecoder {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
 
-
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         int rl = in.readableBytes();
@@ -32,10 +31,9 @@ public class ByteBufToMessageDecoder extends ByteToMessageDecoder {
         //logger.debug("pl={} ,rl={}", packageLength, in.readableBytes());
         //半包
         if (packageLength > in.readableBytes()) {
-           if(packageLength>2000000)
-           {
-               ctx.close().sync();
-           }
+            if (packageLength > 2000000) {
+                ctx.close().sync();
+            }
             logger.info("数据不够一个数据包 pl={} ,rl={}", packageLength, in.readableBytes());
             in.resetReaderIndex();
         } else {
@@ -44,19 +42,19 @@ public class ByteBufToMessageDecoder extends ByteToMessageDecoder {
             int messageLengh = packageLength - 4;
             if (message == null) {
                 logger.warn("没有找到消息处理程序 messageId {}", messageId);
-               // ctx.close();
+                // ctx.close();
                 in.skipBytes(messageLengh);
             } else {
                 try {
-                    message.read(in,in.readerIndex()+packageLength - 4);
-                   // message.read(in.copy(in.readerIndex(), packageLength - 4));
+                    message.read(in, in.readerIndex() + packageLength - 4);
+                    // message.read(in.copy(in.readerIndex(), packageLength - 4));
                     out.add(message);
                 } catch (Exception e) {
                     ctx.close();
                     logger.debug("二进制转换为消息失败 messageId {}, message{}", messageId, message);
-                    logger.error("error",e);
+                    logger.error("error", e);
                 }
-               // in.skipBytes(messageLengh);
+                // in.skipBytes(messageLengh);
 
             }
 

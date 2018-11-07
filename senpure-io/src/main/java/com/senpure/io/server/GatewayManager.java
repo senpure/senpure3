@@ -81,7 +81,7 @@ public class GatewayManager {
             breakToken(token, 0);
         }
         if (userId > 0) {
-            breakUser(userId,0);
+            breakUser(userId, 0);
         }
     }
 

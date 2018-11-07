@@ -83,7 +83,7 @@ public class Server2GatewayMessage {
                 "messageId=" + messageId +
                 ", token=" + token +
                 ", userIds=" + Arrays.toString(userIds) +
-                "\n" + message.toString(indent==null?"    ":indent) +
+                "\n" + message.toString(indent == null ? "    " : indent) +
                 '}';
     }
 

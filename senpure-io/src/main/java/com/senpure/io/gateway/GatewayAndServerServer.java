@@ -67,9 +67,9 @@ public class GatewayAndServerServer {
                             p.addLast(new GatewayAndServerMessageDecoder());
                             p.addLast(new GatewayAndServerMessageEncoder());
                             p.addLast(new LoggingHandler(LogLevel.DEBUG));
-                            OffLineHandler offLineHandler = new OffLineHandler();
-                            ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
-                            p.addLast(offLineHandler);
+                            // OffLineHandler offLineHandler = new OffLineHandler();
+                            // ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
+                            // p.addLast(offLineHandler);
                             p.addLast(new GatewayAndServerServerHandler(messageExecuter));
 
                         }

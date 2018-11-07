@@ -11,7 +11,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Message> {
     protected void channelRead0(ChannelHandlerContext ctx, Message message) throws Exception {
 
 
-        MessageHandlerUtil.execute(ctx.channel(),message);
+        MessageHandlerUtil.execute(ctx.channel(), message);
     }
 
 }

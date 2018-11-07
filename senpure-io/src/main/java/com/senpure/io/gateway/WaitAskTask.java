@@ -30,7 +30,7 @@ public class WaitAskTask {
         startTime = System.currentTimeMillis();
     }
 
-    public synchronized void answer(ServerManager serverManager,ServerChannelManager serverChannelManager, boolean canHandle) {
+    public synchronized void answer(ServerManager serverManager, ServerChannelManager serverChannelManager, boolean canHandle) {
         answerTimes++;
         if (canHandle) {
             if (this.serverChannelManager != null) {

@@ -83,7 +83,7 @@ public class HandleMessageManager {
 
             WaitAskTask waitAskTask = new WaitAskTask();
             waitAskTask.setAskToken(askHandleMessage.getToken());
-            int askTimes=0;
+            int askTimes = 0;
             for (ServerManager serverManager : serverManagers) {
                 askTimes += serverManager.getUseChannelManagers().size();
             }

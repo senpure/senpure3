@@ -24,11 +24,13 @@ public class MessageHandlerUtil {
 
         service.execute(() -> handlerMap.get(message.getMessageId()).execute(channel, message));
     }
+
     public static MessageHandler getHandler(int messageId) {
         return handlerMap.get(messageId);
     }
+
     public static void regMessageHandler(MessageHandler handler) {
-        Assert.isNull(handlerMap.get(handler.handlerId()), handler.handlerId()+" -> " + handler.getEmptyMessage().getClass().getName() + "  处理程序已经存在");
+        Assert.isNull(handlerMap.get(handler.handlerId()), handler.handlerId() + " -> " + handler.getEmptyMessage().getClass().getName() + "  处理程序已经存在");
         handlerMap.put(handler.handlerId(), handler);
     }
 

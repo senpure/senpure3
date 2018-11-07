@@ -66,6 +66,7 @@ public abstract class Bean {
     public static void writeSLong(ByteBuf buf, long value) {
         writeVar64(buf, encodeZigZag64(value));
     }
+
     public static void writeSFixed32(ByteBuf buf, int tag, int value) {
         writeVar32(buf, tag);
         buf.writeInt(value);
@@ -211,6 +212,7 @@ public abstract class Bean {
 
         return decodeZigZag32(readVar32(buf));
     }
+
     public static long readSLong(ByteBuf buf) {
 
         return decodeZigZag64(readVar64(buf));
@@ -235,8 +237,9 @@ public abstract class Bean {
 
         return buf.readDouble();
     }
+
     public static void readBean(ByteBuf buf, Bean value) {
-        value.read(buf, readVar32(buf)+buf.readerIndex());
+        value.read(buf, readVar32(buf) + buf.readerIndex());
 
     }
 
@@ -255,7 +258,6 @@ public abstract class Bean {
     public static long decodeZigZag64(long value) {
         return value >>> 1 ^ -(value & 1L);
     }
-
 
 
     static int getTagWriteType(int tag) {
@@ -431,13 +433,13 @@ public abstract class Bean {
 
     public static void main(String[] args) {
 
-        Class c=Bean.class;
+        Class c = Bean.class;
         Method[] methods = c.getDeclaredMethods();
 
         Set<String> names = new HashSet<>();
         StringBuilder sb = new StringBuilder();
         for (Method method : methods) {
-            if (method.getName().equals("main")||method.getName().equals("toString")) {
+            if (method.getName().equals("main") || method.getName().equals("toString")) {
                 continue;
             }
             names.add(method.getName());

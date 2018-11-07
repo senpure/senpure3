@@ -5,52 +5,53 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * 断开用户与网关
- * 
+ *
  * @author senpure
  * @time 2018-11-5 18:06:48
  */
-public class SCBreakUserGatewayMessage extends  Message {
+public class SCBreakUserGatewayMessage extends Message {
     //channel token
     private long token;
     //用户Id
     private long userId;
     //relation token
     private long relationToken;
+
     /**
      * 写入字节缓存
      */
     @Override
-    public void write(ByteBuf buf){
+    public void write(ByteBuf buf) {
         getSerializedSize();
         //channel token
-        writeVar64(buf,8,token);
+        writeVar64(buf, 8, token);
         //用户Id
-        writeVar64(buf,16,userId);
+        writeVar64(buf, 16, userId);
         //relation token
-        writeVar64(buf,24,relationToken);
+        writeVar64(buf, 24, relationToken);
     }
 
     /**
      * 读取字节缓存
      */
     @Override
-    public void read(ByteBuf buf,int endIndex){
-        while(true){
+    public void read(ByteBuf buf, int endIndex) {
+        while (true) {
             int tag = readTag(buf, endIndex);
             switch (tag) {
                 case 0://end
-                return;
+                    return;
                 //channel token
                 case 8:// 1 << 3 | 0
-                        token = readVar64(buf);
+                    token = readVar64(buf);
                     break;
                 //用户Id
                 case 16:// 2 << 3 | 0
-                        userId = readVar64(buf);
+                    userId = readVar64(buf);
                     break;
                 //relation token
                 case 24:// 3 << 3 | 0
-                        relationToken = readVar64(buf);
+                    relationToken = readVar64(buf);
                     break;
                 default://skip
                     skip(buf, tag);
@@ -62,27 +63,28 @@ public class SCBreakUserGatewayMessage extends  Message {
     private int serializedSize = -1;
 
     @Override
-    public int getSerializedSize(){
-        int size = serializedSize ;
-        if (size != -1 ){
+    public int getSerializedSize() {
+        int size = serializedSize;
+        if (size != -1) {
             return size;
         }
-        size = 0 ;
+        size = 0;
         //channel token
-        size += computeVar64Size(1,token);
+        size += computeVar64Size(1, token);
         //用户Id
-        size += computeVar64Size(1,userId);
+        size += computeVar64Size(1, userId);
         //relation token
-        size += computeVar64Size(1,relationToken);
-        serializedSize = size ;
-        return size ;
+        size += computeVar64Size(1, relationToken);
+        serializedSize = size;
+        return size;
     }
 
     /**
      * get channel token
+     *
      * @return
      */
-    public  long getToken() {
+    public long getToken() {
         return token;
     }
 
@@ -90,14 +92,16 @@ public class SCBreakUserGatewayMessage extends  Message {
      * set channel token
      */
     public SCBreakUserGatewayMessage setToken(long token) {
-        this.token=token;
+        this.token = token;
         return this;
     }
+
     /**
      * get 用户Id
+     *
      * @return
      */
-    public  long getUserId() {
+    public long getUserId() {
         return userId;
     }
 
@@ -105,14 +109,16 @@ public class SCBreakUserGatewayMessage extends  Message {
      * set 用户Id
      */
     public SCBreakUserGatewayMessage setUserId(long userId) {
-        this.userId=userId;
+        this.userId = userId;
         return this;
     }
+
     /**
      * get relation token
+     *
      * @return
      */
-    public  long getRelationToken() {
+    public long getRelationToken() {
         return relationToken;
     }
 
@@ -120,7 +126,7 @@ public class SCBreakUserGatewayMessage extends  Message {
      * set relation token
      */
     public SCBreakUserGatewayMessage setRelationToken(long relationToken) {
-        this.relationToken=relationToken;
+        this.relationToken = relationToken;
         return this;
     }
 
@@ -132,11 +138,11 @@ public class SCBreakUserGatewayMessage extends  Message {
     @Override
     public String toString() {
         return "SCBreakUserGatewayMessage[1202]{"
-                +"token=" + token
-                +",userId=" + userId
-                +",relationToken=" + relationToken
+                + "token=" + token
+                + ",userId=" + userId
+                + ",relationToken=" + relationToken
                 + "}";
-   }
+    }
 
     //最长字段长度 13
     private int filedPad = 13;

@@ -2,8 +2,8 @@ package com.senpure.io;
 
 
 public class IOMessageProperties {
-    private boolean inFormat=false;
-    private boolean outFormat=false;
+    private boolean inFormat = false;
+    private boolean outFormat = false;
 
     public boolean isInFormat() {
         return inFormat;

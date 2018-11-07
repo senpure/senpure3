@@ -35,54 +35,54 @@ public class GatewayAndClientServer {
     public void start() throws CertificateException, SSLException {
 
         Assert.notNull(messageExecuter);
-            if (properties == null) {
-                properties = new IOServerProperties();
-            }
+        if (properties == null) {
+            properties = new IOServerProperties();
+        }
 
-            logger.info("启动{}，监听端口号 {}", getReadableServerName(), properties.getCsPort());
-             readableServerName = readableServerName + "[" + properties.getCsPort() + "]";
-            // Configure SSL.
-            final SslContext sslCtx;
-            if (properties.isSsl()) {
-                SelfSignedCertificate ssc = new SelfSignedCertificate();
-                sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-            } else {
-                sslCtx = null;
-            }
-            // Configure the server.
-            bossGroup = new NioEventLoopGroup(1);
-            workerGroup = new NioEventLoopGroup();
-            try {
-                ServerBootstrap b = new ServerBootstrap();
-                b.group(bossGroup, workerGroup)
-                        .channel(NioServerSocketChannel.class)
-                        .option(ChannelOption.SO_BACKLOG, 100)
-                        .handler(new LoggingHandler(LogLevel.INFO))
-                        .childHandler(new ChannelInitializer<SocketChannel>() {
-                            @Override
-                            public void initChannel(SocketChannel ch) throws Exception {
-                                ChannelPipeline p = ch.pipeline();
-                                if (sslCtx != null) {
-                                    p.addLast(sslCtx.newHandler(ch.alloc()));
-                                }
-                                p.addLast(new GatewayAndClientMessageDecoder());
-                                p.addLast(new GatewayAndClientMessageEncoder());
-                                p.addLast(new LoggingHandler(LogLevel.DEBUG));
-                                OffLineHandler offLineHandler = new OffLineHandler();
-                                ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
-                                p.addLast(offLineHandler);
-                                p.addLast(new GatewayAndClientServerHandler(messageExecuter));
-
+        logger.info("启动{}，监听端口号 {}", getReadableServerName(), properties.getCsPort());
+        readableServerName = readableServerName + "[" + properties.getCsPort() + "]";
+        // Configure SSL.
+        final SslContext sslCtx;
+        if (properties.isSsl()) {
+            SelfSignedCertificate ssc = new SelfSignedCertificate();
+            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
+        } else {
+            sslCtx = null;
+        }
+        // Configure the server.
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup();
+        try {
+            ServerBootstrap b = new ServerBootstrap();
+            b.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 100)
+                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        public void initChannel(SocketChannel ch) throws Exception {
+                            ChannelPipeline p = ch.pipeline();
+                            if (sslCtx != null) {
+                                p.addLast(sslCtx.newHandler(ch.alloc()));
                             }
-                        });
-                // Start the server.
-                channelFuture = b.bind(properties.getCsPort()).sync();
-                logger.info("{}启动完成", getReadableServerName());
-            } catch (Exception e) {
+                            p.addLast(new GatewayAndClientMessageDecoder());
+                            p.addLast(new GatewayAndClientMessageEncoder());
+                            p.addLast(new LoggingHandler(LogLevel.DEBUG));
+                            OffLineHandler offLineHandler = new OffLineHandler();
+                            ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
+                            p.addLast(offLineHandler);
+                            p.addLast(new GatewayAndClientServerHandler(messageExecuter));
 
-                logger.error("启动" + getReadableServerName() + " 失败", e);
-                destroy();
-            }
+                        }
+                    });
+            // Start the server.
+            channelFuture = b.bind(properties.getCsPort()).sync();
+            logger.info("{}启动完成", getReadableServerName());
+        } catch (Exception e) {
+
+            logger.error("启动" + getReadableServerName() + " 失败", e);
+            destroy();
+        }
 
 
     }

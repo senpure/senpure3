@@ -38,7 +38,7 @@ public class GatewayMessageExecuter {
 
     private ConcurrentMap<Long, Channel> userClientChannel = new ConcurrentHashMap<>(32768);
     private ConcurrentMap<Long, Channel> tokenChannel = new ConcurrentHashMap<>(32768);
-    private ConcurrentMap<String, ServerManager> serverInstanceMap = new ConcurrentHashMap<>(128);
+    protected ConcurrentMap<String, ServerManager> serverInstanceMap = new ConcurrentHashMap<>(128);
 
     private ConcurrentMap<Integer, ServerManager> messageHandleMap = new ConcurrentHashMap<>(2048);
     private ConcurrentMap<Integer, HandleMessageManager> handleMessageManagerMap = new ConcurrentHashMap<>(2048);
@@ -70,7 +70,7 @@ public class GatewayMessageExecuter {
     public void execute(final Channel channel, final Client2GatewayMessage message) {
 
         service.execute(() -> {
-            logger.debug("{} messageId {} data {}",channel, message.getMessageId(), message.getData().length);
+            logger.debug("{} messageId {} data {}", channel, message.getMessageId(), message.getData().length);
             //登录
             if (message.getMessageId() == csLoginMessageId) {
                 prepLoginChannels.put(ChannelAttributeUtil.getToken(channel), channel);
@@ -289,7 +289,6 @@ public class GatewayMessageExecuter {
 
         }
     }
-
 
 
     public void sendMessage(ServerChannelManager serverChannelManager, Message message) {

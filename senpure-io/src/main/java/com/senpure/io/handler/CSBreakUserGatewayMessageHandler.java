@@ -14,10 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CSBreakUserGatewayMessageHandler extends AbstractRealityMessageHandler<CSBreakUserGatewayMessage> {
     @Autowired
     private GatewayManager gatewayManager;
+
     @Override
     public void execute(Channel channel, long token, long userId, CSBreakUserGatewayMessage message) {
 
-        gatewayManager.breakToken(message.getToken(),message.getRelationToken());
+        gatewayManager.breakToken(message.getToken(), message.getRelationToken());
         gatewayManager.breakUser(message.getUserId(), message.getRelationToken());
 
     }

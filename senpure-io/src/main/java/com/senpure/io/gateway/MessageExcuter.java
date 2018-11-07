@@ -8,7 +8,7 @@ import com.senpure.io.message.Client2GatewayMessage;
  * @author senpure
  * @time 2018-10-25 15:54:53
  */
-public interface MessageExcuter  {
+public interface MessageExcuter {
 
 
     void execute(Client2GatewayMessage message);

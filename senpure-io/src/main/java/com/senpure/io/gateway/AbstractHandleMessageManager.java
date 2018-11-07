@@ -15,7 +15,6 @@ public abstract class AbstractHandleMessageManager {
     private boolean serverShare;
 
 
-
     public int getMessageType() {
         return messageType;
     }

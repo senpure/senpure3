@@ -17,7 +17,7 @@ public class RealityServerHandler extends SimpleChannelInboundHandler<Gateway2Se
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Gateway2ServerMessage msg) throws Exception {
-        messageExecuter.execute(ctx.channel(),msg);
+        messageExecuter.execute(ctx.channel(), msg);
     }
 
 }

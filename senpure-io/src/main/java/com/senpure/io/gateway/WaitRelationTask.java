@@ -9,7 +9,7 @@ import com.senpure.io.message.Client2GatewayMessage;
  * @author senpure
  * @time 2018-11-01 14:04:52
  */
-public class WaitRelationTask  {
+public class WaitRelationTask {
 
     private boolean relation = false;
     protected long startTime;
@@ -81,10 +81,6 @@ public class WaitRelationTask  {
     }
 
 
-
-
-
-
     public Long getRelationToken() {
         return relationToken;
     }
@@ -100,7 +96,6 @@ public class WaitRelationTask  {
     public void setRelation(boolean relation) {
         this.relation = relation;
     }
-
 
 
     public long getRelationTime() {

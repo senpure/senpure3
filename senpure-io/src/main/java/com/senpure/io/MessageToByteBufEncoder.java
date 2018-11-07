@@ -17,7 +17,7 @@ public class MessageToByteBufEncoder extends MessageToByteEncoder<Message> {
     protected void encode(ChannelHandlerContext channelHandlerContext, Message message, ByteBuf out) throws Exception {
 
         int length = message.getSerializedSize();
-       // logger.debug("message length {}", length);
+        // logger.debug("message length {}", length);
         //head 4 +messageId 4+ content length
 
         out.ensureWritable(8 + length);
@@ -26,7 +26,7 @@ public class MessageToByteBufEncoder extends MessageToByteEncoder<Message> {
 
         message.write(out);
 
-       // logger.debug("out length {}", out.writerIndex());
+        // logger.debug("out length {}", out.writerIndex());
 
 
     }

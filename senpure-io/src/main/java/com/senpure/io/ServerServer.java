@@ -25,7 +25,8 @@ public class ServerServer {
     private EventLoopGroup workerGroup;
     private String serverName = "游戏服务器";
     private IOMessageProperties ioMessageProperties;
-    public void start () throws CertificateException, SSLException {
+
+    public void start() throws CertificateException, SSLException {
         {
             logger.debug("启动游戏服务器，监听端口号 {}", properties.getPort());
             if (properties == null) {
@@ -37,8 +38,8 @@ public class ServerServer {
                 ioMessageProperties.setOutFormat(properties.isOutFormat());
             }
 
-            logger.debug("启动{}，监听端口号 {}", getServerName(),  properties.getPort());
-            serverName = serverName + "[" + properties.getPort()+ "]";
+            logger.debug("启动{}，监听端口号 {}", getServerName(), properties.getPort());
+            serverName = serverName + "[" + properties.getPort() + "]";
             // Configure SSL.
             final SslContext sslCtx;
             if (properties.isSsl()) {
@@ -97,6 +98,7 @@ public class ServerServer {
         logger.debug("关闭{}并释放资源 ", getServerName());
 
     }
+
     public IOServerProperties getProperties() {
         return properties;
     }

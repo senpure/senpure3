@@ -16,9 +16,10 @@ public interface RealityMessageHandler<T extends Message> {
 
     /**
      * 是否直接转发，false 网关会进行一次询问
+     *
      * @return
      */
-    boolean  direct();
+    boolean direct();
 
 
     /**
@@ -29,6 +30,7 @@ public interface RealityMessageHandler<T extends Message> {
 
     /**
      * 内部请求不要注册到网关
+     *
      * @return
      */
     boolean regToGateway();

@@ -36,7 +36,7 @@ public class ServerManager {
 
     private int csRelationMessageId = new CSRelationUserGatewayMessage().getMessageId();
 
-    private ConcurrentMap<Long, ServerChannelManager> userServerChannelManagerMap = new ConcurrentHashMap<>();
+    private ConcurrentMap<Long, ServerChannelManager> tokenServerChannelManagerMap = new ConcurrentHashMap<>();
 
     private List<ServerChannelManager> useChannelManagers = new ArrayList<>();
 
@@ -47,40 +47,16 @@ public class ServerManager {
     private int relationWaitTime = 200;
     private int waitTimeFailCount = 0;
 
-    //不用等待返回
-    public Channel channel2(Long token, Long userId) {
-        Channel channel = null;
-        ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(userId);
-        if (serverChannelManager == null) {
-            serverChannelManager = nextServerChannelManager();
-            channel = serverChannelManager.nextChannel();
-            Long relationToken = messageExecuter.idGenerator.nextId();
-            CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
-            message.setToken(token);
-            message.setUserId(userId);
-            message.setRelationToken(relationToken);
-            Client2GatewayMessage toMessage = new Client2GatewayMessage();
-            toMessage.setMessageId(csRelationMessageId);
-            ByteBuf buf = Unpooled.buffer();
-            message.write(buf);
-            toMessage.setData(buf.array());
-            channel.writeAndFlush(toMessage);
-            userServerChannelManagerMap.put(userId, serverChannelManager);
-            return channel;
-        }
-        channel = serverChannelManager.nextChannel();
-        return channel;
-    }
 
     public void bind(Long token, ServerChannelManager serverChannelManager) {
-        userServerChannelManagerMap.put(token, serverChannelManager);
+        tokenServerChannelManagerMap.put(token, serverChannelManager);
 
     }
 
     @Deprecated
     public Channel channel(Long token, Long userId) {
         Channel channel = null;
-        ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(userId);
+        ServerChannelManager serverChannelManager = tokenServerChannelManagerMap.get(userId);
         if (serverChannelManager == null) {
             serverChannelManager = nextServerChannelManager();
             channel = serverChannelManager.nextChannel();
@@ -110,7 +86,7 @@ public class ServerManager {
                     messageExecuter.waitRelationMap.remove(relationToken);
                     return null;
                 }
-                userServerChannelManagerMap.put(userId, serverChannelManager);
+                tokenServerChannelManagerMap.put(userId, serverChannelManager);
                 return channel;
             } catch (InterruptedException e) {
                 logger.error("等待关联用户与网关出错", e);
@@ -123,17 +99,23 @@ public class ServerManager {
 
 
     public void sendMessage(Client2GatewayMessage client2GatewayMessage) {
-        ServerChannelManager serverChannelManager = userServerChannelManagerMap.get(client2GatewayMessage.getToken());
+        ServerChannelManager serverChannelManager = tokenServerChannelManagerMap.get(client2GatewayMessage.getToken());
         if (serverChannelManager == null) {
             serverChannelManager = nextServerChannelManager();
-            bindAndWaitSendMessage(serverChannelManager, client2GatewayMessage);
+            if (serverChannelManager == null) {
+
+                logger.warn("{}没有服务实例可以使用", serverName);
+            } else {
+                bindAndWaitSendMessage(serverChannelManager, client2GatewayMessage);
+            }
 
         } else {
             serverChannelManager.sendMessage(client2GatewayMessage);
+
         }
     }
 
-    public void bindAndWaitSendMessage(ServerChannelManager serverChannelManager , Client2GatewayMessage client2GatewayMessage) {
+    public void bindAndWaitSendMessage(ServerChannelManager serverChannelManager, Client2GatewayMessage client2GatewayMessage) {
         Long relationToken = messageExecuter.idGenerator.nextId();
         CSRelationUserGatewayMessage message = new CSRelationUserGatewayMessage();
         message.setToken(client2GatewayMessage.getToken());
@@ -154,12 +136,15 @@ public class ServerManager {
     }
 
     protected ServerChannelManager nextServerChannelManager() {
+        if (useChannelManagers.size() == 0) {
+            return null;
+        }
         ServerChannelManager manager = useChannelManagers.get(nextIndex());
         return manager;
     }
 
     private int nextIndex() {
-        if (useChannelManagers.size() == 0) {
+        if (useChannelManagers.size() == 1) {
             return 0;
         }
         int index = atomicIndex.incrementAndGet();
@@ -169,6 +154,39 @@ public class ServerManager {
     public synchronized void prepStopOldInstance() {
         prepStopOldInstance.addAll(useChannelManagers);
         useChannelManagers.clear();
+    }
+
+
+    public synchronized void offLine(Channel channel) {
+        offline(channel, prepStopOldInstance);
+        offline(channel, useChannelManagers);
+    }
+
+    private void offline(Channel channel, List<ServerChannelManager> channelManagers) {
+        for (int i = 0; i < channelManagers.size(); i++) {
+            ServerChannelManager serverChannelManager = channelManagers.get(i);
+            if (serverChannelManager.offline(channel)) {
+                if (!serverChannelManager.isActive()) {
+                    channelManagers.remove(i);
+                    clearRelation(serverChannelManager);
+                }
+            }
+        }
+
+    }
+
+    private void clearRelation(ServerChannelManager serverChannelManager) {
+        logger.warn("{} {} 全部channel已经下线 切换 清空关联列表");
+        List<Long> tokens = new ArrayList<>();
+        for (Map.Entry<Long, ServerChannelManager> entry : tokenServerChannelManagerMap.entrySet()) {
+            if (serverChannelManager == entry.getValue()) {
+                tokens.add(entry.getKey());
+            }
+        }
+        for (Long token : tokens) {
+            logger.info("{} 取消关联 {} ", token, serverChannelManager.getServerKey());
+            tokenServerChannelManagerMap.remove(token);
+        }
     }
 
     public String getServerName() {

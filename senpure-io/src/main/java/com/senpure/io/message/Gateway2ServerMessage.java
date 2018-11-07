@@ -3,7 +3,7 @@ package com.senpure.io.message;
 import io.netty.buffer.ByteBuf;
 
 
-public class Gateway2ServerMessage  {
+public class Gateway2ServerMessage {
 
     private long token;
     private int messageId;
@@ -19,9 +19,6 @@ public class Gateway2ServerMessage  {
     public void setMessageId(int messageId) {
         this.messageId = messageId;
     }
-
-
-
 
 
     public ByteBuf getBuf() {
@@ -55,7 +52,7 @@ public class Gateway2ServerMessage  {
                 "token=" + token +
                 ", messageId=" + messageId +
                 ", userId=" + userId +
-                ", buf=" + buf.writerIndex()+
+                ", buf=" + buf.writerIndex() +
                 '}';
     }
 }

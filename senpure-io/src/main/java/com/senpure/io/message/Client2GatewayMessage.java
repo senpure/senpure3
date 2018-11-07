@@ -45,7 +45,6 @@ public class Client2GatewayMessage {
     }
 
 
-
     @Override
     public String toString() {
         return "Client2GatewayMessage{" +

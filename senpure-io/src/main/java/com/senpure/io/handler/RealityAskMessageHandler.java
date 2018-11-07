@@ -8,6 +8,6 @@ import com.senpure.io.protocol.Message;
 public interface RealityAskMessageHandler<T extends Message> extends RealityMessageHandler<T> {
 
 
-   SCAskHandleMessage ask(CSAskHandleMessage message);
+    SCAskHandleMessage ask(CSAskHandleMessage message);
 
 }

@@ -54,17 +54,17 @@ public class MessageLoggingHandler extends LoggingHandler {
                     this.logger.log(this.internalLevel, "{} {} {}{}",
                             ChannelAttributeUtil.getChannelLogStr(ctx.channel()),
                             "RECEIVED", "\n", ((Message) msg).toString(null));
-                   // this.logger.log(this.internalLevel, this.format(ctx, ChannelAttributeUtil.getChannelPlayerStr(ctx.channel()) + " RECEIVED", "\n" + ((Message) msg).toString(null)));
+                    // this.logger.log(this.internalLevel, this.format(ctx, ChannelAttributeUtil.getChannelPlayerStr(ctx.channel()) + " RECEIVED", "\n" + ((Message) msg).toString(null)));
 
                 } else {
-                    this.logger.log(this.internalLevel, "{} {} {}{}",
+                    this.logger.log(this.internalLevel, "{} {} {}",
                             ChannelAttributeUtil.getChannelLogStr(ctx.channel()),
-                            "RECEIVED: ",  msg);
+                            "RECEIVED: ", msg);
                 }
             } else {
-                this.logger.log(this.internalLevel, "{} {} {}{}",
+                this.logger.log(this.internalLevel, "{} {} {}",
                         ChannelAttributeUtil.getChannelLogStr(ctx.channel()),
-                        "RECEIVED: ",  msg);
+                        "RECEIVED: ", msg);
             }
         }
         ctx.fireChannelRead(msg);

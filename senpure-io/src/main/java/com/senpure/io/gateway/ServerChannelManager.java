@@ -1,5 +1,6 @@
 package com.senpure.io.gateway;
 
+import com.senpure.io.ChannelAttributeUtil;
 import com.senpure.io.message.Client2GatewayMessage;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ public class ServerChannelManager {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     // private ConcurrentMap<Integer, Channel> serverChannels = new ConcurrentHashMap<>();
-    private List<Channel> channels = new ArrayList<>(16);
+    protected List<Channel> channels = new ArrayList<>(16);
 
     private AtomicInteger atomicIndex = new AtomicInteger(-1);
 
@@ -42,14 +43,28 @@ public class ServerChannelManager {
 
     }
 
+    public boolean isActive() {
+        return channels.size() > 0;
+    }
+
     public boolean handleRange(long num) {
         return num >= start && num <= end;
     }
 
-    public void addChannel(Channel channel) {
+    public synchronized void addChannel(Channel channel) {
         channels.add(channel);
     }
 
+    public synchronized boolean offline(Channel channel) {
+        for (int i = 0; i < channels.size(); i++) {
+            if (channel == channels.get(i)) {
+                logger.info("{} {}与网关断开连接", ChannelAttributeUtil.getServerName(channel), channel);
+                channels.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
 
     public boolean handle(long value) {
         return value >= start && value <= end;
@@ -73,11 +88,14 @@ public class ServerChannelManager {
     }
 
     public Channel nextChannel() {
+        if (channels.size() == 0) {
+            return null;
+        }
         return channels.get(nextIndex());
     }
 
     private int nextIndex() {
-        if (channels.size() == 0) {
+        if (channels.size() == 1) {
             return 0;
         }
         int index = atomicIndex.incrementAndGet();
