@@ -1,4 +1,4 @@
-package com.senpure.io.event.handler;
+package com.senpure.io.handler;
 
 
 import com.senpure.io.protocol.Event;

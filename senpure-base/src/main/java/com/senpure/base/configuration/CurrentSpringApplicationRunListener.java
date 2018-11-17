@@ -26,12 +26,12 @@ public class CurrentSpringApplicationRunListener implements SpringApplicationRun
 
     @Override
     public void environmentPrepared(ConfigurableEnvironment environment) {
-            //保证开发阶段的的有几个classpath 时rootPath正确性
-        StackTraceElement[] statcks = Thread.currentThread()
-                .getStackTrace();
+        //保证开发阶段的的有几个classpath 时rootPath正确性
+
+        StackTraceElement[]  statcks = Thread.currentThread().getStackTrace();
 
         StackTraceElement statck = statcks[statcks.length - 1];
-        Class clazz=null;
+        Class clazz = null;
         try {
             clazz = Class.forName(statck.getClassName());
             AppEvn.markClassRootPath(clazz);

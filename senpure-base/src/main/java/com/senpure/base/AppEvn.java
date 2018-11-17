@@ -24,6 +24,8 @@ public class AppEvn {
     private static String classRootPath;
     private static Logger logger = LoggerFactory.getLogger(AppEvn.class);
 
+    private static boolean installedAnsi = false;
+
     public static boolean isWindowsOS() {
         String os = System.getProperty("os.name").toLowerCase();
         return os.contains("windows");
@@ -146,14 +148,19 @@ public class AppEvn {
      * @return
      */
     public static boolean classInJar(Class clazz) {
+        return  classInJar(clazz,true);
+    }
+
+    private static boolean classInJar(Class clazz, boolean log) {
         URL url = clazz.getResource("");
-        logger.trace("clazz {}  url {}", url, clazz.getName());
+        if (log) {
+            logger.trace("clazz {}  url {}", url, clazz.getName());
+        }
         if (url == null) {
             return true;
         }
         return url.toString().contains("jar:file:");
     }
-
 
     public static boolean callerInJar() {
         return classInJar(getCallerClass());
@@ -226,18 +233,29 @@ public class AppEvn {
     }
 
     public static void installAnsiConsole(Class clazz) {
+        if (installedAnsi) {
+            return;
+        }
         try {
             Class.forName("org.fusesource.jansi.AnsiConsole");
             AnsiOutput.setEnabled(AnsiOutput.Enabled.ALWAYS);
-            if (AppEvn.classInJar(clazz)) {
-                String name=clazz.getResource("").toString();
-                if (!name.contains("debugger-agent-storage.jar")&&!name.contains("deploy.jar")) {
+            if (AppEvn.classInJar(clazz,false)) {
+                URL url = clazz.getResource("");
+                if (url == null) {
+                    logger.info("url is null {}", clazz);
                     AnsiConsole.systemInstall();
+                } else {
+                    String name = url.toString();
+                    if (!name.contains("debugger-agent-storage.jar") && !name.contains("deploy.jar")) {
+                        AnsiConsole.systemInstall();
+                    }
                 }
+
             }
         } catch (ClassNotFoundException e) {
             logger.info("不适用控制台彩色日志");
         }
+        installedAnsi = true;
     }
 
     public static void installAnsiConsole() {

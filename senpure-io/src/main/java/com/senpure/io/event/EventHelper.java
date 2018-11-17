@@ -1,7 +1,7 @@
 package com.senpure.io.event;
 
 import com.senpure.base.util.Assert;
-import com.senpure.io.event.handler.EventHandler;
+import com.senpure.io.handler.EventHandler;
 import com.senpure.io.protocol.Bean;
 import com.senpure.io.protocol.Event;
 import io.netty.buffer.ByteBuf;
