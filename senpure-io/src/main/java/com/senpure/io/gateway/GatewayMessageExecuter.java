@@ -119,6 +119,18 @@ public class GatewayMessageExecuter {
     }
 
 
+    /**
+     * 子类可重写该方法，实现特殊处理
+     *
+     * @param channel
+     * @param message
+     * @return false 中断消息的后续处理
+     */
+    protected boolean receiveServerMessage(Channel channel, Server2GatewayMessage message) {
+
+        return true;
+    }
+
     //处理服务器发过来的消息
     public void execute(Channel channel, final Server2GatewayMessage message) {
         service.execute(() -> {
@@ -126,7 +138,6 @@ public class GatewayMessageExecuter {
                 regServerInstance(channel, message);
                 return;
             } else if (message.getMessageId() == scrRelationUserGatewayMessageId) {
-
                 relationMessage(channel, message);
                 return;
             } else if (message.getMessageId() == scAskMessageId) {
@@ -141,21 +152,22 @@ public class GatewayMessageExecuter {
                     userClientChannel.putIfAbsent(userId, clientChannel);
                 }
             }
-
-            if (message.getUserIds().length == 0) {
-                Channel clientChannel = tokenChannel.get(message.getToken());
-                if (clientChannel == null) {
-                    logger.warn("没有找到channel{}", message.getToken());
-                } else {
-                    clientChannel.writeAndFlush(message);
-                }
-            } else {
-                for (Long userId : message.getUserIds()) {
-                    Channel clientChannel = userClientChannel.get(userId);
+            if (receiveServerMessage(channel, message)) {
+                if (message.getUserIds().length == 0) {
+                    Channel clientChannel = tokenChannel.get(message.getToken());
                     if (clientChannel == null) {
-                        logger.warn("没有找到玩家{}", userId);
+                        logger.warn("没有找到channel{}", message.getToken());
                     } else {
                         clientChannel.writeAndFlush(message);
+                    }
+                } else {
+                    for (Long userId : message.getUserIds()) {
+                        Channel clientChannel = userClientChannel.get(userId);
+                        if (clientChannel == null) {
+                            logger.warn("没有找到玩家{}", userId);
+                        } else {
+                            clientChannel.writeAndFlush(message);
+                        }
                     }
                 }
             }

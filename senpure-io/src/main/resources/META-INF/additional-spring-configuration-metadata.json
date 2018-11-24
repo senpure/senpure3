@@ -1,0 +1,78 @@
+{
+  "hints": [
+    {
+      "name": "server.io.gateway-address",
+      "values": [
+        {
+          "value": "127.0.0.1:2222"
+        },
+        {
+          "value": "127.0.0.1:3333"
+        }
+      ],
+      "providers": [
+        {
+          "name": "any"
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "name": "server.io",
+      "sourceType": "com.senpure.io.IOServerProperties",
+      "type": "java.lang.String",
+      "description": "io服务器的一些配置."
+    }
+  ],
+  "properties": [
+    {
+      "name": "server.io.ssl",
+      "type": "java.lang.String",
+      "defaultValue": false,
+      "description": "是否开启ssl认证.",
+      "sourceType": "com.senpure.io.IOServerProperties"
+    },
+    {
+      "name": "server.io.port",
+      "type": "java.lang.Integer",
+      "defaultValue": 1111,
+      "description": "io服务器的监听端口号.",
+      "sourceType": "com.senpure.io.IOServerProperties"
+    },
+    {
+      "name": "server.io.cs-port",
+      "type": "java.lang.Integer",
+      "description": "网关cs服务器的监听端口号.",
+      "sourceType": "com.senpure.io.IOServerProperties"
+    },
+    {
+      "name": "server.io.sc-port",
+      "type": "java.lang.Integer",
+      "defaultValue": 3333,
+      "description": "网关cs服务器的监听端口号.",
+      "sourceType": "com.senpure.io.IOServerProperties"
+    },
+    {
+      "name": "server.io.gateway-address",
+      "type": "java.lang.String",
+      "defaultValue": "127.0.0.1:3333",
+      "description": "io服务器需要连接的网关地址.",
+      "sourceType": "com.senpure.io.IOServerProperties"
+    },
+    {
+      "name": "server.io.out-format",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "io输出消息日志时是否格式化.",
+      "sourceType": "com.senpure.io.IOServerProperties"
+    },
+    {
+      "name": "server.io.in-format",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "io接收消息日志时是否格式化.",
+      "sourceType": "com.senpure.io.IOServerProperties"
+    }
+  ]
+}

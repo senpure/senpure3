@@ -2,6 +2,7 @@ package com.senpure.io.gateway;
 
 
 import com.senpure.io.ChannelAttributeUtil;
+import com.senpure.io.event.SourceOffline;
 import com.senpure.io.message.Server2GatewayMessage;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -9,12 +10,15 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.BlockingDeque;
+
 
 public class GatewayAndServerServerHandler extends SimpleChannelInboundHandler<Server2GatewayMessage> {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
     private GatewayMessageExecuter messageExecuter;
 
+    private SourceOffline sourceOffline;
 
     public GatewayAndServerServerHandler(GatewayMessageExecuter messageExecuter) {
         this.messageExecuter = messageExecuter;
@@ -34,10 +38,16 @@ public class GatewayAndServerServerHandler extends SimpleChannelInboundHandler<S
         if (serverName != null) {
             ServerManager serverManager = messageExecuter.serverInstanceMap.get(serverName);
             messageExecuter.execute(() -> serverManager.serverOffLine(channel));
-
         }
+       extraChannelOffline(channel);
 
 
+    }
+
+    protected void extraChannelOffline(Channel channel) {
+
+        BlockingDeque blockingDeque;
+       // blockingDeque.take()
     }
 
     @Override

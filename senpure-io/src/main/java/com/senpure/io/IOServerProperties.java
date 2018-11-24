@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("server.io")
 public class IOServerProperties {
 
+
     private boolean ssl = false;
     private int port = 1111;
     private String host = "127.0.0.1";

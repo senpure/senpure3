@@ -10,5 +10,4 @@ public abstract class Event  extends Bean {
 
     public abstract int getEventId();
 
-    public abstract  Event getEmptyEvent();
 }

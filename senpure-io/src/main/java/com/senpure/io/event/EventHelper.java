@@ -24,7 +24,7 @@ public class EventHelper {
 
     private static Logger logger = LoggerFactory.getLogger(EventHelper.class);
     private static Map<Integer, EventHandler> eventHandlerMap = new HashMap<>();
-    private  static  ScheduledExecutorService service;
+    private static ScheduledExecutorService service;
 
 
     public static void setService(ScheduledExecutorService service) {
@@ -79,9 +79,14 @@ public class EventHelper {
         }
         Event event = eventHandler.getEmptyEvent();
         event.read(byteBuf, byteBuf.writerIndex());
-
         service.execute(() -> eventHandler.execute(event));
         return event;
+    }
+
+    public static byte[] getBytes(Event event) {
+        ByteBuf byteBuf = Unpooled.buffer(event.getSerializedSize());
+        event.write(byteBuf);
+        return byteBuf.array();
     }
 
 

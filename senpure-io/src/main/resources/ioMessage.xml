@@ -9,14 +9,12 @@
 
     </bean>
 
-
     <message id="104" type="SC" name="RegServerHandleMessage" explain="服务器注册消息处理器到网关">
         <field type="String" name="serverName" explain="服务器名"></field>
         <field type="String" name="ipAndFirstPort" explain="ip和第一个实例端口号"></field>
         <field type="String" name="readableServerName" explain="服务器名"></field>
         <list type="HandleMessage" name="messages" explain="可以处理的消息"></list>
     </message>
-
     <message id="101" type="CS" name="RelationUserGateway" explain="关联用户与网关">
         <field type="long" name="token" explain="channel token"></field>
         <field type="long" name="userId" explain="用户Id"></field>
@@ -55,4 +53,12 @@
         <field type="int" name="fromMessageId" explain="消息ID"></field>
         <field type="String" name="value" explain="值"></field>
     </message>
+    <event id="800"  name="Online" explain="上线">
+        <field type="long" name="token" explain="channel token"></field>
+        <field type="long" name="userId" explain="用户Id"></field>
+    </event>
+    <event id="801"  name="Offline" explain="离线">
+        <field type="long" name="token" explain="channel token"></field>
+        <field type="long" name="userId" explain="用户Id"></field>
+    </event>
 </messages>
