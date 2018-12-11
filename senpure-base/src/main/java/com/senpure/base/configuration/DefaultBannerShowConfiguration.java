@@ -5,11 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
 
-@Configuration
+//@Configuration
 public class DefaultBannerShowConfiguration {
 
     @Value("${default.banner:true}")
@@ -31,7 +30,7 @@ public class DefaultBannerShowConfiguration {
             }
             if (show) {
                 BannerShow.show();
-                Thread.sleep(500);
+                Thread.sleep(1500);
             }
 
         }
