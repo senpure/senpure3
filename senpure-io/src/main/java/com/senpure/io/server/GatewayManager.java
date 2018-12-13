@@ -53,41 +53,31 @@ public class GatewayManager {
         }
     }
 
-    public void breakUser(Long userId, long relationToken) {
+    public boolean breakUser(Long userId, long relationToken) {
         GatewayRelation relation = userGatewayMap.get(userId);
         if (relation != null) {
             if (relation.relationToken == relationToken) {
                 logger.debug("{} 取消关联user {}", relation.gatewayChannelManager.getGatewayKey(), userId);
                 userGatewayMap.remove(userId);
+                return true;
             }
         }
-
+        return false;
     }
 
-    public void breakToken(Long token, long relationToken) {
+    public boolean breakToken(Long token, long relationToken) {
         GatewayRelation relation = tokenGatewayMap.get(token);
         if (relation != null) {
             if (relation.relationToken == relationToken) {
                 logger.debug("{} 取消关联token {}", relation.gatewayChannelManager.getGatewayKey(), token);
                 tokenGatewayMap.remove(token);
+                return true;
             }
         }
-
-    }
-
-    public void offline(long token, long userId) {
-        logger.debug("token {} id {}离线", token, userId);
-        if (token != 0) {
-            breakToken(token, 0);
-        }
-        if (userId > 0) {
-            breakUser(userId, 0);
-        }
-    }
-
-    public boolean canHandleMessageValue(int messageId, String value) {
         return false;
     }
+
+
 
     /**
      * 将消息发送给所有的网关
@@ -142,6 +132,14 @@ public class GatewayManager {
             gatewayUsers.userIds.toArray(users);
             gatewayUsers.gatewayChannelManager.sendMessage(toGateway);
         });
+    }
+
+    public void sendMessage2EveryOne(Message message) {
+        Server2GatewayMessage toGateway = new Server2GatewayMessage();
+        toGateway.setUserIds(new Long[]{0L});
+        toGateway.setMessage(message);
+        toGateway.setMessageId(message.getMessageId());
+        dispatchMessage2Gateway(toGateway);
     }
 
     class GatewayUsers {

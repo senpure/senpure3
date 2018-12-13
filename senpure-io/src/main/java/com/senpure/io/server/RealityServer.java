@@ -28,7 +28,7 @@ public class RealityServer {
     private IOServerProperties properties;
     private IOMessageProperties ioMessageProperties;
     private ChannelFuture channelFuture;
-    private EventLoopGroup group;
+
     private String serverName = "realityServer";
     private String readableServerName = "realityServer";
     private boolean setReadableServerName = false;
@@ -39,6 +39,8 @@ public class RealityServer {
     private Channel channel;
     private GatewayManager gatewayManager;
 
+    private static EventLoopGroup group;
+    private static Object groupLock = new Object();
 
     public boolean start(String host, int port) throws CertificateException, SSLException {
         Assert.notNull(gatewayManager);
@@ -57,6 +59,14 @@ public class RealityServer {
             readableServerName = readableServerName + "[" + host + ":" + port + "]";
         }
         // Configure SSL.
+
+
+        if (group == null) {
+            synchronized (groupLock) {
+
+            }
+        }
+        group = new NioEventLoopGroup();
         final SslContext sslCtx;
         if (properties.isSsl()) {
             SelfSignedCertificate ssc = new SelfSignedCertificate();
@@ -64,8 +74,6 @@ public class RealityServer {
         } else {
             sslCtx = null;
         }
-
-        group = new NioEventLoopGroup();
         Bootstrap b = new Bootstrap();
         b.group(group)
                 .channel(NioSocketChannel.class)
