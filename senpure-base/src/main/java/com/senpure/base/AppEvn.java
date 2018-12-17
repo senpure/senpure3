@@ -22,6 +22,7 @@ public class AppEvn {
     }
 
     private static String classRootPath;
+    private static Class startClass;
     private static Logger logger = LoggerFactory.getLogger(AppEvn.class);
 
     private static boolean installedAnsi = false;
@@ -125,6 +126,14 @@ public class AppEvn {
         }
     }
 
+    public static void markStartClass(Class clazz) {
+        Assert.isNull(startClass);
+        startClass = clazz;
+    }
+
+    public static Class getStartClass() {
+        return startClass;
+    }
 
     public static String getCallerRootPath() {
         return getClassRootPath(getCallerClass());
@@ -148,7 +157,7 @@ public class AppEvn {
      * @return
      */
     public static boolean classInJar(Class clazz) {
-        return  classInJar(clazz,true);
+        return classInJar(clazz, true);
     }
 
     private static boolean classInJar(Class clazz, boolean log) {
@@ -239,7 +248,7 @@ public class AppEvn {
         try {
             Class.forName("org.fusesource.jansi.AnsiConsole");
             AnsiOutput.setEnabled(AnsiOutput.Enabled.ALWAYS);
-            if (AppEvn.classInJar(clazz,false)) {
+            if (AppEvn.classInJar(clazz, false)) {
                 URL url = clazz.getResource("");
                 if (url == null) {
                     logger.info("url is null {}", clazz);

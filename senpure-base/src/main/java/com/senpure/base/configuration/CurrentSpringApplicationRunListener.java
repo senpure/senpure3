@@ -27,17 +27,19 @@ public class CurrentSpringApplicationRunListener implements SpringApplicationRun
     @Override
     public void environmentPrepared(ConfigurableEnvironment environment) {
         //保证开发阶段的的有几个classpath 时rootPath正确性
+        Class clazz = AppEvn.getStartClass();
+        if (clazz == null) {
+            StackTraceElement[] statcks = Thread.currentThread().getStackTrace();
+            StackTraceElement statck = statcks[statcks.length - 1];
+            try {
+                clazz = Class.forName(statck.getClassName());
+                AppEvn.markStartClass(clazz);
 
-        StackTraceElement[]  statcks = Thread.currentThread().getStackTrace();
-
-        StackTraceElement statck = statcks[statcks.length - 1];
-        Class clazz = null;
-        try {
-            clazz = Class.forName(statck.getClassName());
-            AppEvn.markClassRootPath(clazz);
-        } catch (Exception e) {
-            logger.error("error", e);
+            } catch (Exception e) {
+                logger.error("error", e);
+            }
         }
+        AppEvn.markClassRootPath(clazz);
         AppEvn.installAnsiConsole(clazz);
         logger.debug("{}={}", "spring.output.ansi.enabled", environment.getProperty("spring.output.ansi.enabled"));
 

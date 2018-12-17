@@ -9,9 +9,9 @@ import org.springframework.messaging.SubscribableChannel;
  * @author senpure
  * @time 2018-11-16 10:08:27
  */
-public interface SinkOffline {
+public interface SinkLogin {
 
-    String OFFLINE_INPUT = "offline-input";
-    @Input(OFFLINE_INPUT)
+    String LOGIN_INPUT = "login-input";
+    @Input(LOGIN_INPUT)
     SubscribableChannel input();
 }

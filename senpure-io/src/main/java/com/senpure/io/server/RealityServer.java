@@ -22,27 +22,27 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class RealityServer {
-    protected Logger logger = LoggerFactory.getLogger(getClass());
-
-
+    protected static Logger logger = LoggerFactory.getLogger(RealityServer.class);
     private IOServerProperties properties;
     private IOMessageProperties ioMessageProperties;
     private ChannelFuture channelFuture;
-
     private String serverName = "realityServer";
     private String readableServerName = "realityServer";
     private boolean setReadableServerName = false;
     private RealityMessageExecuter messageExecuter;
 
-    private static Map<String, Integer> firstPortMap = new ConcurrentHashMap<>();
     private String host;
     private Channel channel;
     private GatewayManager gatewayManager;
 
+    private static Map<String, Integer> firstPortMap = new ConcurrentHashMap<>();
     private static EventLoopGroup group;
+    private static Bootstrap bootstrap;
     private static Object groupLock = new Object();
 
-    public boolean start(String host, int port) throws CertificateException, SSLException {
+    private static int serverRefCont = 0;
+
+    public final boolean start(String host, int port) throws CertificateException, SSLException {
         Assert.notNull(gatewayManager);
         Assert.notNull(messageExecuter);
         this.host = host;
@@ -54,49 +54,50 @@ public class RealityServer {
             ioMessageProperties.setInFormat(properties.isInFormat());
             ioMessageProperties.setOutFormat(properties.isOutFormat());
         }
-        logger.debug("启动{}，网关地址 {}", getReadableServerName(), host + ":" + port);
-        if (!setReadableServerName) {
-            readableServerName = readableServerName + "[" + host + ":" + port + "]";
-        }
         // Configure SSL.
-
-
         if (group == null) {
             synchronized (groupLock) {
+                if (group == null) {
+                    group = new NioEventLoopGroup();
+                    final SslContext sslCtx;
+                    if (properties.isSsl()) {
+                        SelfSignedCertificate ssc = new SelfSignedCertificate();
+                        sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
+                    } else {
+                        sslCtx = null;
+                    }
+                    bootstrap = new Bootstrap();
+                    bootstrap.group(group)
+                            .channel(NioSocketChannel.class)
+                            .option(ChannelOption.TCP_NODELAY, true)
+                            .handler(new ChannelInitializer<SocketChannel>() {
+                                @Override
+                                public void initChannel(SocketChannel ch) throws Exception {
+                                    ChannelPipeline p = ch.pipeline();
+                                    if (sslCtx != null) {
+                                        p.addLast(sslCtx.newHandler(ch.alloc(), host, port));
+                                    }
+                                    p.addLast(new RealityMessageDecoder());
+                                    p.addLast(new RealityMessageEncoder());
+                                    p.addLast(new RealityMessageLoggingHandler(LogLevel.DEBUG, ioMessageProperties));
+                                    p.addLast(new RealityServerHandler(messageExecuter));
+                                }
+                            });
 
+                }
             }
         }
-        group = new NioEventLoopGroup();
-        final SslContext sslCtx;
-        if (properties.isSsl()) {
-            SelfSignedCertificate ssc = new SelfSignedCertificate();
-            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-        } else {
-            sslCtx = null;
-        }
-        Bootstrap b = new Bootstrap();
-        b.group(group)
-                .channel(NioSocketChannel.class)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
-                        ChannelPipeline p = ch.pipeline();
-                        if (sslCtx != null) {
-                            p.addLast(sslCtx.newHandler(ch.alloc(), host, port));
-                        }
-                        p.addLast(new RealityMessageDecoder());
-                        p.addLast(new RealityMessageEncoder());
-                        p.addLast(new RealityMessageLoggingHandler(LogLevel.DEBUG, ioMessageProperties));
-                        p.addLast(new RealityServerHandler(messageExecuter));
-                    }
-                });
-
         // Start the client.
         try {
-
-            channelFuture = b.connect(host, port).sync();
+            logger.debug("启动{}，网关地址 {}", getReadableServerName(), host + ":" + port);
+            if (!setReadableServerName) {
+                readableServerName = readableServerName + "[" + host + ":" + port + "]";
+            }
+            channelFuture = bootstrap.connect(host, port).sync();
             channel = channelFuture.channel();
+            synchronized (groupLock) {
+                serverRefCont++;
+            }
             InetSocketAddress address = (InetSocketAddress) channel.localAddress();
             logger.info("{}启动完成", getReadableServerName());
             markFirstPort(host, address.getPort());
@@ -126,17 +127,29 @@ public class RealityServer {
     public void destroy() {
         if (channelFuture != null) {
             channelFuture.channel().close();
+            synchronized (groupLock) {
+                serverRefCont--;
+            }
         }
-        if (group != null) {
-            group.shutdownGracefully();
+        logger.debug("关闭{}并释放资源 ", getReadableServerName());
+        tryDestroyGroup(getReadableServerName());
+    }
+
+    private synchronized static void tryDestroyGroup(String readableServerName) {
+        synchronized (groupLock) {
+            if (serverRefCont == 0) {
+                if (group != null&&(!group.isShutdown()|!group.isShuttingDown())) {
+                    logger.debug("{} 关闭 group 并释放资源 ", readableServerName);
+                    group.shutdownGracefully();
+                }
+            }
+
         }
 
-        logger.debug("关闭{}并释放资源 ", getReadableServerName());
 
     }
 
     private synchronized static void markFirstPort(String host, int port) {
-
         firstPortMap.putIfAbsent(host, port);
 
     }
