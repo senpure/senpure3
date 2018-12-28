@@ -5,16 +5,24 @@ import com.senpure.base.util.Assert;
 import com.senpure.io.handler.MessageHandler;
 import com.senpure.io.protocol.Message;
 import io.netty.channel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 
 public class MessageHandlerUtil {
+    private static Logger logger = LoggerFactory.getLogger(MessageHandlerUtil.class);
     private static Map<Integer, MessageHandler> handlerMap = new HashMap<>();
-    private static ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+
+    private static ScheduledExecutorService service;
+
+
+    public static void setService(ScheduledExecutorService service) {
+        MessageHandlerUtil.service = service;
+    }
 
     public static void execute(Runnable runnable) {
         service.execute(runnable);
@@ -22,7 +30,14 @@ public class MessageHandlerUtil {
 
     public static void execute(Channel channel, Message message) {
 
-        service.execute(() -> handlerMap.get(message.getMessageId()).execute(channel, message));
+        service.execute(() -> {
+            try {
+                handlerMap.get(message.getMessageId()).execute(channel, message);
+            } catch (Exception e) {
+                logger.error("执行handler[" + handlerMap.get(message.getMessageId()).getClass().getName() + "]逻辑出错 ", e);
+
+            }
+        });
     }
 
     public static MessageHandler getHandler(int messageId) {

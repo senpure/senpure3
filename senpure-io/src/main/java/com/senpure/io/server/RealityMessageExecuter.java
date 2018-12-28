@@ -41,7 +41,11 @@ public class RealityMessageExecuter {
             }
             Message message = handler.getEmptyMessage();
             message.read(gsMessage.getBuf(), gsMessage.getBuf().writerIndex());
-            handler.execute(channel, gsMessage.getToken(), userId, message);
+            try {
+                handler.execute(channel, gsMessage.getToken(), userId, message);
+            } catch (Exception e) {
+                logger.error("执行handler[" + handler.getClass().getName() + "]逻辑出错 ", e);
+            }
 
         });
     }

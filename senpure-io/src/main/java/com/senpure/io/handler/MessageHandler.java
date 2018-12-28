@@ -10,7 +10,7 @@ public interface MessageHandler<T extends Message> {
 
     T getEmptyMessage();
 
-    void execute(Channel channel, T message);
+    void execute(Channel channel, T message) throws  Exception;
 
     int handlerId();
 

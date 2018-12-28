@@ -10,7 +10,7 @@ public interface RealityMessageHandler<T extends Message> {
 
     T getEmptyMessage();
 
-    void execute(Channel channel, long token, long playerId, T message);
+    void execute(Channel channel, long token, long playerId, T message) throws  Exception;
 
     int handlerId();
 

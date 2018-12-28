@@ -15,6 +15,6 @@ public interface EventHandler<T extends Event> {
 
     int handlerId();
 
-    void execute(T event);
+    void execute(T event) throws  Exception;
 
 }

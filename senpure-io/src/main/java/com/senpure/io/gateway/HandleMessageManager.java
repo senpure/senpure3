@@ -68,7 +68,14 @@ public class HandleMessageManager {
         } else {
             ByteBuf buf = Unpooled.buffer();
             buf.writeBytes(message.getData());
-            String value = Bean.readString(buf);
+            String value = null;
+            try {
+                value = Bean.readString(buf);
+            } catch (Exception e) {
+
+                Assert.error("读取询问值出错 询问值只能是string 类型 messageId  " + message.getMessageId());
+                return;
+            }
             CSAskHandleMessage askHandleMessage = new CSAskHandleMessage();
             askHandleMessage.setFromMessageId(message.getMessageId());
             askHandleMessage.setToken(messageExecuter.idGenerator.nextId());

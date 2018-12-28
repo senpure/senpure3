@@ -48,7 +48,7 @@ public class ClientServer {
             sslCtx = null;
         }
 
-        group = new NioEventLoopGroup();
+        group = new NioEventLoopGroup(1);
         Bootstrap b = new Bootstrap();
         b.group(group)
                 .channel(NioSocketChannel.class)

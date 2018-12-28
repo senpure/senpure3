@@ -33,6 +33,10 @@ public class GatewayMessageExecuter {
     private int csBreakUserGatewayMessageId = new CSBreakUserGatewayMessage().getMessageId();
 
 
+    public void setScLoginMessageId(int scLogoutMessageId) {
+        this.scLoginMessageId = scLogoutMessageId;
+    }
+
     private int scAskMessageId = new SCAskHandleMessage().getMessageId();
 
     private ConcurrentMap<Long, Channel> prepLoginChannels = new ConcurrentHashMap<>(2048);
@@ -113,7 +117,11 @@ public class GatewayMessageExecuter {
                 logger.warn("没有找到消息的接收服务器{}", message.getMessageId());
                 return;
             }
-            handleMessageManager.execute(message);
+            try {
+                handleMessageManager.execute(message);
+            } catch (Exception e) {
+                logger.error("转发消息出错 " + message.getMessageId(), e);
+            }
 
         });
     }

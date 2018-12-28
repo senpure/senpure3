@@ -71,15 +71,33 @@ public class EventHelper {
     }
 
     public static Event readAndExecute(byte[] bytes) {
-        ByteBuf byteBuf = Unpooled.copiedBuffer(bytes);
-        int eventId = Bean.readVar32(byteBuf);
-        EventHandler eventHandler = getEventHandler(eventId);
-        if (eventHandler == null) {
+        EventHandler eventHandler = null;
+        Event event = null;
+        int eventId = 0;
+        try {
+            ByteBuf byteBuf = Unpooled.copiedBuffer(bytes);
+            eventId = Bean.readVar32(byteBuf);
+            eventHandler = getEventHandler(eventId);
+            if (eventHandler == null) {
+                logger.warn("没有找到事件处理器{}", eventId);
+                return null;
+            }
+            event = eventHandler.getEmptyEvent();
+            event.read(byteBuf, byteBuf.writerIndex());
+        } catch (Exception e) {
+
+            logger.warn("解析事件二进制数据出错{}", eventId);
             return null;
         }
-        Event event = eventHandler.getEmptyEvent();
-        event.read(byteBuf, byteBuf.writerIndex());
-        service.execute(() -> eventHandler.execute(event));
+        EventHandler finalEventHandler = eventHandler;
+        Event finalEvent = event;
+        service.execute(() -> {
+            try {
+                finalEventHandler.execute(finalEvent);
+            } catch (Exception e) {
+                logger.error("执行事件处理出错[" + finalEventHandler.getClass().getName() + "]", e);
+            }
+        });
         return event;
     }
 
