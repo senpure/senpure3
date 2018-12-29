@@ -2,14 +2,13 @@ package com.senpure.base.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
-@Configuration
+//@Configuration
 
 public class ValidatorConfiguration implements WebMvcConfigurer {
     Logger logger = LoggerFactory.getLogger(ValidatorConfiguration.class);

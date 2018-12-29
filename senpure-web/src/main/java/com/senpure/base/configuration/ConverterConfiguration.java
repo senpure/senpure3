@@ -9,7 +9,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 
-@Configuration
+//@Configuration
 public class ConverterConfiguration {
 
 

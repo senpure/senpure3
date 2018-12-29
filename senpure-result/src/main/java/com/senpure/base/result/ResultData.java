@@ -11,7 +11,7 @@ public class ResultData<T> {
     private String message;
     private T data;
 
-    public boolean isSuccess() {
+    public boolean success() {
 
         return code == Result.SUCCESS;
     }

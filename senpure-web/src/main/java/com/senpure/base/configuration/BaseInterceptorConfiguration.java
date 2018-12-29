@@ -5,15 +5,14 @@ import com.senpure.base.spring.URLInfoInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
 //@Configuration
-@ConditionalOnMissingBean(name = "baseMultipleInterceptor")
-public class BaseInterceptorConfiguration extends WebMvcConfigurerAdapter {
+//@ConditionalOnMissingBean(name = "baseMultipleInterceptor")
+public class BaseInterceptorConfiguration implements WebMvcConfigurer {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
@@ -48,7 +47,7 @@ public class BaseInterceptorConfiguration extends WebMvcConfigurerAdapter {
         // multipleInterceptor=getMultipleInterceptor();
         registry.addInterceptor(multipleInterceptor).excludePathPatterns("/resources/**");
         logger.debug(urlInfoInterceptor.toString());
-        super.addInterceptors(registry);
+       // super.addInterceptors(registry);
 
     }
 }
