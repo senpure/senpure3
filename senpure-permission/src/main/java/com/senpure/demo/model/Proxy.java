@@ -7,7 +7,7 @@ import java.util.Date;
  * 代理关系表
  * 
  * @author senpure-generator
- * @version 2018-6-6 15:27:45
+ * @version 2019-1-3 16:24:33
  */
 public class Proxy implements Serializable {
     private static final long serialVersionUID = 315239481L;

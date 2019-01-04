@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * @author senpure-generator
- * @version 2018-6-6 15:27:45
+ * @version 2019-1-3 16:24:33
  */
 @Mapper
 public interface ProxyMapper {

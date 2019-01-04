@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentMap;
  * <li>update(NoticeCriteria criteria):有主键时按主键移除缓存，没有主键时清除<strong>所有</strong>Notice缓存 </li>
  *
  * @author senpure-generator
- * @version 2018-6-6 15:27:45
+ * @version 2019-1-3 16:24:33
  */
 @Service
 public class NoticeService extends BaseService {

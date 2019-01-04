@@ -7,7 +7,7 @@ import java.util.Date;
  * 公告模型
  * 
  * @author senpure-generator
- * @version 2018-6-6 15:27:45
+ * @version 2019-1-3 16:24:33
  */
 public class Notice implements Serializable {
     private static final long serialVersionUID = 339330519L;

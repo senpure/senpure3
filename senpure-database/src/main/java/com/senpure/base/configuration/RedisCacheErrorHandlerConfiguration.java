@@ -5,10 +5,8 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.cache.interceptor.SimpleCacheErrorHandler;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 
-@Configuration
 @ConditionalOnClass({RedisTemplate.class})
 public class RedisCacheErrorHandlerConfiguration extends  BaseConfiguration {
 
