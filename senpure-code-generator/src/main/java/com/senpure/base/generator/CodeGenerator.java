@@ -14,6 +14,9 @@ import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,6 +29,8 @@ public class CodeGenerator {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    private List<String> exists = new ArrayList<>();
+    private List<String> springLocal = new ArrayList<>();
 
     public void generate(Object object, Template template, File file) {
         try {
@@ -44,31 +49,63 @@ public class CodeGenerator {
         }
     }
 
+    private String getCache(ModelConfig config) {
+        if (config.isCache()) {
+            if (config.isRemoteCache()) {
+                return "true:springCache";
+            } else if (config.isLocalCache()) {
+                return "true:springLocal";
+            } else if (config.isLocalCache()) {
+                return "true:localMap";
+            }
+        }
+        return "false";
+    }
+
+
+    private void generateFile(Template template, Map<String, Object> args, File file, boolean cover) {
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+        if (file.exists()) {
+            if (cover) {
+                logger.debug("{}{}", AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, "覆盖生成"}), file.getAbsolutePath());
+                generate(args, template, file);
+            } else {
+
+                logger.warn("{}存在无法生成", file.getAbsolutePath());
+            }
+        } else {
+            logger.debug("生成{}", file.getAbsolutePath());
+
+            generate(args, template, file);
+        }
+    }
+
     private void generateFile(Template template, Model model, File file, boolean cover) {
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
         if (file.exists()) {
             if (cover) {
-                if (file.getName().endsWith("Service.java")) {
-                    // logger.debug("{}{} useCache:{}", AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, "覆盖生成"}), file.getAbsolutePath(), AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, getCache((Model) model)}));
+                if (model.isCurrentService()) {
+                    logger.debug("{}{} useCache:{}", AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, "覆盖生成"}), file.getAbsolutePath(), AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, getCache(model.getConfig())}));
 
                 } else {
                     logger.debug("{}{}", AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, "覆盖生成"}), file.getAbsolutePath());
                 }
                 generate(model, template, file);
             } else {
-//                exists.add(file.getAbsolutePath());
-//                if (file.getName().endsWith("Service.java") && model instanceof Model) {
-//
-//                    springLocal.remove(((Model) model).getName());
-//                }
-//                logger.warn("{}存在无法生成", file.getAbsolutePath());
+                exists.add(file.getAbsolutePath());
+                if (model.isCurrentService()) {
+                    springLocal.remove(model.getName());
+                }
+                logger.warn("{}存在无法生成", file.getAbsolutePath());
             }
 
         } else {
-            if (file.getName().endsWith("Service.java")) {
-                //  logger.debug("生成{} useCache:{}", file.getAbsolutePath(), AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, getCache((Model) model)}));
+            if (model.isCurrentService()) {
+                logger.debug("生成{} useCache:{}", file.getAbsolutePath(), AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, getCache(model.getConfig())}));
             } else {
                 logger.debug("生成{}", file.getAbsolutePath());
             }
@@ -95,20 +132,29 @@ public class CodeGenerator {
         cfg.setSharedVariable("space", new SpaceResidual());
         cfg.setSharedVariable("serial", new HashCode());
         cfg.setSharedVariable("labelFormat", new LabelFormat());
-
+        cfg.setSharedVariable("apiModelProperty", new ApiModelProperty());
         cfg.setClassForTemplateLoading(getClass(), "/");
         Template modelTemplate = null;
         Template serviceTemplate = null;
+        Template serviceMapCacheTemplate = null;
+        Template serviceSpringCacheTemplate = null;
         Template mapperJavaTemplate = null;
         Template mapperXmlTemplate = null;
         Template criteriaTemplate = null;
         Template criteriaTemplateStr = null;
+        Template configurationTemplate = null;
         try {
             modelTemplate = cfg.getTemplate(
                     config.getModelTemplate(),
                     "utf-8");
             serviceTemplate = cfg.getTemplate(
                     config.getServiceTemplate(),
+                    "utf-8");
+            serviceMapCacheTemplate = cfg.getTemplate(
+                    config.getServiceMapCacheTemplate(),
+                    "utf-8");
+            serviceSpringCacheTemplate = cfg.getTemplate(
+                    config.getServiceSpringCacheTemplate(),
                     "utf-8");
             mapperJavaTemplate = cfg.getTemplate(
                     config.getMapperJavaTemplate(),
@@ -121,6 +167,9 @@ public class CodeGenerator {
                     "utf-8");
             criteriaTemplateStr = cfg.getTemplate(
                     config.getCriteriaStrTemplate(),
+                    "utf-8");
+            configurationTemplate = cfg.getTemplate(
+                    config.getConfigurationTemplate(),
                     "utf-8");
 
         } catch (IOException e) {
@@ -139,7 +188,10 @@ public class CodeGenerator {
             if (model.getId() == null) {
                 Assert.error(model.getName() + "没有主键");
             }
+
             ModelConfig modelConfig = config.getModelConfig(model.getName());
+            model.setConfig(modelConfig);
+
             model.setModelPackage(part + "." + config.getModelPartName());
             model.setMapperPackage(part + "." + config.getMapperPartName());
             model.setCriteriaPackage(part + "." + config.getCriteriaPartName());
@@ -147,7 +199,6 @@ public class CodeGenerator {
             model.setControllerPackage(part + "." + config.getControllerPartName());
             model.setModelPackage(part + "." + config.getModelPartName());
             model.setTableType(modelConfig.getTableType());
-
             if (!modelConfig.getTableType().equalsIgnoreCase(config.TABLE_TYPE_SINGLE)) {
                 ModelField modelField = new ModelField();
                 modelField.setAccessType("private");
@@ -170,6 +221,31 @@ public class CodeGenerator {
             } else {
                 logger.info("{} 不生成mapper", model.getName());
             }
+
+            if (modelConfig.isGenerateService()) {
+                File serviceFile = new File(javaPart, config.getServicePartName() + "/" + model.getName() + config.getServiceSuffix() + ".java");
+                Template template = null;
+                if (modelConfig.isCache()) {
+                    if (modelConfig.isRemoteCache()) {
+                        template = serviceSpringCacheTemplate;
+                    } else if (modelConfig.isLocalCache()) {
+                        template = serviceSpringCacheTemplate;
+                        springLocal.add(model.getName());
+                    } else {
+                        template = serviceMapCacheTemplate;
+                    }
+
+                } else {
+                    template = serviceTemplate;
+                }
+
+
+                model.setCurrentService(true);
+                generateFile(template, model, serviceFile, modelConfig.isCoverService());
+                model.setCurrentService(false);
+            } else {
+                logger.info("{} 不生成service", model.getName());
+            }
             if (modelConfig.isGenerateCriteria()) {
                 File criteriaFile = new File(javaPart, config.getCriteriaPartName() + "/" + model.getName() + config.getCriteriaSuffix() + ".java");
                 generateFile(criteriaTemplate, model, criteriaFile, modelConfig.isCoverCriteria());
@@ -182,8 +258,61 @@ public class CodeGenerator {
             }
 
         }
+        generateSpringCacheConfiguration(part, javaPart,config,configurationTemplate);
+        if (exists.size() > 0) {
+            logger.warn(AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, "↓↓↓↓↓↓↓↓↓↓以下文件存在没有生成↓↓↓↓↓↓↓↓↓↓"}));
+            for (String name : exists) {
+                logger.warn(AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_CYAN, name}));
+            }
+            logger.warn(AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, "↑↑↑↑↑↑↑↑↑↑以上文件存在没有生成↑↑↑↑↑↑↑↑↑↑"}));
+        }
     }
 
+    private void generateSpringCacheConfiguration(String part, File javaPart,GeneratorConfig config, Template template) {
+        if (springLocal.size() > 0) {
+            logger.debug("springLocal = {}", springLocal);
+        }
+
+        String configName = "LocalCacheConfiguration";
+        if ("com.senpure.base".equals(part)) {
+            configName = "LocalCacheConfiguration";
+        } else {
+            int index = StringUtil.indexOf(part, ".", 1, true);
+            String tempPart;
+            if (index > 0) {
+                tempPart = part.substring(index + 1);
+            } else {
+                tempPart = part;
+            }
+            configName = StringUtil.toUpperFirstLetter(tempPart) + "LocalCache"+config.getConfigurationSuffix();
+        }
+        File configFile = new File(javaPart, config.getConfigurationPartName()+"/" + configName + ".java");
+        if (springLocal.size() > 0) {
+            Class clazz = null;
+            try {
+                clazz = Class.forName("org.springframework.data.redis.core.RedisTemplate");
+            } catch (ClassNotFoundException e) {
+                logger.debug("没有找到{} 不用生成redis的本地缓存配置","org.springframework.data.redis.core.RedisTemplate");
+            }
+            if (clazz != null) {
+                Map<String, Object> args = new HashMap<>(16);
+                args.put("configName", configName);
+                args.put("names", springLocal);
+                args.put("package", part + ".configuration");
+
+                if (template != null) {
+                    generateFile(template, args, configFile, true);
+                }
+            }
+        } else {
+
+            if (configFile.exists()) {
+                logger.info("{} {}", AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, "删除"}), configFile.getAbsolutePath());
+                configFile.delete();
+            }
+
+        }
+    }
 
     private void prepLog() {
         AnsiOutput.setEnabled(AnsiOutput.Enabled.ALWAYS);

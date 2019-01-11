@@ -1,7 +1,10 @@
 package ${criteriaPackage};
 
-import ${modelPackage}.${name};
 import com.senpure.base.criterion.Criteria;
+import ${modelPackage}.${name};
+<#if hasDate>
+import com.senpure.base.util.DateFormatUtil;
+</#if>
 
 <#if table??>
 import javax.validation.constraints.Null;
@@ -31,13 +34,19 @@ public class ${name}Criteria extends Criteria implements Serializable {
     ${version.accessType} ${version.clazzType} ${version.name};
 </#if>
 <#list modelFieldMap?values as field>
+    <#if field.strShow>
 <#if field.hasExplain>
     //${field.explain}
 </#if>
     ${field.accessType} ${field.clazzType} ${field.name};
-    <#if field.order&&field.htmlShow>
-    //table [${tableName}][column = ${field.column}] order
+    <#if field.hasCriteriaRange>
+    ${field.accessType} ${field.clazzType} start${field.name?cap_first};
+    ${field.accessType} ${field.clazzType} end${field.name?cap_first};
+    </#if>
+    <#if field.criteriaOrder>
+    //table [${tableName}][column = ${field.column}] criteriaOrder
     ${field.accessType} String ${field.name}Order;
+    </#if>
     </#if>
 </#list>
 <#if table??>
@@ -52,7 +61,14 @@ public class ${name}Criteria extends Criteria implements Serializable {
     public static ${name} to${name}(${name}Criteria criteria, ${name} ${nameRule(name)}) {
         ${nameRule(name)}.set${id.name?cap_first}(criteria.get${id.name?cap_first}());
     <#list modelFieldMap?values as field>
+    <#if field.strShow>
         ${nameRule(name)}.set${field.name?cap_first}(criteria.<#if field.clazzType=="boolean">is<#else>get</#if>${field.name?cap_first}());
+        <#if field.longDate??>
+        if (criteria.get${field.name?cap_first}() != null) {
+            ${nameRule(name)}.set${field.longDate.name?cap_first}(criteria.get${field.name?cap_first}().getTime());
+        }
+        </#if>
+    </#if>
     </#list>
 <#if version??>
     <#assign field = version />
@@ -81,9 +97,14 @@ public class ${name}Criteria extends Criteria implements Serializable {
         </#if>
 <#list modelFieldMap?values as field>
     <#if field.javaNullable>
+    <#if field.strShow>
         if (<#if field.clazzType=="boolean">is<#else>get</#if>${field.name?cap_first}() != null) {
             ${nameRule(name)}.set${field.name?cap_first}(<#if field.clazzType=="boolean">is<#else>get</#if>${field.name?cap_first}());
+        <#if field.longDate??>
+            ${nameRule(name)}.set${field.longDate.name?cap_first}(get${field.name?cap_first}().getTime());
+        </#if>
         }
+    </#if>
     <#else>
         ${nameRule(name)}.set${field.name?cap_first}(<#if field.clazzType=="boolean">is<#else>get</#if>${field.name?cap_first}());
     </#if>
@@ -100,11 +121,29 @@ public class ${name}Criteria extends Criteria implements Serializable {
 </#if>
         return ${nameRule(name)};
     }
-<#if !hasDate>
+<#if hasRange>
 
     @Override
-    public boolean isHasDate() {
-        return false;
+    protected void rangeStr(StringBuilder sb) {
+    <#list modelFieldMap?values as field>
+         <#if field.strShow&&field.hasCriteriaRange>
+         <#if field.clazzType="Date">
+        if (start${field.name?cap_first} != null) {
+            sb.append("start${field.name?cap_first}=").append(DateFormatUtil.getDateFormat(datePattern).format(start${field.name?cap_first})).append(",");
+        }
+        if (end${field.name?cap_first} != null) {
+            sb.append("end${field.name?cap_first}=").append(DateFormatUtil.getDateFormat(datePattern).format(end${field.name?cap_first})).append(",");
+        }
+         <#else >
+        if (start${field.name?cap_first} != null) {
+            sb.append("start${field.name?cap_first}=").append(start${field.name?cap_first}).append(",");
+        }
+        if (end${field.name?cap_first} != null) {
+            sb.append("end${field.name?cap_first}=").append(end${field.name?cap_first}).append(",");
+        }
+         </#if>
+         </#if>
+     </#list>
     }
 </#if>
 
@@ -129,26 +168,25 @@ public class ${name}Criteria extends Criteria implements Serializable {
 </#if>
 <#list modelFieldMap?values as field>
     <#if field.javaNullable>
+    <#if field.strShow>
         if (${field.name} != null) {
             sb.append("${field.name}=").append(${field.name}).append(",");
         }
+    </#if>
     <#else >
         sb.append("${field.name}=").append(${field.name}).append(",");
     </#if>
 </#list>
     }
+
 <#assign field = id />
 <#assign name >${name}Criteria</#assign>
-
 <#include "getset.ftl">
-
 <#list modelFieldMap?values as field>
-    <#include "getsetStringNull.ftl">
-    <#if field_has_next >
-
+    <#if field.strShow>
+        <#include "getsetStringNull.ftl">
     </#if>
 </#list>
-
 <#if version??>
     <#assign field = version />
     <#include "getset.ftl">
@@ -157,5 +195,4 @@ public class ${name}Criteria extends Criteria implements Serializable {
     <#assign field = table />
     <#include "getset.ftl">
 </#if>
-
 }

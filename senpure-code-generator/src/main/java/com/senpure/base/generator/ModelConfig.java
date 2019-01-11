@@ -38,6 +38,12 @@ public class ModelConfig {
     //表类型 mix single
     private String tableType = GeneratorConfig.TABLE_TYPE_SINGLE;
 
+    private boolean cache;
+    private boolean remoteCache;
+    private boolean localCache;
+    private boolean mapCache;
+
+
     public boolean isGenerateMapper() {
         return generateMapper;
     }
@@ -148,5 +154,37 @@ public class ModelConfig {
 
     public void setUseCriteriaStr(boolean useCriteriaStr) {
         this.useCriteriaStr = useCriteriaStr;
+    }
+
+    public boolean isCache() {
+        return cache;
+    }
+
+    public void setCache(boolean cache) {
+        this.cache = cache;
+    }
+
+    public boolean isRemoteCache() {
+        return remoteCache;
+    }
+
+    public void setRemoteCache(boolean remoteCache) {
+        this.remoteCache = remoteCache;
+    }
+
+    public boolean isLocalCache() {
+        return localCache;
+    }
+
+    public void setLocalCache(boolean localCache) {
+        this.localCache = localCache;
+    }
+
+    public boolean isMapCache() {
+        return mapCache;
+    }
+
+    public void setMapCache(boolean mapCache) {
+        this.mapCache = mapCache;
     }
 }

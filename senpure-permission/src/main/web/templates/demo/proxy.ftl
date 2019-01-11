@@ -81,7 +81,7 @@
                 <input type="hidden" name="pageSize" value="${criteria.pageSize!}">
 
                 <!--hide input-->
-                <div class="criteria-order">
+                <div class="criteria-criteriaOrder">
                 <input type="hidden" name="bindTimeOrder" id="bindTimeOrder-pagination"
                        value="${criteria.bindTimeOrder!}">
                 </div>
@@ -115,7 +115,7 @@
                         <th>
                         level
                         </th>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${criteria.bindTimeOrder!}"
                             data-field="bindTimeOrder" data-init="DESC"
                          >

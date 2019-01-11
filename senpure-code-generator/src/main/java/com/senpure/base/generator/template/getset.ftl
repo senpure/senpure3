@@ -19,3 +19,4 @@
         this.${field.name} = ${field.name};
         return this;
     }
+

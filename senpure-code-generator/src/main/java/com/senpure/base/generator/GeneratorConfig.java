@@ -29,11 +29,16 @@ public class GeneratorConfig {
 
     private String modelTemplate = "com/senpure/base/generator/template/model.ftl";
     private String serviceTemplate = "com/senpure/base/generator/template/service.ftl";
+    private String serviceMapCacheTemplate = "com/senpure/base/generator/template/serviceMapCache.ftl";
+
+    private String serviceSpringCacheTemplate = "com/senpure/base/generator/template/serviceSpringCache.ftl";
+
     private String mapperJavaTemplate = "com/senpure/base/generator/template/mapperJava.ftl";
     private String mapperXmlTemplate = "com/senpure/base/generator/template/mapperXml.ftl";
     private String controllerXmlTemplate = "com/senpure/base/generator/template/controller.ftl";
     private String criteriaTemplate = "com/senpure/base/generator/template/criteria.ftl";
     private String criteriaStrTemplate = "com/senpure/base/generator/template/criteriaStr.ftl";
+    private String configurationTemplate = "com/senpure/base/generator/template/LocalRemoteConfiguration.ftl";
 
     private String entityPartName = "entity";
     private String modelPartName = "model";
@@ -41,7 +46,11 @@ public class GeneratorConfig {
     private String mapperPartName = "mapper";
     private String controllerPartName = "controller";
     private String criteriaPartName = "criteria";
+    private String configurationPartName = "configuration";
+
+    private String configurationSuffix="Configuration";
     private String mapperSuffix="Mapper";
+    private String serviceSuffix="Service";
     private String criteriaSuffix="Criteria";
     private String criteriaStrSuffix="CriteriaStr";
 
@@ -108,6 +117,14 @@ public class GeneratorConfig {
         this.class2SourceSource = class2SourceSource;
     }
 
+    public String getConfigurationTemplate() {
+        return configurationTemplate;
+    }
+
+    public void setConfigurationTemplate(String configurationTemplate) {
+        this.configurationTemplate = configurationTemplate;
+    }
+
     public Dialect getDialect() {
         return dialect;
     }
@@ -154,6 +171,30 @@ public class GeneratorConfig {
 
     public void setControllerXmlTemplate(String controllerXmlTemplate) {
         this.controllerXmlTemplate = controllerXmlTemplate;
+    }
+
+    public String getServiceSuffix() {
+        return serviceSuffix;
+    }
+
+    public String getConfigurationPartName() {
+        return configurationPartName;
+    }
+
+    public void setConfigurationPartName(String configurationPartName) {
+        this.configurationPartName = configurationPartName;
+    }
+
+    public String getConfigurationSuffix() {
+        return configurationSuffix;
+    }
+
+    public void setConfigurationSuffix(String configurationSuffix) {
+        this.configurationSuffix = configurationSuffix;
+    }
+
+    public void setServiceSuffix(String serviceSuffix) {
+        this.serviceSuffix = serviceSuffix;
     }
 
     public String getCriteriaTemplate() {
@@ -275,5 +316,22 @@ public class GeneratorConfig {
 
     public void setCriteriaStrSuffix(String criteriaStrSuffix) {
         this.criteriaStrSuffix = criteriaStrSuffix;
+    }
+
+
+    public String getServiceMapCacheTemplate() {
+        return serviceMapCacheTemplate;
+    }
+
+    public void setServiceMapCacheTemplate(String serviceMapCacheTemplate) {
+        this.serviceMapCacheTemplate = serviceMapCacheTemplate;
+    }
+
+    public String getServiceSpringCacheTemplate() {
+        return serviceSpringCacheTemplate;
+    }
+
+    public void setServiceSpringCacheTemplate(String serviceSpringCacheTemplate) {
+        this.serviceSpringCacheTemplate = serviceSpringCacheTemplate;
     }
 }

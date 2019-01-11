@@ -106,9 +106,9 @@ ${r'<#include "../top.ftl">'}
                 <input type="hidden" name="pageSize" value="${r'${criteria.pageSize!}'}">
 
                 <!--hide input-->
-                <div class="criteria-order">
+                <div class="criteria-criteriaOrder">
             <#list modelFieldMap?values as field>
-            <#if field.order&&field.htmlShow>
+            <#if field.criteriaOrder&&field.htmlShow>
                 <input type="hidden" name="${field.name}Order" id="${field.name}Order-pagination"
                        value="${r'${criteria.'}${field.name}Order!}">
             </#if>
@@ -137,8 +137,8 @@ ${r'<#include "../top.ftl">'}
                     </th>
                 <#list modelFieldMap?values as field>
                     <#if field.htmlShow>
-                        <#if field.order>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <#if field.criteriaOrder>
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${r'${criteria.'}${field.name}Order!}"
                             data-field="${field.name}Order" data-init="<#if field.date>DESC<#else >ASC</#if>"
                          >

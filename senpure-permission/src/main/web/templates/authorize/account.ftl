@@ -22,7 +22,7 @@
                       auto-refresh="true" refresh-interval="300000">
                     <@spring.formHiddenInput "criteria.pageSize" />
 
-                    <div class="criteria-order">
+                    <div class="criteria-criteriaOrder">
                     <#--
                         <input type="hidden" name="createTimeOrder" id="createTimeOrder-pagination"
                                value="${criteria.createTimeOrder}">

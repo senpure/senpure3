@@ -22,7 +22,7 @@ public class NoticeCriteriaStr extends CriteriaStr implements Serializable {
     private String msg;
     //发出时间
     private String sendDate;
-    //table [demo_notice][column = send_date] order
+    //table [demo_notice][column = send_date] criteriaOrder
     private String sendDateOrder;
 
     public NoticeCriteria toNoticeCriteria() {
@@ -48,7 +48,7 @@ public class NoticeCriteriaStr extends CriteriaStr implements Serializable {
         if (sendDate != null) {
             criteria.setSendDate(sendDateValid.getDate());
         }
-        //table [demo_notice][column = send_date] order
+        //table [demo_notice][column = send_date] criteriaOrder
         if (sendDateOrder != null) {
             criteria.setSendDateOrder(sendDateOrder);
         }
@@ -154,7 +154,7 @@ public class NoticeCriteriaStr extends CriteriaStr implements Serializable {
     }
 
     /**
-     * get table [demo_notice][column = send_date] order
+     * get table [demo_notice][column = send_date] criteriaOrder
      *
      * @return
      */
@@ -176,7 +176,7 @@ public class NoticeCriteriaStr extends CriteriaStr implements Serializable {
     }
 
     /**
-     * set table [demo_notice][column = send_date] order DESC||ASC
+     * set table [demo_notice][column = send_date] criteriaOrder DESC||ASC
      *
      * @return
      */

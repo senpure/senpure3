@@ -98,7 +98,7 @@
                 <input type="hidden" name="pageSize" value="${criteria.pageSize!}">
 
                 <!--hide input-->
-                <div class="criteria-order">
+                <div class="criteria-criteriaOrder">
                 <input type="hidden" name="nameOrder" id="nameOrder-pagination"
                        value="${criteria.nameOrder!}">
                 <input type="hidden" name="joinWritersOrder" id="joinWritersOrder-pagination"
@@ -128,13 +128,13 @@
                         <th>
                         phone
                         </th>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${criteria.nameOrder!}"
                             data-field="nameOrder" data-init="ASC"
                          >
                         name
                         </th>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${criteria.joinWritersOrder!}"
                             data-field="joinWritersOrder" data-init="DESC"
                          >

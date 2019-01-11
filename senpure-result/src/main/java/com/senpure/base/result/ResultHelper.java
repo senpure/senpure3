@@ -2,6 +2,7 @@ package com.senpure.base.result;
 
 import com.senpure.base.AppEvn;
 import com.senpure.base.util.Assert;
+import com.senpure.base.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -101,26 +104,44 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
 
 
     private static void syncResults() {
-
         String rootPath = AppEvn.getClassRootPath();
         logger.debug("rootPath {}", rootPath);
         logger.debug("result baseName {}", BASE_NAME);
-        File i18n = new File(rootPath, BASE_NAME + ".properties");
+        logger.debug("{}", AppEvn.getStartClass());
+        URL url = AppEvn.getStartClass().getResource(BASE_NAME + ".properties");
+        logger.debug("url {}", url);
+        File i18n = null;
+        try {
+            if (url != null) {
+                i18n = new File(url.toURI().getPath());
+            } else {
+                logger.warn("资源文件不存在 {} ", BASE_NAME);
+            }
+
+        } catch (URISyntaxException e) {
+            logger.error("", e);
+        }
         if (develop) {
             i18n = new File(new File(rootPath).getParentFile().getParentFile(), "src/main/resources/" + BASE_NAME + ".properties");
         }
-        logger.debug("资源文件完整路径：" + i18n.getAbsolutePath());
-        boolean exist = true;
+        boolean exist = false;
         boolean create = false;
         boolean update = false;
-        if (develop&&!i18n.exists()) {
-            exist = false;
-            create = true;
-            i18n.getParentFile().mkdirs();
+        if (i18n != null) {
+            if (i18n.exists()) {
+                exist = true;
+
+            } else {
+                if (develop) {
+                    create = true;
+                    i18n.getParentFile().mkdirs();
+                }
+            }
         }
         Properties props = new Properties();
         SortProperties save = new SortProperties();
         if (exist) {
+            logger.debug("{} 资源文件完整路径：{}", i18n.exists(), i18n.getAbsolutePath());
             InputStream in = null;
             try {
                 in = new FileInputStream(i18n);
@@ -137,6 +158,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
 
         List<CodeAndInstance> codeAndInstanceList = new ArrayList<>();
         for (FieldAndInstance fieldAndInstance : fieldAndInstances) {
+
             for (Field field : fieldAndInstance.fields) {
                 int code = 0;
                 try {
@@ -162,22 +184,28 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
         keyMap.clear();
         codeMap.clear();
         StringBuilder updateBuilder = new StringBuilder();
+
         for (CodeAndInstance codeAndInstance : codeAndInstanceList) {
 
             Field field = codeAndInstance.field;
             Object instance = codeAndInstance.instance;
             int code = codeAndInstance.code;
-            String name = field.getName().replace("_", ".").toLowerCase();
+            Message m = field.getAnnotation(Message.class);
+            String name = m.key();
+            if (StringUtil.isNullOrEmptyTrim(name)) {
+                name = field.getName().replace("_", ".").toLowerCase();
+            }
+            //重复的时候提示使用
             String tempName = instance.getClass().getName() + "_" + field.getName();
             Assert.isNull(keyMap.get(name), "key不能重复 [" + name + "]\n" + keyMap.get(name) + "\n" + tempName);
             Assert.isNull(codeMap.get(code), "错误码不能重复 [" + code + "]\n" + codeName.get(code) + "\n" + tempName);
             codeName.put(code, tempName);
             keyMap.put(name, tempName);
             codeMap.put(code, name);
-            Message m = field.getAnnotation(Message.class);
+
             String thisValue = null;
-            if (m != null && m.message().trim().length() != 0) {
-                thisValue = m.message();
+            if (m != null && m.value().trim().length() != 0) {
+                thisValue = m.value();
             } else {
                 thisValue = "RESULT-CODE[" + code + "]";
 
@@ -197,7 +225,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
 
             }
         }
-        if (develop&&update) {
+        if (develop && update) {
             OutputStream out = null;
             try {
                 out = new FileOutputStream(i18n);
@@ -219,16 +247,27 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
 
         }
         StringBuilder info = new StringBuilder();
-        int maxLen = 0;
+        int codeMaxLen = 0;
+        int keyMaxLen = 0;
         for (Map.Entry<Integer, String> entry : codeMap.entrySet()) {
 
             int len = (entry.getKey() + "").length();
-            maxLen = maxLen > len ? maxLen : len;
+            codeMaxLen = codeMaxLen > len ? codeMaxLen : len;
+        }
+        for (Map.Entry<String, String> entry : keyMap.entrySet()) {
+            int len = entry.getKey().length();
+            keyMaxLen = keyMaxLen > len ? keyMaxLen : len;
         }
         for (CodeAndInstance codeAndInstance : codeAndInstanceList) {
-            int len = (codeAndInstance.code + "").length();
-            info.append(codeAndInstance.code);
-            for (int i = len; i < maxLen; i++) {
+            int codeLen = (codeAndInstance.code + "").length();
+            String key = getKey(codeAndInstance.code);
+            int keyLen = key.length();
+            info.append(key).append(" ");
+            for (int i = keyLen; i <keyMaxLen ; i++) {
+                info.append(" ");
+            }
+            info.append("[").append(codeAndInstance.code).append("] ");
+            for (int i = codeLen; i < codeMaxLen; i++) {
                 info.append(" ");
             }
             info.append(":").append(getMessage(codeAndInstance.code, Locale.CHINA)).append("\n");
@@ -245,15 +284,51 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
 
     }
 
-    public static void devSyncResult(Class<Result>[] results) throws IllegalAccessException, InstantiationException {
-        ResultHelper obj = new ResultHelper();
-        develop = true;
-        force = true;
-        for (Class<Result> result : results) {
-            result.newInstance().report();
+    private static void findResult(Map<String, Result> map, Result result) {
+        Result temp = map.get(result.getClass().getName());
+        if (temp != null) {
+            return;
+        }
+        map.put(result.getClass().getName(), result);
+        try {
+            Object object = result.getClass().getSuperclass().newInstance();
+            if (object instanceof Result) {
+                findResult(map, (Result) object);
+            }
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
-        syncResults();
+
+    }
+
+    public static void devSyncResult(Class<? extends  Result>... result) throws IllegalAccessException, InstantiationException {
+        develop = true;
+        force = true;
+        if (result != null) {
+            Map<String, Result> map = new LinkedHashMap<>();
+            for (Class<? extends  Result> resultClass : result) {
+
+                Result obj = resultClass.newInstance();
+                findResult(map, obj);
+            }
+
+            List<Result> results = new ArrayList<>();
+            results.addAll(map.values());
+            Collections.reverse(results);
+
+            for (Result r : results) {
+                r.report();
+            }
+            syncResults();
+        }
+        //  for (Class<Result> result : results) {
+        //   result.newInstance().report();
+        // }
+
+
     }
 
     public String getResultBaseName() {
@@ -265,9 +340,17 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
         BASE_NAME = resultBaseName;
     }
 
-    public static void main(String[] args) throws IllegalAccessException, InstantiationException {
-        AppEvn.markClassRootPath();
-        devSyncResult(results);
+    public static void main(String[] args) throws IllegalAccessException, InstantiationException, URISyntaxException {
+        //AppEvn.markClassRootPath();
+        devSyncResult(Result.class);
+        URL url = ResultHelper.class.getClassLoader().getResource(BASE_NAME + "2.properties");
+
+        System.out.println(url.toURI().getPath());
+
+        File file = new File(url.toURI().getPath());
+
+        System.out.println(file.getAbsolutePath());
+        System.out.println(file.exists());
         // ResultMap result = ResultMap.result(Result.ACCOUNT_OTHER_LOGIN);
 
         // ResultHelper.wrapMessage(result, Locale.CANADA,"77");

@@ -17,6 +17,7 @@ import java.nio.charset.Charset;
 @ConfigurationProperties(
         prefix = "spring.messages"
 )
+//@AutoConfigureBefore(MessageSourceAutoConfiguration.class)
 public class MessageSourceConfiguration  extends BaseConfiguration {
     private  boolean  useCodeAsDefaultMessage=true;
     private String basename = "messages";

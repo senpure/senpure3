@@ -22,15 +22,16 @@ public class Criteria implements Serializable {
     private int pageSize = 15;
     //前端必须分页
     @AssertTrue
-    private  boolean usePage = true;
+    private boolean usePage = true;
     private Date startDate;
     private Date endDate;
-    private String datePattern;
-    private  Map<String, String> order = new LinkedHashMap<>(8);
+    protected String datePattern="yyyy-MM-dd HH:mm:ss";
+    private Map<String, String> order = new LinkedHashMap<>(8);
 
     public int getPage() {
         return page;
     }
+
     public void setPage(int page) {
         if (page < 1) {
             page = 1;
@@ -41,6 +42,7 @@ public class Criteria implements Serializable {
     public Date getStartDate() {
         return startDate;
     }
+
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
@@ -48,6 +50,7 @@ public class Criteria implements Serializable {
     public Date getEndDate() {
         return endDate;
     }
+
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
@@ -107,6 +110,7 @@ public class Criteria implements Serializable {
     public boolean isHasDate() {
         return true;
     }
+
     public boolean isCanCache() {
         if (!isHasDate()) {
             return true;
@@ -118,15 +122,22 @@ public class Criteria implements Serializable {
         }
         return date.getTime() < System.currentTimeMillis();
     }
+
     protected void beforeStr(StringBuilder sb) {
         sb.append("Criteria{");
     }
+
     public String getCacheKey() {
         StringBuilder sb = new StringBuilder();
         beforeStr(sb);
         dateStr(sb);
         afterStr(sb);
         return sb.toString();
+    }
+
+    protected void rangeStr(StringBuilder sb) {
+        String empty = "";
+        sb.append(empty);
     }
 
     protected void dateStr(StringBuilder sb) {
@@ -141,6 +152,7 @@ public class Criteria implements Serializable {
                     format(getEndDate())).append(",");
         }
     }
+
     protected void dateCache(StringBuilder sb) {
         if (getStartDate() != null) {
             sb.append("startDate=").append(DateFormatUtil.
@@ -153,6 +165,7 @@ public class Criteria implements Serializable {
                     format(getEndDate())).append(",");
         }
     }
+
     protected void afterStr(StringBuilder sb) {
         if (order.size() > 0) {
             Iterator<Map.Entry<String, String>> iterator = order.entrySet().iterator();
@@ -177,7 +190,7 @@ public class Criteria implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         beforeStr(sb);
-        dateStr(sb);
+        rangeStr(sb);
         afterStr(sb);
         return sb.toString();
     }

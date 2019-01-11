@@ -7,7 +7,18 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Message {
-    String message() default "" ;
+    /**
+     * 错误消息
+     *
+     * @return
+     */
+    String value() default "";
 
-    String describe() default "";
+    /**
+     * 资源文件的key
+     *
+     * @return
+     */
+    String key() default "";
+
 }

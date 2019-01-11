@@ -4,7 +4,7 @@ package com.senpure.base.generator;
 public class ModelField {
 
     private boolean hasExplain;
-    private String explain;
+    private String explain="";
     //private public
     private String accessType = "";
 
@@ -19,22 +19,35 @@ public class ModelField {
     private String jdbcType;
     private boolean id;
     private boolean version;
-    private boolean databaseId;
-    private boolean criteriaEquals = true;
-    private boolean findOne=false;
-    private boolean date;
     /**
-     * 两个字段同一个意思是，只取一个显示 Data可以排序，但是可能不用显示
+     * 是否由数据库生成id
      */
-    private boolean htmlShow=true;
+    private boolean databaseId;
 
-    private boolean order=false;
     /**
-     * 生成条件的时候两个字段同一个意思是，只取一个显示
+     * 是否有 范围条件判断
+     */
+    private boolean hasCriteriaRange;
+    /**
+     * 两个字段表示一个意思是，只显示一个 如 date 和long型的时间戳
      */
     private boolean strShow=true;
-    private ModelField longDate;
 
+    private boolean findOne = false;
+    /**
+     * 是否是日期类型的字段 date 或时间戳
+     */
+    private boolean date;
+
+    /**
+     * 是否可以条件排序
+     */
+    private boolean criteriaOrder = false;
+
+    /**
+     * Date 类型的 long类型字段
+     */
+    private ModelField longDate;
 
 
     public int getXmlLen() {
@@ -42,17 +55,36 @@ public class ModelField {
         return str.length();
 
     }
-    public int getColumnLen()
-    {
+
+
+
+    public int getColumnLen() {
         return column.length();
     }
-    public int getNameLen()
-    {
+
+    public int getNameLen() {
         return name.length();
     }
-    public int getJdbcLen()
-    {
+
+    public int getJdbcLen() {
         return jdbcType.length();
+    }
+
+
+    public boolean isHasCriteriaRange() {
+        return hasCriteriaRange;
+    }
+
+    public boolean isStrShow() {
+        return strShow;
+    }
+
+    public void setStrShow(boolean strShow) {
+        this.strShow = strShow;
+    }
+
+    public void setHasCriteriaRange(boolean hasCriteriaRange) {
+        this.hasCriteriaRange = hasCriteriaRange;
     }
 
     public String getAccessType() {
@@ -116,13 +148,6 @@ public class ModelField {
         return hasExplain;
     }
 
-    public boolean isCriteriaEquals() {
-        return criteriaEquals;
-    }
-
-    public void setCriteriaEquals(boolean criteriaEquals) {
-        this.criteriaEquals = criteriaEquals;
-    }
 
     public String getExplain() {
         return explain;
@@ -162,8 +187,6 @@ public class ModelField {
     }
 
     public void setFindOne(boolean findOne) {
-
-        order=true;
         this.findOne = findOne;
     }
 
@@ -175,30 +198,16 @@ public class ModelField {
         this.date = date;
     }
 
-    public boolean isHtmlShow() {
-        return htmlShow;
+
+
+    public boolean isCriteriaOrder() {
+        return criteriaOrder;
     }
 
-    public void setHtmlShow(boolean htmlShow) {
-        this.htmlShow = htmlShow;
+    public void setCriteriaOrder(boolean criteriaOrder) {
+        this.criteriaOrder = criteriaOrder;
     }
 
-    public boolean isOrder() {
-        return order;
-    }
-
-    public void setOrder(boolean order) {
-        this.order = order;
-    }
-
-    public boolean isStrShow() {
-
-        return strShow;
-    }
-
-    public void setStrShow(boolean strShow) {
-        this.strShow = strShow;
-    }
 
     public ModelField getLongDate() {
         return longDate;
@@ -207,6 +216,8 @@ public class ModelField {
     public void setLongDate(ModelField longDate) {
         this.longDate = longDate;
     }
+
+
 
     @Override
     public String toString() {

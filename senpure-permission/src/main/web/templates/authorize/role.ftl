@@ -22,7 +22,7 @@
                       auto-refresh="true" refresh-interval="300000">
                     <@spring.formHiddenInput "criteria.pageSize"  'jkl="jkl"'/>
                     <@spring.formHiddenInput "criteria.containerId"  />
-                    <div class="criteria-order">
+                    <div class="criteria-criteriaOrder">
                         <input type="hidden" name="createTimeOrder" id="createTimeOrder-pagination"
                                value="${criteria.createTimeOrder!}"/>
                     </div>
@@ -37,7 +37,7 @@
                             <th>
                                 <@spring.message "label.name"/>
                             </th>
-                            <th data-order="true" data-form="#criteria-pagination"
+                            <th data-criteriaOrder="true" data-form="#criteria-pagination"
                                 data-value="${criteria.createTimeOrder!}"
                                 data-field="createTimeOrder" data-init="ASC">
                                 <@spring.message "label.create.date"/>

@@ -17,9 +17,15 @@ public class Model  {
     private String explain;
 
     /**
-     * 是否有data类型字段
+     * 是否有data类型字段 只有java.untl.Date
      */
     private boolean hasDate;
+    /**
+     * 是否还有long类型的日期
+     */
+    private boolean hasLongDate;
+
+    private boolean hasRange;
     /**
      * 数据库表明
      */
@@ -46,16 +52,11 @@ public class Model  {
      */
     private int menuId = 0;
     private boolean useCriteriaStr = true;
-    /**
-     * 动态字段当前生成什么东西 入model criteria dao
-     */
-    private String currentGenerateType = "";
 
-    private boolean localCache;
-    private boolean springCache;
-    private boolean springLocal;
-    private boolean cache;
-    private int dateFieldNum = 0;
+    private boolean currentService;
+
+
+
     //class 和super class
     private List<String> clazzs = new ArrayList<>();
     /**
@@ -73,7 +74,6 @@ public class Model  {
     private ModelField id;
 
     private ModelField version;
-    private ModelField dateField;
 
     private Map<String, ModelField> dateFieldMap = new LinkedHashMap<>();
     /**
@@ -88,10 +88,8 @@ public class Model  {
 
     private List<ModelField> allFields = new ArrayList<>();
 
+private ModelConfig config;
 
-    public void dateFieldIncr() {
-        dateFieldNum++;
-    }
 
     public boolean isHasDate() {
         return hasDate;
@@ -163,13 +161,6 @@ public class Model  {
         return hasExplain;
     }
 
-    public ModelField getDateField() {
-        return dateField;
-    }
-
-    public int getDateFieldNum() {
-        return dateFieldNum;
-    }
 
     public String getExplain() {
         return explain;
@@ -178,6 +169,14 @@ public class Model  {
     public void setExplain(String explain) {
         this.explain = explain;
         hasExplain = true;
+    }
+
+    public boolean isCurrentService() {
+        return currentService;
+    }
+
+    public void setCurrentService(boolean currentService) {
+        this.currentService = currentService;
     }
 
     public String getEntityPackage() {
@@ -212,41 +211,7 @@ public class Model  {
         this.servicePackage = servicePackage;
     }
 
-    public boolean isLocalCache() {
-        return localCache;
-    }
 
-    public void setLocalCache(boolean localCache) {
-        this.localCache = localCache;
-    }
-
-    public boolean isSpringCache() {
-        return springCache;
-    }
-
-    public void setSpringCache(boolean springCache) {
-        this.springCache = springCache;
-    }
-
-    public boolean isSpringLocal() {
-        return springLocal;
-    }
-
-    public void setSpringLocal(boolean springLocal) {
-        this.springLocal = springLocal;
-    }
-
-    public boolean isCache() {
-        return cache;
-    }
-
-    public void setCache(boolean cache) {
-        this.cache = cache;
-    }
-
-    public void setDateField(ModelField dateField) {
-        this.dateField = dateField;
-    }
 
 
     public ModelField getTable() {
@@ -393,13 +358,8 @@ public class Model  {
         this.clazz = clazz;
     }
 
-    public String getCurrentGenerateType() {
-        return currentGenerateType;
-    }
 
-    public void setCurrentGenerateType(String currentGenerateType) {
-        this.currentGenerateType = currentGenerateType;
-    }
+
 
     public String getTableType() {
         return tableType;
@@ -415,6 +375,31 @@ public class Model  {
 
     public void setDateFieldMap(Map<String, ModelField> dateFieldMap) {
         this.dateFieldMap = dateFieldMap;
+    }
+
+    public boolean isHasLongDate() {
+        return hasLongDate;
+    }
+
+    public void setHasLongDate(boolean hasLongDate) {
+        this.hasLongDate = hasLongDate;
+    }
+
+    public boolean isHasRange() {
+        return hasRange;
+    }
+
+    public void setHasRange(boolean hasRange) {
+        this.hasRange = hasRange;
+    }
+
+
+    public ModelConfig getConfig() {
+        return config;
+    }
+
+    public void setConfig(ModelConfig config) {
+        this.config = config;
     }
 
     @Override

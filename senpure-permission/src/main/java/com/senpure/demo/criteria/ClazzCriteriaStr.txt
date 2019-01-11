@@ -24,7 +24,7 @@ public class ClazzCriteriaStr extends CriteriaStr implements Serializable {
     private String num;
     //创建时间
     private String createDate;
-    //table [demo_class][column = create_time] order
+    //table [demo_class][column = create_time] criteriaOrder
     private String createTimeOrder;
 
     public ClazzCriteria toClazzCriteria() {
@@ -57,7 +57,7 @@ public class ClazzCriteriaStr extends CriteriaStr implements Serializable {
                 criteria.setCreateTime(createDateValid.getDate().getTime());
             }
         }
-        //table [demo_class][column = create_time] order
+        //table [demo_class][column = create_time] criteriaOrder
         if (createTimeOrder != null) {
             criteria.setCreateTimeOrder(createTimeOrder);
         }
@@ -203,7 +203,7 @@ public class ClazzCriteriaStr extends CriteriaStr implements Serializable {
 
 
     /**
-     * get table [demo_class][column = create_time] order
+     * get table [demo_class][column = create_time] criteriaOrder
      *
      * @return
      */
@@ -212,7 +212,7 @@ public class ClazzCriteriaStr extends CriteriaStr implements Serializable {
     }
 
     /**
-     * set table [demo_class][column = create_time] order DESC||ASC
+     * set table [demo_class][column = create_time] criteriaOrder DESC||ASC
      *
      * @return
      */

@@ -1,7 +1,6 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.senpure.base.configuration.ConverterConfiguration,\
   com.senpure.base.configuration.LocaleResolverConfiguration,\
-  com.senpure.base.configuration.MessageSourceConfiguration,\
   com.senpure.base.configuration.ResourcesConfiguration,\
   com.senpure.base.configuration.ValidatorConfiguration
 

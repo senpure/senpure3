@@ -202,7 +202,7 @@
         </where>
         <if test="hasOrder">
             ORDER BY
-            <foreach collection="order" index="key" item="item" separator=",">
+            <foreach collection="criteriaOrder" index="key" item="item" separator=",">
                 <if test="item == 'DESC'">
                     ${key} DESC
                 </if>

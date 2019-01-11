@@ -3,6 +3,7 @@ package com.senpure.base.criterion;
 
 import com.senpure.base.struct.PatternDate;
 import com.senpure.base.validator.DynamicDate;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -17,21 +18,26 @@ public class CriteriaStr implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(hidden = true)
     private String startDate, endDate;
 
     @DynamicDate
+    @ApiModelProperty(hidden = true)
     private PatternDate startDateValid = new PatternDate();
+    @ApiModelProperty(hidden = true)
     @DynamicDate
     private PatternDate endDateValid = new PatternDate();
-
+    @ApiModelProperty(position = 200, value = "页数", example = "2", dataType = "integer",  allowEmptyValue = true)
     @Min(value = 1, message = "{input.error}")
     private String page = "1";
     @Max(value = 200, message = "{input.error}")
+    @ApiModelProperty(position = 201,  value = "每页数据", notes = "每页显示多少条数据，默认15条", example = "20")
     private String pageSize = "15";
     //前端必须分页
     @Pattern(regexp = "true", message = "{input.error}")
+    @ApiModelProperty(hidden = true)
     private String usePage = "true";
-
+    @ApiModelProperty(hidden = true)
     private String datePattern = "yyyy-MM-dd HH:mm:ss";
 
     public String getStartDate() {
@@ -85,7 +91,6 @@ public class CriteriaStr implements Serializable {
     public void setPageSize(String pageSize) {
         this.pageSize = pageSize;
     }
-
     public String getPage() {
         return page;
     }
@@ -93,6 +98,7 @@ public class CriteriaStr implements Serializable {
     public void setPage(String page) {
         this.page = page;
     }
+
 
     public String getPageSize() {
         return pageSize;
@@ -120,6 +126,12 @@ public class CriteriaStr implements Serializable {
         sb.append("Criteria{");
     }
 
+    protected void rangeStr(StringBuilder sb) {
+        String empty = "";
+        sb.append(empty);
+
+    }
+
     protected void dateStr(StringBuilder sb) {
         if (getStartDate() != null) {
             sb.append("startDate=").append(getStartDate()).append(",");
@@ -142,7 +154,7 @@ public class CriteriaStr implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         beforeStr(sb);
-        dateStr(sb);
+        rangeStr(sb);
         afterStr(sb);
         return sb.toString();
     }

@@ -81,7 +81,7 @@
                 <input type="hidden" name="pageSize" value="${criteria.pageSize!}">
 
                 <!--hide input-->
-                <div class="criteria-order">
+                <div class="criteria-criteriaOrder">
                 <input type="hidden" name="sendDateOrder" id="sendDateOrder-pagination"
                        value="${criteria.sendDateOrder!}">
                 </div>
@@ -109,7 +109,7 @@
                         <th>
                         msg
                         </th>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${criteria.sendDateOrder!}"
                             data-field="sendDateOrder" data-init="DESC"
                          >

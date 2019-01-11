@@ -31,8 +31,9 @@ public class SwaggerConfiguration {
         tokenPar.name("x-requested-with").description("ajax").modelRef(new ModelRef("string")).parameterType("header").defaultValue("XMLHttpRequest").required(true).build();
         pars.add(tokenPar.build());
 
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.SPRING_WEB)
                 .apiInfo(apiInfo())
+
                 .select()
 
                 //.apis(RequestHandlerSelectors.basePackage("com.senpure"))

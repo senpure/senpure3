@@ -32,23 +32,21 @@
         delete from <#if tableType=="SINGLE">${tableName}<#else>${r'${'}tableName}</#if>
         <where>
         <#list criteriaFieldMap?values as field>
-            <#if field.criteriaEquals >
+            <#if field.strShow>
                 <#if field.javaNullable >
             <if test="${field.name} != null">
-                and ${field.column} = ${r'#{'}${field.name}}
-            </if>
+                <#if field.longDate??>
+                and ${field.longDate.column} = ${r'#{'}${field.name}.time}
                 <#else >
                 and ${field.column} = ${r'#{'}${field.name}}
                 </#if>
-            <#elseif dateField.name==field.name><#--时间比较-->
-            <if test="startDate != null">
-                and ${field.column} >= <#if field.clazzType =='Date'>${r'#{'}startDate}<#else>${r'#{'}startDate.time}</#if>
             </if>
-            <if test="endDate != null">
-                and ${field.column} &lt;= <#if field.clazzType =='Date'>${r'#{'}endDate}<#else>${r'#{'}endDate.time}</#if>
-            </if>
+                <#else>
+                and ${field.column} = ${r'#{'}${field.name}}
+                </#if>
             </#if>
         </#list>
+<#include "crieriaRange.ftl">
         </where>
     </delete>
 
@@ -72,8 +70,8 @@
         update <#if tableType=="SINGLE">${tableName}<#else>${r'${'}tableName}</#if>
         <set>
         <#if version??>
-                <bind name="${version.name}Update" value="${version.name} + 1"/>
-                ${version.column} = ${r'#{'}${version.name}Update},</#if>
+            <bind name="${version.name}Update" value="${version.name} + 1"/>
+            ${version.column} = ${r'#{'}${version.name}Update},</#if>
         <#list modelFieldMap?values as field>
             <#if field.javaNullable >
             <if test="${field.name} != null">
@@ -122,13 +120,18 @@
             </#if>
         </#if>
         <#list modelFieldMap?values as field>
+        <#if field.strShow>
                 <#if field.javaNullable >
                 <if test="${field.name} != null">
                     ${field.column} = ${r'#{'}${field.name}},
+                     <#if field.longDate??>
+                    ${field.longDate.column} = ${r'#{'}${field.name}.time},
+                     </#if>
                 </if>
                 <#else>
                     ${field.column} = ${r'#{'}${field.name}},
                 </#if>
+        </#if>
         </#list>
         </set>
         <where>
@@ -139,14 +142,7 @@
         <#else >
                     ${id.column} = ${r'#{'}${id.name}}
         </#if>
-        <#if dateFieldNum ==1>
-                <if test="startDate != null">
-                    and ${dateField.column} >= <#if dateField.clazzType =='Date'>${r'#{'}startDate}<#else>${r'#{'}startDate.time}</#if>
-                </if>
-                <if test="endDate != null">
-                    and ${dateField.column} &lt;= <#if dateField.clazzType =='Date'>${r'#{'}endDate}<#else>${r'#{'}endDate.time}</#if>
-                </if>
-        </#if>
+<#include "crieriaRange.ftl">
         <#if version??>
             <#if version.javaNullable >
                 <if test="${version.name} != null">
@@ -172,23 +168,21 @@
         select count(*) from <#if tableType=="SINGLE">${tableName}<#else>${r'${'}tableName}</#if>
         <where>
         <#list criteriaFieldMap?values as field>
-            <#if field.criteriaEquals >
+            <#if field.strShow >
                 <#if field.javaNullable >
             <if test="${field.name} != null">
+                <#if field.longDate??>
+                and ${field.longDate.column} = ${r'#{'}${field.name}.time}
+                    <#else >
                 and ${field.column} = ${r'#{'}${field.name}}
+                </#if>
             </if>
                 <#else>
                 and ${field.column} = ${r'#{'}${field.name}}
                 </#if>
-            <#elseif dateField.name==field.name><#--时间比较-->
-            <if test="startDate != null">
-               and ${field.column} >= <#if field.clazzType =='Date'>${r'#{'}startDate}<#else>${r'#{'}startDate.time}</#if>
-            </if>
-            <if test="endDate != null">
-                 and ${field.column} &lt;= <#if field.clazzType =='Date'>${r'#{'}endDate}<#else>${r'#{'}endDate.time}</#if>
-            </if>
             </#if>
         </#list>
+<#include "crieriaRange.ftl">
         </where>
     </select>
 
@@ -198,7 +192,7 @@
         from <#if tableType=="SINGLE">${tableName}<#else>${r'${'}tableName}</#if>
         <where>
         <#list criteriaFieldMap?values as field>
-            <#if field.criteriaEquals >
+            <#if field.strShow >
                 <#if field.javaNullable >
             <if test="${field.name} != null">
                 and ${field.column} = ${r'#{'}${field.name}}
@@ -206,19 +200,13 @@
                 <#else >
                 and ${field.column} = ${r'#{'}${field.name}}
                 </#if>
-            <#elseif dateField.name==field.name><#--时间比较-->
-            <if test="startDate != null">
-                and ${field.column} >= <#if field.clazzType =='Date'>${r'#{'}startDate}<#else>${r'#{'}startDate.time}</#if>
-            </if>
-            <if test="endDate != null">
-                and ${field.column} &lt;= <#if field.clazzType =='Date'>${r'#{'}endDate}<#else>${r'#{'}endDate.time}</#if>
-            </if>
             </#if>
         </#list>
+<#include "crieriaRange.ftl">
         </where>
         <if test="hasOrder">
             ORDER BY
-            <foreach collection="order" index="key" item="item" separator=",">
+            <foreach collection="criteriaOrder" index="key" item="item" separator=",">
                 <if test="item == 'DESC'">
                     ${r'${'}key} DESC
                 </if>

@@ -136,7 +136,7 @@
                 <input type="hidden" name="pageSize" value="${criteria.pageSize!}">
 
                 <!--hide input-->
-                <div class="criteria-order">
+                <div class="criteria-criteriaOrder">
                 <input type="hidden" name="nameOrder" id="nameOrder-pagination"
                        value="${criteria.nameOrder!}">
                 <input type="hidden" name="nickOrder" id="nickOrder-pagination"
@@ -167,19 +167,19 @@
                     <th>
                     id
                     </th>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${criteria.nameOrder!}"
                             data-field="nameOrder" data-init="ASC"
                          >
                         name
                         </th>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${criteria.nickOrder!}"
                             data-field="nickOrder" data-init="ASC"
                          >
                         nick
                         </th>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${criteria.createTimeOrder!}"
                             data-field="createTimeOrder" data-init="DESC"
                          >
@@ -197,7 +197,7 @@
                         <th>
                         good
                         </th>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${criteria.clazzIdOrder!}"
                             data-field="clazzIdOrder" data-init="ASC"
                          >

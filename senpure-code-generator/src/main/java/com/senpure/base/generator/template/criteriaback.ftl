@@ -32,8 +32,8 @@ public class ${name}Criteria extends Criteria implements Serializable {
     //${field.explain}
 </#if>
     ${field.accessType} ${field.clazzType} ${field.name};
-    <#if field.order&&field.htmlShow>
-    //table [${tableName}][column = ${field.column}] order
+    <#if field.criteriaOrder&&field.htmlShow>
+    //table [${tableName}][column = ${field.column}] criteriaOrder
     ${field.accessType} String ${field.name}Order;
     </#if>
 </#list>

@@ -21,6 +21,7 @@ public class ClazzCriteriaStr extends CriteriaStr implements Serializable {
     private String version;
     //年级，如三年级
     private String age;
+    private String page;
     //几班，如二班
     private String num;
     //创建时间
@@ -29,6 +30,16 @@ public class ClazzCriteriaStr extends CriteriaStr implements Serializable {
     private PatternDate createDateValid = new PatternDate();
     //table [demo_class][column = create_time] order
     private String createTimeOrder;
+
+    @Override
+    public String getPage() {
+        return page;
+    }
+
+    @Override
+    public void setPage(String page) {
+        this.page = page;
+    }
 
     public ClazzCriteria toClazzCriteria() {
         ClazzCriteria criteria = new ClazzCriteria();

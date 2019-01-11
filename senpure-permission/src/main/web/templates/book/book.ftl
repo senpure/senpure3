@@ -116,7 +116,7 @@
                 <input type="hidden" name="pageSize" value="${criteria.pageSize!}">
 
                 <!--hide input-->
-                <div class="criteria-order">
+                <div class="criteria-criteriaOrder">
                 <input type="hidden" name="nameOrder" id="nameOrder-pagination"
                        value="${criteria.nameOrder!}">
                 <input type="hidden" name="releaseTimeOrder" id="releaseTimeOrder-pagination"
@@ -145,7 +145,7 @@
                     <th>
                     id
                     </th>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${criteria.nameOrder!}"
                             data-field="nameOrder" data-init="ASC"
                          >
@@ -154,13 +154,13 @@
                         <th>
                         price
                         </th>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${criteria.releaseTimeOrder!}"
                             data-field="releaseTimeOrder" data-init="DESC"
                          >
                         releaseTime
                         </th>
-                        <th data-order="true" data-form="#criteria-pagination"
+                        <th data-criteriaOrder="true" data-form="#criteria-pagination"
                             data-value="${criteria.authorIdOrder!}"
                             data-field="authorIdOrder" data-init="ASC"
                          >

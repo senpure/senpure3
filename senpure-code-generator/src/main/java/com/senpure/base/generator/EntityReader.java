@@ -199,7 +199,9 @@ public class EntityReader {
                 }
             }
             List<ModelField> modelFields = model.getAfterReadColumn().getModelFields();
+            //没有id 和version
             Map<String, ModelField> tempModelFieldMap = new LinkedHashMap<>(model.getModelFieldMap());
+            //完成外键信息补充
             for (ModelField modelField : modelFields) {
                 Model target = modelMap.get(modelField.getName());
                 if (target == null) {
@@ -229,52 +231,35 @@ public class EntityReader {
                 model.getModelFieldMap().put(modelField.getName(), modelField);
                 model.getCriteriaFieldMap().put(modelField.getName(), modelField);
             }
+
+
             model.getCriteriaFieldMap().putAll(tempModelFieldMap);
-            //mybatis 时间范围 >= <= 处理，只处理只有一个时间字段的情况
-            logger.debug("start {} model.getDateFieldNum() {}", model.getName(), model.getDateFieldNum());
-            if (model.getDateFieldNum() == 1) {
-                ModelField field = model.getDateField();
-                field.setCriteriaEquals(false);
+            //将时间加入 >= <=的条件
+            for (ModelField field : model.getDateFieldMap().values()) {
+                field.setHasCriteriaRange(true);
                 String longName = field.getName();
-                logger.debug("time field {}", field);
+                //查找时间戳的字段
                 if (longName.endsWith("Date")) {
+                    logger.debug("time field {}", field);
                     longName = longName.substring(0, longName.length() - 4) + "Time";
-                }
-                logger.debug("time long name {}", longName);
-                ModelField temp = model.getModelFieldMap().get(longName);
-                logger.debug("time long {}", temp);
-                if (temp != null) {
-                    temp.setCriteriaEquals(false);
-                    model.setDateField(temp);
-                }
-            }
-            Collection<ModelField> modelFieldCollection = model.getModelFieldMap().values();
-            for (ModelField modelField : modelFieldCollection) {
-                if (model.getName().equalsIgnoreCase("account")) {
-                    logger.debug(modelField.toString());
-                }
-                String name = modelField.getName();
-                if (name.endsWith("Time") && modelField.getClazzType().equalsIgnoreCase("long")) {
-                    String dateName = name.substring(0, name.length() - 4) + "Date";
-                    ModelField temp = model.getModelFieldMap().get(dateName);
+                    logger.debug("time long name {}", longName);
+                    ModelField temp = model.getModelFieldMap().get(longName);
                     if (temp != null) {
-                        modelField.setDate(true);
-                        modelField.setStrShow(false);
-                        temp.setHtmlShow(false);
-                        temp.setCriteriaEquals(false);
-                        temp.setLongDate(modelField);
-                        modelField.setOrder(true);
+                        temp.setStrShow(false);
+                        temp.setHasCriteriaRange(true);
+                        field.setLongDate(temp);
                     }
                 }
             }
-            if (model.getDateField() == null) {
-                ModelField modelField = new ModelField();
-                modelField.setName("123456789");
-                model.setDateField(modelField);
 
+
+            Collection<ModelField> modelFieldCollection = model.getModelFieldMap().values();
+            for (ModelField modelField : modelFieldCollection) {
+                if (modelField.isHasCriteriaRange()) {
+                    model.setHasRange(true);
+                    break;
+                }
             }
-            logger.debug("end {} model.getDateFieldNum() {}", model.getName(), model.getDateFieldNum());
-
             //解读出findBy的字段
             for (ModelField modelField : modelFieldCollection) {
                 if (modelField.getName().equals("account")) {
@@ -332,9 +317,11 @@ public class EntityReader {
         if (model.getFindModeFields().contains(modelField)) {
             logger.info("change {} to {},{}  {}", modelField.isFindOne(), findOne, model, modelField);
             modelField.setFindOne(findOne);
+            modelField.setCriteriaOrder(true);
         } else {
             logger.info("find  {}  {}", model, modelField);
             modelField.setFindOne(findOne);
+            modelField.setCriteriaOrder(true);
             model.getFindModeFields().add(modelField);
         }
     }
@@ -401,14 +388,10 @@ public class EntityReader {
                 modelField.setJdbcType(jdbcType);
                 if ("Date".equals(modelField.getClazzType())) {
                     model.setHasDate(true);
-                    model.dateFieldIncr();
-                    model.setDateField(modelField);
                     model.getDateFieldMap().put(modelField.getName(), modelField);
                     modelField.setJdbcType("TIMESTAMP");
                     modelField.setDate(true);
-                    modelField.setOrder(true);
-
-
+                    modelField.setCriteriaOrder(true);
                 }
                 if ("DOUBLE PRECISION".equalsIgnoreCase(jdbcType)) {
                     modelField.setJdbcType("DOUBLE");
@@ -450,12 +433,12 @@ public class EntityReader {
                 }
                 if (field.getAnnotation(LongDate.class) != null) {
                     if (modelField.getClazzType().equalsIgnoreCase("long")) {
-                        model.dateFieldIncr();
-                        model.setDateField(modelField);
+                        model.setHasLongDate(true);
+                        model.getDateFieldMap().put(modelField.getName(), modelField);
                     }
                 }
                 logger.debug(modelField.toString());
-                // System.out.println(field.getType());
+
             }
         }
     }

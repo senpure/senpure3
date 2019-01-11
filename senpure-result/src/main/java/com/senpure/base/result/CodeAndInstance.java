@@ -4,10 +4,10 @@ import java.lang.reflect.Field;
 
 
 public class CodeAndInstance {
-   protected int code;
+    protected int code;
     protected Field field;
 
-    protected  Object instance;
+    protected Object instance;
 
 
 
