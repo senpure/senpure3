@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 
@@ -27,16 +26,13 @@ public class CriteriaStr implements Serializable {
     @ApiModelProperty(hidden = true)
     @DynamicDate
     private PatternDate endDateValid = new PatternDate();
-    @ApiModelProperty(position = 200, value = "页数", example = "2", dataType = "integer",  allowEmptyValue = true)
+    @ApiModelProperty( hidden = true,position = 200, value = "页数", example = "2", dataType = "int")
     @Min(value = 1, message = "{input.error}")
     private String page = "1";
+    @Min(value = 5, message = "{input.error}")
     @Max(value = 200, message = "{input.error}")
-    @ApiModelProperty(position = 201,  value = "每页数据", notes = "每页显示多少条数据，默认15条", example = "20")
+    @ApiModelProperty(hidden = true,position = 201, value = "每页数据", notes = "每页显示多少条数据，默认15条", example = "20",dataType = "int")
     private String pageSize = "15";
-    //前端必须分页
-    @Pattern(regexp = "true", message = "{input.error}")
-    @ApiModelProperty(hidden = true)
-    private String usePage = "true";
     @ApiModelProperty(hidden = true)
     private String datePattern = "yyyy-MM-dd HH:mm:ss";
 
@@ -91,6 +87,7 @@ public class CriteriaStr implements Serializable {
     public void setPageSize(String pageSize) {
         this.pageSize = pageSize;
     }
+
     public String getPage() {
         return page;
     }
@@ -104,17 +101,9 @@ public class CriteriaStr implements Serializable {
         return pageSize;
     }
 
-    public String getUsePage() {
-        return usePage;
-    }
-
-    public void setUsePage(String usePage) {
-        this.usePage = usePage;
-    }
 
     public Criteria toCriteria() {
         Criteria criteria = new Criteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(startDateValid.getDate());

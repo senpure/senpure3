@@ -1,5 +1,8 @@
 package ${modelPackage};
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 <#if hasDate>
 import java.util.Date;
@@ -11,6 +14,11 @@ import java.util.Date;
  * @author senpure-generator
  * @version ${.now?datetime}
  */
+<#if hasExplain>
+@ApiModel(value = "${explain}")
+<#else >
+@ApiModel
+</#if>
 public class ${name} implements Serializable {
     private static final long serialVersionUID = ${serial(modelFieldMap)}L;
 
@@ -22,12 +30,14 @@ public class ${name} implements Serializable {
     <#if id.hasExplain>
     //${version.explain}
     </#if>
+    @ApiModelProperty(hidden = true )
     ${version.accessType} ${version.clazzType} ${version.name};
 </#if>
 <#list modelFieldMap?values as field>
 <#if field.hasExplain>
     //${field.explain}
 </#if>
+    ${apiModelProperty(name,field)}
     ${field.accessType} ${field.clazzType} ${field.name};
 </#list>
 <#if table??>

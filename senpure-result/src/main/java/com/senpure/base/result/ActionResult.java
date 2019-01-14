@@ -16,7 +16,7 @@ public class ActionResult {
     private int code;
     @ApiModelProperty(position = 1, value = "操作提示", example = "您的权限不足", allowEmptyValue = true)
     private String message;
-    @ApiModelProperty(position = 2, value = "操作提示的格式格式化参数(一般是数字)", example = "[\"100000\",\"20000\"]", allowEmptyValue = true)
+    @ApiModelProperty(position = 100, value = "操作提示的格式格式化参数(一般是数字)", example = "[\"100000\",\"20000\"]", allowEmptyValue = true)
     private List<String> messageArgs;
 
     public boolean success() {

@@ -33,7 +33,7 @@ public class AccountRoleCriteriaStr extends CriteriaStr implements Serializable 
 
     public AccountRoleCriteria toAccountRoleCriteria() {
         AccountRoleCriteria criteria = new AccountRoleCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

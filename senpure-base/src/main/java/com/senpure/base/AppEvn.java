@@ -104,6 +104,9 @@ public class AppEvn {
         return classRootPath;
     }
 
+    /**
+     * 不能也用于测试实例
+     */
     public static void markClassRootPath() {
         StackTraceElement[] statcks = Thread.currentThread()
                 .getStackTrace();
@@ -123,6 +126,9 @@ public class AppEvn {
             String nowClassRootPath = classRootPath;
             classRootPath = oldClassRootPath;
             Assert.error("两个不相同的标识" + classRootPath + "," + nowClassRootPath);
+        }
+        if (startClass == null) {
+            markStartClass(clazz);
         }
     }
 

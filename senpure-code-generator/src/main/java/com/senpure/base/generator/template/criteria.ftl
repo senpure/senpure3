@@ -5,6 +5,7 @@ import ${modelPackage}.${name};
 <#if hasDate>
 import com.senpure.base.util.DateFormatUtil;
 </#if>
+import io.swagger.annotations.ApiModelProperty;
 
 <#if table??>
 import javax.validation.constraints.Null;

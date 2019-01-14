@@ -247,6 +247,7 @@ public class EntityReader {
                     if (temp != null) {
                         temp.setStrShow(false);
                         temp.setHasCriteriaRange(true);
+                        temp.setLongTime(true);
                         field.setLongDate(temp);
                     }
                 }
@@ -434,6 +435,7 @@ public class EntityReader {
                 if (field.getAnnotation(LongDate.class) != null) {
                     if (modelField.getClazzType().equalsIgnoreCase("long")) {
                         model.setHasLongDate(true);
+                        modelField.setLongTime(true);
                         model.getDateFieldMap().put(modelField.getName(), modelField);
                     }
                 }

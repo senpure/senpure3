@@ -27,7 +27,7 @@ public class AccountValueCriteriaStr extends CriteriaStr implements Serializable
 
     public AccountValueCriteria toAccountValueCriteria() {
         AccountValueCriteria criteria = new AccountValueCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

@@ -35,9 +35,13 @@ public class ModelField {
 
     private boolean findOne = false;
     /**
-     * 是否是日期类型的字段 date 或时间戳
+     * 是否是日期类型的字段 java.lang.Date
      */
     private boolean date;
+    /**
+     * 数字表示时间
+     */
+    private boolean longTime;
 
     /**
      * 是否可以条件排序
@@ -156,6 +160,15 @@ public class ModelField {
     public void setExplain(String explain) {
         this.explain = explain;
         hasExplain = true;
+    }
+
+
+    public boolean isLongTime() {
+        return longTime;
+    }
+
+    public void setLongTime(boolean longTime) {
+        this.longTime = longTime;
     }
 
     public boolean isNullable() {

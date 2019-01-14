@@ -132,7 +132,8 @@ public class CodeGenerator {
         cfg.setSharedVariable("space", new SpaceResidual());
         cfg.setSharedVariable("serial", new HashCode());
         cfg.setSharedVariable("labelFormat", new LabelFormat());
-        cfg.setSharedVariable("apiModelProperty", new ApiModelProperty());
+        ApiModelProperty apiModelProperty= new ApiModelProperty() ;
+        cfg.setSharedVariable("apiModelProperty", apiModelProperty);
         cfg.setClassForTemplateLoading(getClass(), "/");
         Template modelTemplate = null;
         Template serviceTemplate = null;
@@ -207,8 +208,11 @@ public class CodeGenerator {
                 model.setTable(modelField);
             }
             if (modelConfig.isGenerateModel()) {
+                int startPosition = apiModelProperty.getStartPosition();
                 File modelFile = new File(javaPart, config.getModelPartName() + "/" + model.getName() + ".java");
                 generateFile(modelTemplate, model, modelFile, modelConfig.isCoverModel());
+
+                apiModelProperty.setStartPosition(startPosition);
 
             } else {
                 logger.info("{} 不生成model", model.getName());

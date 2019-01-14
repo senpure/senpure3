@@ -4,8 +4,8 @@ import com.senpure.base.criterion.CriteriaStr;
 <#if hasDate>
 import com.senpure.base.struct.PatternDate;
 import com.senpure.base.validator.DynamicDate;
-import io.swagger.annotations.ApiModelProperty;
 </#if>
+import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 
@@ -22,12 +22,13 @@ public class ${name}CriteriaStr extends CriteriaStr implements Serializable {
 <#if id.hasExplain>
     //${id.explain}
 </#if>
+    ${apiModelProperty(name,id)}
     ${id.accessType} String ${id.name};
 <#if version??>
     <#if version.hasExplain>
     //${version.explain}
     </#if>
-      @ApiModelProperty(hidden = true )
+    @ApiModelProperty(hidden = true )
     ${version.accessType} String ${version.name};
 </#if>
 <#list modelFieldMap?values as field>
@@ -37,24 +38,29 @@ public class ${name}CriteriaStr extends CriteriaStr implements Serializable {
         </#if>
     ${apiModelProperty(name,field)}
     ${field.accessType} String ${field.name};
-    <#if field.hasCriteriaRange>
-     ${apiModelProperty(name,field,"start")}
-    ${field.accessType} String start${field.name?cap_first};
-     ${apiModelProperty(name,field,"end")}
-    ${field.accessType} String end${field.name?cap_first};
-     </#if><#-- 范围判断-->
-        <#if field.date>
+     <#if field.date>
     //${field.name} 时间格式
+    ${apiModelProperty(name,field,"pattern")}
     ${field.accessType} String ${field.name}Pattern ;
     @DynamicDate
     ${field.accessType} PatternDate ${field.name}Valid = new PatternDate();
-            <#if field.hasCriteriaRange>
+        </#if><#--时间类型-->
+    </#if>
+</#list>
+<#list modelFieldMap?values as field>
+    <#if field.strShow>
+        <#if field.hasCriteriaRange>
+    ${apiModelProperty(name,field,"start")}
+    ${field.accessType} String start${field.name?cap_first};
+    ${apiModelProperty(name,field,"end")}
+    ${field.accessType} String end${field.name?cap_first};
+            <#if field.date>
     @DynamicDate
     ${field.accessType} PatternDate start${field.name?cap_first}Valid = new PatternDate();
     @DynamicDate
     ${field.accessType} PatternDate end${field.name?cap_first}Valid = new PatternDate();
-            </#if><#--范围-->
-        </#if><#--时间类型-->
+            </#if>
+        </#if><#-- 范围判断-->
     </#if>
 </#list>
 <#list modelFieldMap?values as field>

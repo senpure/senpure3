@@ -37,7 +37,7 @@ public class ContainerCriteriaStr extends CriteriaStr implements Serializable {
 
     public ContainerCriteria toContainerCriteria() {
         ContainerCriteria criteria = new ContainerCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

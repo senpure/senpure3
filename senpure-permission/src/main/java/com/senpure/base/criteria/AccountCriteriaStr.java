@@ -82,7 +82,7 @@ public class AccountCriteriaStr extends CriteriaStr implements Serializable {
 
     public AccountCriteria toAccountCriteria() {
         AccountCriteria criteria = new AccountCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());
