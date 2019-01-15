@@ -34,7 +34,7 @@ public class AuthorCriteriaStr extends CriteriaStr implements Serializable {
 
     public AuthorCriteria toAuthorCriteria() {
         AuthorCriteria criteria = new AuthorCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

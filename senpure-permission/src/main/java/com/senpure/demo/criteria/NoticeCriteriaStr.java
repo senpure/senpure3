@@ -30,7 +30,7 @@ public class NoticeCriteriaStr extends CriteriaStr implements Serializable {
 
     public NoticeCriteria toNoticeCriteria() {
         NoticeCriteria criteria = new NoticeCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

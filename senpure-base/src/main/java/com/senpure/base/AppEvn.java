@@ -1,10 +1,12 @@
 package com.senpure.base;
 
 import com.senpure.base.util.Assert;
+import com.senpure.base.util.Rsa;
 import com.senpure.base.util.StringUtil;
 import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.ansi.AnsiOutput;
 
 import java.io.File;
@@ -49,12 +51,13 @@ public class AppEvn {
     public static String getClassRootPath(Class clazz) {
         String classRootPath = null;
         try {
-            URL url = clazz.getResource("");
+            URL url = clazz.getResource(clazz.getSimpleName() + ".class");
             if (url == null) {
                 return getClassRootPath();
             }
             URI uri = url.toURI();
 
+            //jar里位空
             classRootPath = uri.getPath();
             boolean cutPackage = true;
             if (classRootPath == null) {
@@ -74,6 +77,7 @@ public class AppEvn {
                 if (clazz.getPackage() != null) {
                     String packpath = clazz.getPackage().getName();
                     packpath = packpath.replace(".", File.separator);
+                    packpath = packpath + File.separator + clazz.getSimpleName() + ".class";
                     classRootPath = classRootPath.replace(packpath, "");
                 }
             }
@@ -300,4 +304,10 @@ public class AppEvn {
         }
     }
 
+    public static void main(String[] args) {
+
+        System.out.println(Rsa.class.getSimpleName());
+        markClassRootPath(SpringApplication.class);
+        System.out.println(getClassRootPath());
+    }
 }

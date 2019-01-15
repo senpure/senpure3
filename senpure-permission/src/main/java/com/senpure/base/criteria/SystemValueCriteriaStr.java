@@ -26,7 +26,7 @@ public class SystemValueCriteriaStr extends CriteriaStr implements Serializable 
 
     public SystemValueCriteria toSystemValueCriteria() {
         SystemValueCriteria criteria = new SystemValueCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

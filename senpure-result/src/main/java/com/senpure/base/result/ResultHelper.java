@@ -96,8 +96,8 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
         try {
             syncResults();
         } catch (Exception e) {
-            logger.error("result解析出错，关闭服务器", e);
-            act.close();
+            //logger.error("result解析出错，关闭服务器", e);
+           // act.close();
         }
 
     }

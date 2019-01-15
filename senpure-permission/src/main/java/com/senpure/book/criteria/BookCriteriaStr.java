@@ -36,7 +36,7 @@ public class BookCriteriaStr extends CriteriaStr implements Serializable {
 
     public BookCriteria toBookCriteria() {
         BookCriteria criteria = new BookCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

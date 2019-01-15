@@ -33,7 +33,7 @@ public class RolePermissionCriteriaStr extends CriteriaStr implements Serializab
 
     public RolePermissionCriteria toRolePermissionCriteria() {
         RolePermissionCriteria criteria = new RolePermissionCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

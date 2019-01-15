@@ -33,7 +33,7 @@ public class ContainerPermissionCriteriaStr extends CriteriaStr implements Seria
 
     public ContainerPermissionCriteria toContainerPermissionCriteria() {
         ContainerPermissionCriteria criteria = new ContainerPermissionCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

@@ -39,7 +39,7 @@ public class PermissionCriteriaStr extends CriteriaStr implements Serializable {
 
     public PermissionCriteria toPermissionCriteria() {
         PermissionCriteria criteria = new PermissionCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

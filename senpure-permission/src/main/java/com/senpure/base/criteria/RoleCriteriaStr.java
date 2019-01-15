@@ -33,7 +33,7 @@ public class RoleCriteriaStr extends CriteriaStr implements Serializable {
 
     public RoleCriteria toRoleCriteria() {
         RoleCriteria criteria = new RoleCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

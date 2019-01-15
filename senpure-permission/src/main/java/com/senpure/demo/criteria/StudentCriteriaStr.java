@@ -42,7 +42,7 @@ public class StudentCriteriaStr extends CriteriaStr implements Serializable {
 
     public StudentCriteria toStudentCriteria() {
         StudentCriteria criteria = new StudentCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

@@ -32,7 +32,7 @@ public class SequenceCriteriaStr extends CriteriaStr implements Serializable {
 
     public SequenceCriteria toSequenceCriteria() {
         SequenceCriteria criteria = new SequenceCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

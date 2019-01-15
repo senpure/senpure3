@@ -34,7 +34,7 @@ public class ProxyCriteriaStr extends CriteriaStr implements Serializable {
 
     public ProxyCriteria toProxyCriteria() {
         ProxyCriteria criteria = new ProxyCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());

@@ -43,7 +43,7 @@ public class ClazzCriteriaStr extends CriteriaStr implements Serializable {
 
     public ClazzCriteria toClazzCriteria() {
         ClazzCriteria criteria = new ClazzCriteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
+
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         criteria.setStartDate(getStartDateValid().getDate());
