@@ -7,9 +7,7 @@ import com.senpure.base.util.DatabaseUtil;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -17,10 +15,8 @@ import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
@@ -30,10 +26,10 @@ import javax.sql.DataSource;
  */
 
 
-@MapperScan(basePackages = "com.senpure", sqlSessionFactoryRef = "sqlSessionFactory")
-@EnableTransactionManagement
-@EnableJpaRepositories
-@ConditionalOnMissingBean(name = "dataSource")
+//@MapperScan(basePackages = "com.senpure", sqlSessionFactoryRef = "sqlSessionFactory")
+//@EnableTransactionManagement
+//@EnableJpaRepositories
+//@ConditionalOnMissingBean(name = "dataSource")
 public class DataSourceAutoConfiguration extends BaseConfiguration {
 
     @Bean(name = "dataSourceProperties")
@@ -44,7 +40,7 @@ public class DataSourceAutoConfiguration extends BaseConfiguration {
     }
 
 
-    @Bean
+    @Bean(name = "dataSource")
     @ConfigurationProperties(prefix = "spring.datasource")
     @Primary
     public DataSource dataSource() {

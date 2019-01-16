@@ -74,11 +74,8 @@ public class ${name}CriteriaStr extends CriteriaStr implements Serializable {
 </#list>
     public ${name}Criteria to${name}Criteria() {
         ${name}Criteria criteria = new ${name}Criteria();
-        criteria.setUsePage(Boolean.valueOf(getUsePage()));
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
-        criteria.setStartDate(getStartDateValid().getDate());
-        criteria.setEndDate(getEndDateValid().getDate());
 <#assign field = id/>
 <#include "strFieldTo.ftl">
 <#if version??>

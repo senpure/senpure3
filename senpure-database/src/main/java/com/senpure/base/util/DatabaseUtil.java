@@ -60,7 +60,8 @@ public class DatabaseUtil {
                 sb.append(database);
                 sb.append("`");
                 if (charSet == null) {
-                    sb.append(" default character set utf8 collate utf8_general_ci");
+                    //sb.append(" default character set utf8 collate utf8_general_ci");
+                    sb.append(" default character set utf8mb4 collate utf8mb4_unicode_ci");
                 } else {
                     sb.append(" default character set ");
                     sb.append(charSet.replace("_", "").replace("-", ""));

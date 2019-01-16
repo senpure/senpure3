@@ -9,9 +9,21 @@ package com.senpure.base.generator;
 public class ModelConfig {
 
 
+    public static ModelConfig getCoverAllInstance() {
+        ModelConfig config = new ModelConfig();
+        config.setCoverModel(true);
+        config.setCoverService(true);
+        config.setCoverCriteria(true);
+        config.setCoverController(true);
+        config.setCoverMapperJava(true);
+        config.setCoverMapperXml(true);
+        return config;
+    }
+
     private boolean generateModel = true;
     //生成mapper
-    private boolean generateMapper = true;
+    private boolean generateMapperJava = true;
+    private boolean generateMapperXml = true;
     //生成service
     private boolean generateService = true;
     //生成controller
@@ -27,7 +39,8 @@ public class ModelConfig {
     //覆盖model
     private boolean coverModel = false;
     //覆盖mapper
-    private boolean coverMapper = false;
+    private boolean coverMapperJava = false;
+    private boolean coverMapperXml = false;
     //覆盖service
     private boolean coverService = false;
     //覆盖controller
@@ -38,18 +51,42 @@ public class ModelConfig {
     //表类型 mix single
     private String tableType = GeneratorConfig.TABLE_TYPE_SINGLE;
 
-    private boolean cache;
-    private boolean remoteCache;
+    private boolean cache=true;
+    private boolean remoteCache=true;
     private boolean localCache;
     private boolean mapCache;
 
 
-    public boolean isGenerateMapper() {
-        return generateMapper;
+    public boolean isGenerateMapperJava() {
+        return generateMapperJava;
     }
 
-    public void setGenerateMapper(boolean generateMapper) {
-        this.generateMapper = generateMapper;
+    public void setGenerateMapperJava(boolean generateMapperJava) {
+        this.generateMapperJava = generateMapperJava;
+    }
+
+    public boolean isGenerateMapperXml() {
+        return generateMapperXml;
+    }
+
+    public void setGenerateMapperXml(boolean generateMapperXml) {
+        this.generateMapperXml = generateMapperXml;
+    }
+
+    public boolean isCoverMapperJava() {
+        return coverMapperJava;
+    }
+
+    public void setCoverMapperJava(boolean coverMapperJava) {
+        this.coverMapperJava = coverMapperJava;
+    }
+
+    public boolean isCoverMapperXml() {
+        return coverMapperXml;
+    }
+
+    public void setCoverMapperXml(boolean coverMapperXml) {
+        this.coverMapperXml = coverMapperXml;
     }
 
     public boolean isGenerateService() {
@@ -100,13 +137,6 @@ public class ModelConfig {
         this.coverModel = coverModel;
     }
 
-    public boolean isCoverMapper() {
-        return coverMapper;
-    }
-
-    public void setCoverMapper(boolean coverMapper) {
-        this.coverMapper = coverMapper;
-    }
 
     public boolean isCoverService() {
         return coverService;

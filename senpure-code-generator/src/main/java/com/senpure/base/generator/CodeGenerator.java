@@ -132,7 +132,8 @@ public class CodeGenerator {
         cfg.setSharedVariable("space", new SpaceResidual());
         cfg.setSharedVariable("serial", new HashCode());
         cfg.setSharedVariable("labelFormat", new LabelFormat());
-        ApiModelProperty apiModelProperty= new ApiModelProperty() ;
+        cfg.setSharedVariable("mapperXmlTips", new MapperXmlTips());
+        ApiModelProperty apiModelProperty = new ApiModelProperty();
         cfg.setSharedVariable("apiModelProperty", apiModelProperty);
         cfg.setClassForTemplateLoading(getClass(), "/");
         Template modelTemplate = null;
@@ -192,7 +193,6 @@ public class CodeGenerator {
 
             ModelConfig modelConfig = config.getModelConfig(model.getName());
             model.setConfig(modelConfig);
-
             model.setModelPackage(part + "." + config.getModelPartName());
             model.setMapperPackage(part + "." + config.getMapperPartName());
             model.setCriteriaPackage(part + "." + config.getCriteriaPartName());
@@ -211,19 +211,22 @@ public class CodeGenerator {
                 int startPosition = apiModelProperty.getStartPosition();
                 File modelFile = new File(javaPart, config.getModelPartName() + "/" + model.getName() + ".java");
                 generateFile(modelTemplate, model, modelFile, modelConfig.isCoverModel());
-
                 apiModelProperty.setStartPosition(startPosition);
 
             } else {
                 logger.info("{} 不生成model", model.getName());
             }
-            if (modelConfig.isGenerateMapper()) {
+            if (modelConfig.isGenerateMapperJava()) {
                 File javaFile = new File(javaPart, config.getMapperPartName() + "/" + model.getName() + config.getMapperSuffix() + ".java");
-                generateFile(mapperJavaTemplate, model, javaFile, modelConfig.isCoverMapper());
-                File xmlFile = new File(javaPart, config.getMapperPartName() + "/" + model.getName() + config.getMapperSuffix() + ".xml");
-                generateFile(mapperXmlTemplate, model, xmlFile, modelConfig.isCoverMapper());
+                generateFile(mapperJavaTemplate, model, javaFile, modelConfig.isCoverMapperJava());
             } else {
-                logger.info("{} 不生成mapper", model.getName());
+                logger.info("{} 不生成mapperJava", model.getName());
+            }
+            if (modelConfig.isGenerateMapperJava()) {
+                File xmlFile = new File(javaPart, config.getMapperPartName() + "/" + model.getName() + config.getMapperSuffix() + ".xml");
+                generateFile(mapperXmlTemplate, model, xmlFile, modelConfig.isCoverMapperJava());
+            } else {
+                logger.info("{} 不生成mapperXml", model.getName());
             }
 
             if (modelConfig.isGenerateService()) {
@@ -262,7 +265,7 @@ public class CodeGenerator {
             }
 
         }
-        generateSpringCacheConfiguration(part, javaPart,config,configurationTemplate);
+        generateSpringCacheConfiguration(part, javaPart, config, configurationTemplate);
         if (exists.size() > 0) {
             logger.warn(AnsiOutput.toString(new Object[]{AnsiColor.BRIGHT_RED, "↓↓↓↓↓↓↓↓↓↓以下文件存在没有生成↓↓↓↓↓↓↓↓↓↓"}));
             for (String name : exists) {
@@ -272,7 +275,7 @@ public class CodeGenerator {
         }
     }
 
-    private void generateSpringCacheConfiguration(String part, File javaPart,GeneratorConfig config, Template template) {
+    private void generateSpringCacheConfiguration(String part, File javaPart, GeneratorConfig config, Template template) {
         if (springLocal.size() > 0) {
             logger.debug("springLocal = {}", springLocal);
         }
@@ -288,15 +291,15 @@ public class CodeGenerator {
             } else {
                 tempPart = part;
             }
-            configName = StringUtil.toUpperFirstLetter(tempPart) + "LocalCache"+config.getConfigurationSuffix();
+            configName = StringUtil.toUpperFirstLetter(tempPart) + "LocalCache" + config.getConfigurationSuffix();
         }
-        File configFile = new File(javaPart, config.getConfigurationPartName()+"/" + configName + ".java");
+        File configFile = new File(javaPart, config.getConfigurationPartName() + "/" + configName + ".java");
         if (springLocal.size() > 0) {
             Class clazz = null;
             try {
                 clazz = Class.forName("org.springframework.data.redis.core.RedisTemplate");
             } catch (ClassNotFoundException e) {
-                logger.debug("没有找到{} 不用生成redis的本地缓存配置","org.springframework.data.redis.core.RedisTemplate");
+                logger.debug("没有找到{} 不用生成redis的本地缓存配置", "org.springframework.data.redis.core.RedisTemplate");
             }
             if (clazz != null) {
                 Map<String, Object> args = new HashMap<>(16);
@@ -320,6 +323,7 @@ public class CodeGenerator {
 
     private void prepLog() {
         AnsiOutput.setEnabled(AnsiOutput.Enabled.ALWAYS);
+        AppEvn.tryMarkClassRootPath();
 
     }
 

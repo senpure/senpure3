@@ -108,15 +108,35 @@ public class AppEvn {
         return classRootPath;
     }
 
-    /**
-     * 不能也用于测试实例
-     */
-    public static void markClassRootPath() {
-        StackTraceElement[] statcks = Thread.currentThread()
-                .getStackTrace();
-        StackTraceElement statck = statcks[2];
+
+    public static void tryMarkClassRootPath() {
+        if (classRootPath != null) {
+            return;
+        }
+        Class clazz = startClass;
         try {
-            Class clazz = Class.forName(statck.getClassName());
+            if (clazz == null) {
+                StackTraceElement[] statcks = Thread.currentThread()
+                        .getStackTrace();
+                clazz = Class.forName(statcks[statcks.length - 1].getClassName());
+            }
+            if (clazz != null) {
+                markClassRootPath(clazz);
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void markClassRootPath() {
+        Class clazz = startClass;
+        try {
+            if (clazz == null) {
+                StackTraceElement[] statcks = Thread.currentThread()
+                        .getStackTrace();
+                StackTraceElement statck = statcks[2];
+                clazz = Class.forName(statck.getClassName());
+            }
             markClassRootPath(clazz);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -259,17 +279,7 @@ public class AppEvn {
             Class.forName("org.fusesource.jansi.AnsiConsole");
             AnsiOutput.setEnabled(AnsiOutput.Enabled.ALWAYS);
             if (AppEvn.classInJar(clazz, false)) {
-                URL url = clazz.getResource("");
-                if (url == null) {
-                    logger.info("url is null {}", clazz);
-                    AnsiConsole.systemInstall();
-                } else {
-                    String name = url.toString();
-                    if (!name.contains("debugger-agent-storage.jar") && !name.contains("deploy.jar")) {
-                        AnsiConsole.systemInstall();
-                    }
-                }
-
+                AnsiConsole.systemInstall();
             }
         } catch (ClassNotFoundException e) {
             logger.info("不适用控制台彩色日志");

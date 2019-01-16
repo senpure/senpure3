@@ -1,5 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.senpure.base.configuration.DataSourceAutoConfiguration,\
   com.senpure.base.configuration.IDGeneratorAutoConfiguration
 
 

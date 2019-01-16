@@ -14,6 +14,13 @@ import java.util.Map;
  */
 public class GeneratorConfig {
 
+    public static GeneratorConfig getDefaultCoverAllInstance() {
+        GeneratorConfig config = new GeneratorConfig();
+        ModelConfig modelConfig = ModelConfig.getCoverAllInstance();
+        config.setDefaultModelConfig(modelConfig);
+        return config;
+    }
+
     public static final String TABLE_TYPE_MIX = "MIX";
     public static final String TABLE_TYPE_SINGLE = "SINGLE";
     /**
@@ -48,11 +55,11 @@ public class GeneratorConfig {
     private String criteriaPartName = "criteria";
     private String configurationPartName = "configuration";
 
-    private String configurationSuffix="Configuration";
-    private String mapperSuffix="Mapper";
-    private String serviceSuffix="Service";
-    private String criteriaSuffix="Criteria";
-    private String criteriaStrSuffix="CriteriaStr";
+    private String configurationSuffix = "Configuration";
+    private String mapperSuffix = "Mapper";
+    private String serviceSuffix = "Service";
+    private String criteriaSuffix = "Criteria";
+    private String criteriaStrSuffix = "CriteriaStr";
 
 
     /**
@@ -74,8 +81,6 @@ public class GeneratorConfig {
 
     private ModelConfig defaultModelConfig = new ModelConfig();
     private Map<String, ModelConfig> modelConfigMap = new HashMap<>();
-
-
 
 
     public void setDefaultModelConfig(ModelConfig defaultModelConfig) {

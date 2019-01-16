@@ -2,6 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+${mapperXmlTips(name,mapperPackage)}
+-->
 <mapper namespace="${mapperPackage}.${name}Mapper">
     <resultMap id="${name?uncap_first}ResultMap" type="${modelPackage}.${name}">
         <id     column="${id.column}"${space(id.columnLen,columnMaxLen)} property="${id.name}"${space(id.nameLen,nameMaxLen)} jdbcType="${id.jdbcType}"/><#if id.hasExplain>${space(id.jdbcLen,jdbcMaxLen)}<!-- ${id.explain} --></#if>
