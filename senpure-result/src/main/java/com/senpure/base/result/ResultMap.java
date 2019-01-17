@@ -42,7 +42,7 @@ public class ResultMap extends HashMap<String, Object> {
         return new ResultMap(code);
     }
 
-    public static ResultMap copy(Map<String, Object>  map) {
+    public static ResultMap copy(Map<String, Object> map) {
 
         ResultMap resultMap = failure();
         resultMap.putAll(map);
@@ -52,6 +52,8 @@ public class ResultMap extends HashMap<String, Object> {
 
     private boolean clientFormat;
     private List<Object> args;
+    private String itemName = ITEM_KEY;
+    private String itemsName = ITEMS_KEY;
 
     private ResultMap() {
         super();
@@ -63,8 +65,7 @@ public class ResultMap extends HashMap<String, Object> {
     }
 
     /**
-     *
-     * @param key <b>key的值会覆盖</b>
+     * @param key   <b>key的值会覆盖</b>
      * @param value
      * @return
      */
@@ -79,21 +80,29 @@ public class ResultMap extends HashMap<String, Object> {
     }
 
 
-
-
     public ResultMap putTotal(int total) {
         super.put(TOTAL_KEY, total);
         return this;
     }
 
     public ResultMap putItems(List value) {
-        super.put(ITEMS_KEY, value);
+        super.put(itemName, value);
         return this;
     }
 
+    public ResultMap putItems(String itemsName, List value) {
+        this.itemsName = itemsName;
+        return putItems(value);
+    }
+
     public ResultMap putItem(Object value) {
-        super.put(ITEM_KEY, value);
+        super.put(itemsName, value);
         return this;
+    }
+
+    public ResultMap putItem(String itemName, Object value) {
+        this.itemsName = itemName;
+        return putItem(value);
     }
 
     public ResultMap putMessage(String value) {

@@ -15,7 +15,7 @@ import java.util.Date;
  * @version ${.now?datetime}
  */
 <#if hasExplain>
-@ApiModel(value = "${explain}")
+@ApiModel(description = "${explain}")
 <#else >
 @ApiModel
 </#if>

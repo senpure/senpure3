@@ -36,7 +36,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
     private static Map<Integer, String> codeName = new HashMap();
     private static Map<String, String> keyMap = new HashMap();
     private static String BASE_NAME = "i18n/result/result";
-    private String resultBaseName;
+
 
     public static String getKey(int code) {
 
@@ -87,6 +87,8 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
                 resultMap.put(ResultMap.MESSAGE_KEY, ResultHelper.getMessage(resultMap.getCode(), locale, args));
     }
 
+
+
     public static void refreshProperties() {
         ResourceBundle.clearCache();
     }
@@ -97,7 +99,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
             syncResults();
         } catch (Exception e) {
             //logger.error("result解析出错，关闭服务器", e);
-           // act.close();
+            // act.close();
         }
 
     }
@@ -263,7 +265,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
             String key = getKey(codeAndInstance.code);
             int keyLen = key.length();
             info.append(key).append(" ");
-            for (int i = keyLen; i <keyMaxLen ; i++) {
+            for (int i = keyLen; i < keyMaxLen; i++) {
                 info.append(" ");
             }
             info.append("[").append(codeAndInstance.code).append("] ");
@@ -304,12 +306,12 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
 
     }
 
-    public static void devSyncResult(Class<? extends  Result>... result) throws IllegalAccessException, InstantiationException {
+    public static void devSyncResult(Class<? extends Result>... result) throws IllegalAccessException, InstantiationException {
         develop = true;
         force = true;
         if (result != null) {
             Map<String, Result> map = new LinkedHashMap<>();
-            for (Class<? extends  Result> resultClass : result) {
+            for (Class<? extends Result> resultClass : result) {
 
                 Result obj = resultClass.newInstance();
                 findResult(map, obj);
@@ -331,12 +333,11 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
 
     }
 
-    public String getResultBaseName() {
-        return resultBaseName;
+    public static String getResultBaseName() {
+        return BASE_NAME;
     }
 
-    public void setResultBaseName(String resultBaseName) {
-        this.resultBaseName = resultBaseName;
+    public static void setResultBaseName(String resultBaseName) {
         BASE_NAME = resultBaseName;
     }
 
