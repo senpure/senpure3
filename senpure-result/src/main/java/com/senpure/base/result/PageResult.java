@@ -12,6 +12,8 @@ import java.util.Locale;
  * @time 2019-01-02 11:20:27
  */
 public class PageResult<T> extends ActionResult {
+    private static final long serialVersionUID = 2438584673528847820L;
+
     @ApiModelProperty(position = 3, value = "结果集总数", example = "1086")
     private int total;
     @ApiModelProperty(position = 4, value = "一页数据")

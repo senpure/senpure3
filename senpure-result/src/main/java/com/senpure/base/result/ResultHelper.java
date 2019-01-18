@@ -6,13 +6,11 @@ import com.senpure.base.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -22,12 +20,8 @@ import java.text.MessageFormat;
 import java.util.*;
 
 
-@Component
-@ConfigurationProperties(
-        prefix = "senpure"
-)
 public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>, ApplicationContextAware {
-    private static Class<Result>[] results = new Class[]{Result.class};
+    public static List<Result> results = new ArrayList<>();
     public static List<FieldAndInstance> fieldAndInstances = new ArrayList<>();
     private static boolean develop = false;
     private static boolean force = false;
@@ -88,7 +82,6 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
     }
 
 
-
     public static void refreshProperties() {
         ResourceBundle.clearCache();
     }
@@ -106,11 +99,15 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
 
 
     private static void syncResults() {
+        for (Result result : results) {
+            report(result);
+
+        }
         String rootPath = AppEvn.getClassRootPath();
         logger.debug("rootPath {}", rootPath);
         logger.debug("result baseName {}", BASE_NAME);
-        logger.debug("{}", AppEvn.getStartClass());
-        URL url = AppEvn.getStartClass().getResource(BASE_NAME + ".properties");
+        logger.debug("startClass {}", AppEvn.getStartClass());
+        URL url = AppEvn.getStartClass().getResource("/" + BASE_NAME + ".properties");
         logger.debug("url {}", url);
         File i18n = null;
         try {
@@ -156,6 +153,9 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
                 e.printStackTrace();
             }
 
+        } else {
+            logger.warn("资源文件不存在 {} ", BASE_NAME);
+            logger.warn("{}", ResourceBundle.getBundle(BASE_NAME));
         }
 
         List<CodeAndInstance> codeAndInstanceList = new ArrayList<>();
@@ -188,7 +188,6 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
         StringBuilder updateBuilder = new StringBuilder();
 
         for (CodeAndInstance codeAndInstance : codeAndInstanceList) {
-
             Field field = codeAndInstance.field;
             Object instance = codeAndInstance.instance;
             int code = codeAndInstance.code;
@@ -274,8 +273,8 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
             }
             info.append(":").append(getMessage(codeAndInstance.code, Locale.CHINA)).append("\n");
         }
-
         logger.debug("结果集对照表\n{}", info.toString());
+
     }
 
     private AbstractApplicationContext act;
@@ -284,6 +283,29 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         act = (AbstractApplicationContext) applicationContext;
 
+    }
+
+    private static void report(Result result) {
+        Field[] fields = result.getClass().getDeclaredFields();
+
+        FieldAndInstance fieldAndInstance = new FieldAndInstance();
+        for (Field field : fields) {
+
+            if ("logger".equals(field.getName())) {
+                continue;
+            }
+            if ("int".equals(field.getGenericType().getTypeName())) {
+                fieldAndInstance.fields.add(field);
+            } else {
+
+                logger.warn("该类型的字段不支持 [{}],仅支持 [int] ", field.getGenericType().getTypeName());
+            }
+
+        }
+        if (fieldAndInstance.fields.size() > 0) {
+            fieldAndInstance.instance = result;
+            ResultHelper.fieldAndInstances.add(fieldAndInstance);
+        }
     }
 
     private static void findResult(Map<String, Result> map, Result result) {
@@ -306,23 +328,25 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
 
     }
 
-    public static void devSyncResult(Class<? extends Result>... result) throws IllegalAccessException, InstantiationException {
+    public static void devSyncResult() {
+        devSyncResult(new Result());
+    }
+
+    public static void devSyncResult(Result... result) {
+        AppEvn.tryMarkClassRootPath();
+
         develop = true;
         force = true;
         if (result != null) {
             Map<String, Result> map = new LinkedHashMap<>();
-            for (Class<? extends Result> resultClass : result) {
-
-                Result obj = resultClass.newInstance();
+            for (Result obj : result) {
                 findResult(map, obj);
             }
-
             List<Result> results = new ArrayList<>();
             results.addAll(map.values());
             Collections.reverse(results);
-
             for (Result r : results) {
-                r.report();
+                report(r);
             }
             syncResults();
         }
@@ -343,7 +367,8 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException, URISyntaxException {
         //AppEvn.markClassRootPath();
-        devSyncResult(Result.class);
+        devSyncResult(new Result());
+
         URL url = ResultHelper.class.getClassLoader().getResource(BASE_NAME + "2.properties");
 
         System.out.println(url.toURI().getPath());

@@ -2,6 +2,7 @@ package com.senpure.base.spring;
 
 
 import com.senpure.base.WebConstant;
+import com.senpure.base.result.ActionResult;
 import com.senpure.base.result.Result;
 import com.senpure.base.result.ResultHelper;
 import com.senpure.base.result.ResultMap;
@@ -16,7 +17,10 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class BaseController {
 
@@ -100,10 +104,26 @@ public class BaseController {
         return modelAndView.addObject(WebConstant.ACTION_RESULT_MODEL_VIEW_KEY, incorrect(request, result));
     }
 
-    protected ResultMap incorrect(HttpServletRequest request, BindingResult result) {
-        Locale locale=localeResolver.resolveLocale(request);
-        List<ObjectError> es = result.getAllErrors();
+    protected void incorrect(HttpServletRequest request, BindingResult bindingResult, ActionResult result) {
+        Locale locale = localeResolver.resolveLocale(request);
         Map<String, String> validators = new HashMap<>();
+        incorrect(locale, bindingResult, validators);
+        result.setValidators(validators);
+    }
+
+    protected ResultMap incorrect(HttpServletRequest request, BindingResult bindingResult) {
+        Locale locale = localeResolver.resolveLocale(request);
+        Map<String, String> validators = new HashMap<>();
+        incorrect(locale, bindingResult, validators);
+        ResultMap rm = ResultMap.result(Result.FORMAT_INCORRECT);
+        rm.put(ResultMap.VALIDATOR_KEY, validators);
+        ResultHelper.wrapMessage(rm, locale);
+        return rm;
+    }
+
+    private void incorrect(Locale locale, BindingResult bindingResult, Map<String, String> validators) {
+        List<ObjectError> es = bindingResult.getAllErrors();
+
         StringBuilder sb = new StringBuilder();
         //FieldError
         for (ObjectError e : es) {
@@ -115,7 +135,7 @@ public class BaseController {
                 key = key.replace("Valid", "");
             }
             if (e.getDefaultMessage().contains("NumberFormatException")) {
-                validators.put(key, ResultHelper.getMessage(Result.INPUT_NUMBER,locale));
+                validators.put(key, ResultHelper.getMessage(Result.INPUT_NUMBER, locale));
             } else {
                 validators.put(key, e.getDefaultMessage());
             }
@@ -123,11 +143,7 @@ public class BaseController {
             sb.append("\n");
         }
         logger.debug(sb.toString());
-        ResultMap rm = ResultMap.result(Result.FORMAT_INCORRECT);
-        rm.put(ResultMap.VALIDATOR_KEY, validators);
         logger.warn("validators {} ", validators);
-        ResultHelper.wrapMessage(rm, locale);
-        return rm;
     }
 
     protected ModelAndView formatIncorrect(HttpServletRequest request, BindingResult validResult, String view) {
@@ -144,5 +160,10 @@ public class BaseController {
     protected ResultMap wrapMessage(HttpServletRequest request, ResultMap resultMap, Object... args) {
         ResultHelper.wrapMessage(resultMap, localeResolver.resolveLocale(request), args);
         return resultMap;
+    }
+
+
+    protected Locale getLocale(HttpServletRequest request) {
+        return localeResolver.resolveLocale(request);
     }
 }

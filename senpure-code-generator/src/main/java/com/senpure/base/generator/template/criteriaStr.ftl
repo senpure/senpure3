@@ -12,8 +12,6 @@ import java.io.Serializable;
 <#global "int"="Integer"/>
 /**<#if hasExplain>
  * ${explain}
-<#else >
- * ${name}CriteriaStr
  *</#if>
  * @author senpure-generator
  * @version ${.now?datetime}

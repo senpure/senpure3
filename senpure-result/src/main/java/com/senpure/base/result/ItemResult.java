@@ -13,6 +13,7 @@ import java.util.Locale;
  * @time 2018-12-28 17:42:26
  */
 public class ItemResult<T> extends ActionResult {
+    private static final long serialVersionUID = 4750001063439986482L;
 
     @ApiModelProperty(position = 3)
     private T item;

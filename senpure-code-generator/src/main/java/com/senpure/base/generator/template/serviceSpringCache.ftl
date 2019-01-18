@@ -1,6 +1,7 @@
 package ${servicePackage};
 
 import ${modelPackage}.${name};
+import ${resultPackage}.${name}${globalConfig.resultPageSuffix};
 import ${criteriaPackage}.${name}Criteria;
 import ${mapperPackage}.${name}Mapper;
 <#if version??>
@@ -9,7 +10,7 @@ import com.senpure.base.exception.OptimisticLockingFailureException;
 <#if modelPackage !="com.senpure.base.model">
 import com.senpure.base.service.BaseService;
 </#if>
-import com.senpure.base.result.ResultMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -168,8 +169,8 @@ public class ${name}Service extends BaseService {
 </#if>
 
     @Transactional(readOnly = true)
-    public ResultMap findPage(${name?cap_first}Criteria criteria) {
-        ResultMap resultMap = ResultMap.success();
+    public ${name}${globalConfig.resultPageSuffix} findPage(${name?cap_first}Criteria criteria) {
+        ${name}${globalConfig.resultPageSuffix} result = ${name}${globalConfig.resultPageSuffix}.success();
         //是否是主键查找
         <#if id.javaNullable>
         if (criteria.get${id.name?cap_first}() != null) {
@@ -180,23 +181,23 @@ public class ${name}Service extends BaseService {
             if (${nameRule(name)} != null) {
                 List<${name}> ${pluralize(nameRule(name))} = new ArrayList<>(16);
                 ${pluralize(nameRule(name))}.add(${nameRule(name)});
-                resultMap.putTotal(1);
-                resultMap.putItems(${pluralize(nameRule(name))});
+                result.setTotal(1);
+                result.set${pluralize(nameRule(name))?cap_first}(${pluralize(nameRule(name))});
             } else {
-                resultMap.putTotal(0);
+                result.setTotal(0);
             }
-            return resultMap;
+            return result;
         }
         int total = ${nameRule(name)}Mapper.countByCriteria(criteria);
-        resultMap.putTotal(total);
+        result.setTotal(total);
         if (total == 0) {
-            return resultMap;
+            return result;
         }
         //检查页数是否合法
         checkPage(criteria, total);
         List<${name}> ${pluralize(nameRule(name))} = ${nameRule(name)}Mapper.findByCriteria(criteria);
-        resultMap.putItems(${pluralize(nameRule(name))});
-        return resultMap;
+        result.set${pluralize(nameRule(name))?cap_first}(${pluralize(nameRule(name))});
+        return result;
     }
 
     public List<${name}> find(${name?cap_first}Criteria criteria) {

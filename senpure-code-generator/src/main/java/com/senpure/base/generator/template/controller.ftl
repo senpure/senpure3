@@ -8,6 +8,7 @@ import ${criteriaPackage}.${name}CriteriaStr;
 import ${criteriaPackage}.${name}Criteria;
 import ${servicePackage}.${name}Service;
 import ${modelPackage}.${name};
+import ${resultPackage}.${name}${globalConfig.resultPageSuffix};
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -66,7 +67,10 @@ public class ${name}Controller extends BaseController {
         ${name}Criteria criteria = ${criteriaName}.to${name}Criteria();
 </#if>
         logger.debug("查询条件:{}", criteria);
-        ResultMap resultMap = ${nameRule(name)}Service.findPage(criteria);
+        ${name}${globalConfig.resultPageSuffix} pageResult = ${nameRule(name)}Service.findPage(criteria);
+        ResultMap resultMap = ResultMap.result(pageResult.getCode());
+        resultMap.putTotal(pageResult.getTotal());
+        resultMap.put("${pluralize(nameRule(name))}",pageResult.get${pluralize(nameRule(name))?cap_first}());
         return result(request, view, resultMap);
     }
 

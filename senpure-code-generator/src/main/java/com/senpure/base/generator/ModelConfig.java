@@ -17,6 +17,7 @@ public class ModelConfig {
         config.setCoverController(true);
         config.setCoverMapperJava(true);
         config.setCoverMapperXml(true);
+        config.setCoverResult(true);
         return config;
     }
 
@@ -28,12 +29,16 @@ public class ModelConfig {
     private boolean generateService = true;
     //生成controller
     private boolean generateController = true;
+
+
+    private boolean generateCriteria = true;
+    private boolean generateResult= true;
+
     //生成权限
     private boolean generatePermission = true;
     //生成菜单
     private boolean generateMenu = true;
 
-    private boolean generateCriteria = true;
     private boolean useCriteriaStr = true;
 
     //覆盖model
@@ -47,6 +52,8 @@ public class ModelConfig {
     private boolean coverController = false;
     //覆盖criteria
     private boolean coverCriteria = false;
+    //覆盖result
+    private boolean coverResult= false;
 
     //表类型 mix single
     private String tableType = GeneratorConfig.TABLE_TYPE_SINGLE;
@@ -216,5 +223,21 @@ public class ModelConfig {
 
     public void setMapCache(boolean mapCache) {
         this.mapCache = mapCache;
+    }
+
+    public boolean isGenerateResult() {
+        return generateResult;
+    }
+
+    public void setGenerateResult(boolean generateResult) {
+        this.generateResult = generateResult;
+    }
+
+    public boolean isCoverResult() {
+        return coverResult;
+    }
+
+    public void setCoverResult(boolean coverResult) {
+        this.coverResult = coverResult;
     }
 }

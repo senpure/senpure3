@@ -17,7 +17,6 @@ import java.io.Serializable;
 
 /**<#if hasExplain>
  * ${explain}
-
  *</#if>
  * @author senpure-generator
  * @version ${.now?datetime}

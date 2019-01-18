@@ -2,13 +2,10 @@ package com.senpure.base.result;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.Field;
 
 
-@Component(value = "com.senpure.base.result.result")
 public class Result {
     @Message("失败")
     public static final int FAILURE = 0;
@@ -45,11 +42,11 @@ public class Result {
     public static final int INPUT_NUMBER = 200;
 
     @Message("权限不足[{0}] [{1}] 验证 [{2}] 失败")
-    public static  final int LACK_OF_PERMISSION_RESOURCE_INCORRECT=402;
+    public static final int LACK_OF_PERMISSION_RESOURCE_INCORRECT = 402;
     @Message("权限不足[{0}]")
-    public static  final int LACK_OF_PERMISSION=403;
+    public static final int LACK_OF_PERMISSION = 403;
     @Message("目标不存在[{0}]")
-    public static  final int  TARGET_NOT_EXIST=404;
+    public static final int TARGET_NOT_EXIST = 404;
 
 
     protected Logger logger;
@@ -58,31 +55,12 @@ public class Result {
         logger = LoggerFactory.getLogger(getClass());
     }
 
+
     @PostConstruct
     public void report() {
-
-        Field[] fields = getClass().getDeclaredFields();
-
-        FieldAndInstance fieldAndInstance = new FieldAndInstance();
-        for (Field field : fields) {
-
-            if ("logger".equals(field.getName())) {
-                continue;
-            }
-            if ("int".equals(field.getGenericType().getTypeName())) {
-                fieldAndInstance.fields.add(field);
-            } else {
-
-                logger.warn("该类型的字段不支持 [{}],仅支持 [int] ",field.getGenericType().getTypeName());
-            }
-
-        }
-        if (fieldAndInstance.fields.size() > 0) {
-            fieldAndInstance.instance=this;
-            ResultHelper.fieldAndInstances.add(fieldAndInstance);
-        }
-
+        ResultHelper.results.add(this);
     }
+
 
 
 }

@@ -31,6 +31,7 @@ public class GeneratorConfig {
      * class 与项目相隔几个路径
      */
     private int classLevel = 2;
+
     private String class2SourceClass = "target\\classes";
     private String class2SourceSource = "src\\main\\java";
 
@@ -42,11 +43,15 @@ public class GeneratorConfig {
 
     private String mapperJavaTemplate = "com/senpure/base/generator/template/mapperJava.ftl";
     private String mapperXmlTemplate = "com/senpure/base/generator/template/mapperXml.ftl";
-    private String controllerXmlTemplate = "com/senpure/base/generator/template/controller.ftl";
+    private String controllerTemplate = "com/senpure/base/generator/template/controller.ftl";
     private String criteriaTemplate = "com/senpure/base/generator/template/criteria.ftl";
     private String criteriaStrTemplate = "com/senpure/base/generator/template/criteriaStr.ftl";
     private String configurationTemplate = "com/senpure/base/generator/template/LocalRemoteConfiguration.ftl";
+    private String resultRecordTemplate = "com/senpure/base/generator/template/resultRecord.ftl";
+    private String resultPageTemplate = "com/senpure/base/generator/template/resultPage.ftl";
 
+    //下面这些数据最好不要改，有些是写死在模板文件里，
+    // 没来得及该，如果要改一定要确认模板文件的同步
     private String entityPartName = "entity";
     private String modelPartName = "model";
     private String servicePartName = "service";
@@ -54,6 +59,7 @@ public class GeneratorConfig {
     private String controllerPartName = "controller";
     private String criteriaPartName = "criteria";
     private String configurationPartName = "configuration";
+    private String resultPartName = "result";
 
     private String configurationSuffix = "Configuration";
     private String mapperSuffix = "Mapper";
@@ -61,6 +67,14 @@ public class GeneratorConfig {
     private String criteriaSuffix = "Criteria";
     private String criteriaStrSuffix = "CriteriaStr";
 
+    private String controllerSuffix = "Controller";
+    private String resultRecordSuffix = "RecordResult";
+    private String resultPageSuffix = "PageResult";
+
+    private boolean generatePermission =true;
+    private boolean generateMenu =true;
+    private boolean useCriteriaStr =true;
+    private int menuStartId = 0;
 
     /**
      * model 生成根路径
@@ -98,6 +112,15 @@ public class GeneratorConfig {
             return defaultModelConfig;
         }
         return modelConfig;
+    }
+
+    public boolean isUseCriteriaStr() {
+        return useCriteriaStr;
+    }
+
+    public GeneratorConfig setUseCriteriaStr(boolean useCriteriaStr) {
+        this.useCriteriaStr = useCriteriaStr;
+        return this;
     }
 
     public NamingStrategy getNamingStrategy() {
@@ -172,12 +195,12 @@ public class GeneratorConfig {
         this.mapperXmlTemplate = mapperXmlTemplate;
     }
 
-    public String getControllerXmlTemplate() {
-        return controllerXmlTemplate;
+    public String getControllerTemplate() {
+        return controllerTemplate;
     }
 
-    public void setControllerXmlTemplate(String controllerXmlTemplate) {
-        this.controllerXmlTemplate = controllerXmlTemplate;
+    public void setControllerTemplate(String controllerTemplate) {
+        this.controllerTemplate = controllerTemplate;
     }
 
     public String getServiceSuffix() {
@@ -244,6 +267,30 @@ public class GeneratorConfig {
         this.criteriaRootPath = criteriaRootPath;
     }
 
+
+    public String getResultPartName() {
+        return resultPartName;
+    }
+
+    public void setResultPartName(String resultPartName) {
+        this.resultPartName = resultPartName;
+    }
+
+    public String getResultRecordSuffix() {
+        return resultRecordSuffix;
+    }
+
+    public void setResultRecordSuffix(String resultRecordSuffix) {
+        this.resultRecordSuffix = resultRecordSuffix;
+    }
+
+    public String getResultPageSuffix() {
+        return resultPageSuffix;
+    }
+
+    public void setResultPageSuffix(String resultPageSuffix) {
+        this.resultPageSuffix = resultPageSuffix;
+    }
 
     public int getClassLevel() {
         return classLevel;
@@ -340,5 +387,68 @@ public class GeneratorConfig {
 
     public void setServiceSpringCacheTemplate(String serviceSpringCacheTemplate) {
         this.serviceSpringCacheTemplate = serviceSpringCacheTemplate;
+    }
+
+    public String getResultRecordTemplate() {
+        return resultRecordTemplate;
+    }
+
+    public void setResultRecordTemplate(String resultRecordTemplate) {
+        this.resultRecordTemplate = resultRecordTemplate;
+    }
+
+    public String getControllerSuffix() {
+        return controllerSuffix;
+    }
+
+    public int getMenuStartId() {
+        return menuStartId;
+    }
+
+    public GeneratorConfig setMenuStartId(int menuStartId) {
+        this.menuStartId = menuStartId;
+        return this;
+    }
+
+    public boolean isGeneratePermission() {
+        return generatePermission;
+    }
+
+    public GeneratorConfig setGeneratePermission(boolean generatePermission) {
+        this.generatePermission = generatePermission;
+        return this;
+    }
+
+    public boolean isGenerateMenu() {
+        return generateMenu;
+    }
+
+    public GeneratorConfig setGenerateMenu(boolean generateMenu) {
+        this.generateMenu = generateMenu;
+        return this;
+    }
+
+    public void setControllerSuffix(String controllerSuffix) {
+        this.controllerSuffix = controllerSuffix;
+    }
+
+    public String getResultPageTemplate() {
+        return resultPageTemplate;
+    }
+
+    public void setResultPageTemplate(String resultPageTemplate) {
+        this.resultPageTemplate = resultPageTemplate;
+    }
+
+    public ModelConfig getDefaultModelConfig() {
+        return defaultModelConfig;
+    }
+
+    public Map<String, ModelConfig> getModelConfigMap() {
+        return modelConfigMap;
+    }
+
+    public void setModelConfigMap(Map<String, ModelConfig> modelConfigMap) {
+        this.modelConfigMap = modelConfigMap;
     }
 }

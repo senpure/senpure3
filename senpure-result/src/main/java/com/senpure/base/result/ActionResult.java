@@ -2,8 +2,11 @@ package com.senpure.base.result;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * ActionResult
@@ -11,7 +14,9 @@ import java.util.Locale;
  * @author senpure
  * @time 2019-01-02 10:47:27
  */
-public class ActionResult {
+public class ActionResult implements Serializable {
+
+    private static final long serialVersionUID = -2900736949472602435L;
 
     @ApiModelProperty(value = "操作结果 1 表示成功", example = "1")
     private int code;
@@ -19,9 +24,13 @@ public class ActionResult {
     private String message;
     @ApiModelProperty(hidden = true, position = 100, value = "操作提示的格式格式化参数(一般是数字)", example = "[\"100000\",\"20000\"]", allowEmptyValue = true)
     protected List<String> messageArgs;
-    //客服端格式化
+
     @ApiModelProperty(hidden = true, position = 101)
+    Map<String, String> validators = new HashMap<>();
+    //客服端格式化
+    @ApiModelProperty(hidden = true, position = 102)
     protected boolean clientFormat;
+
 
     public static ActionResult success() {
         return new ActionResult(Result.SUCCESS);
@@ -94,6 +103,16 @@ public class ActionResult {
         this.messageArgs = messageArgs;
         return this;
     }
+
+    public Map<String, String> getValidators() {
+        return validators;
+    }
+
+    public ActionResult setValidators(Map<String, String> validators) {
+        this.validators = validators;
+        return this;
+    }
+
 
     public static void main(String[] args) {
 

@@ -145,6 +145,9 @@ public class CodeGenerator {
         Template criteriaTemplate = null;
         Template criteriaTemplateStr = null;
         Template configurationTemplate = null;
+        Template controllerTemplate = null;
+        Template resultRecordTemplate = null;
+        Template resultPageTemplate = null;
         try {
             modelTemplate = cfg.getTemplate(
                     config.getModelTemplate(),
@@ -173,6 +176,16 @@ public class CodeGenerator {
             configurationTemplate = cfg.getTemplate(
                     config.getConfigurationTemplate(),
                     "utf-8");
+            resultRecordTemplate = cfg.getTemplate(
+                    config.getResultRecordTemplate(),
+                    "utf-8");
+
+            resultPageTemplate = cfg.getTemplate(
+                    config.getResultPageTemplate(),
+                    "utf-8");
+            controllerTemplate= cfg.getTemplate(
+                    config.getControllerTemplate(),
+                    "utf-8");
 
         } catch (IOException e) {
 
@@ -186,20 +199,35 @@ public class CodeGenerator {
         File javaPart = new File(parent,
                 config.getProjectJavaCodePath() + "/" + part.replace(".", "/"));
         Map<String, Model> modelMap = reader.read(part + "." + config.getEntityPartName());
+
+        int menuId = config.getMenuStartId();
+        if (menuId == 0) {
+            menuId = module.hashCode() / 100 * 100;
+        }
         for (Model model : modelMap.values()) {
             if (model.getId() == null) {
                 Assert.error(model.getName() + "没有主键");
             }
-
             ModelConfig modelConfig = config.getModelConfig(model.getName());
+            model.setGlobalConfig(config);
             model.setConfig(modelConfig);
+            model.setMenuId(menuId);
+
+            menuId += 100;
+            model.setGenerateMenu(config.isGenerateMenu());
+            model.setGeneratePermission(config.isGeneratePermission());
+            model.setUseCriteriaStr(config.isUseCriteriaStr());
+            model.setModule(module);
+
             model.setModelPackage(part + "." + config.getModelPartName());
             model.setMapperPackage(part + "." + config.getMapperPartName());
             model.setCriteriaPackage(part + "." + config.getCriteriaPartName());
             model.setServicePackage(part + "." + config.getServicePartName());
             model.setControllerPackage(part + "." + config.getControllerPartName());
             model.setModelPackage(part + "." + config.getModelPartName());
+            model.setResultPackage(part + "." + config.getResultPartName());
             model.setTableType(modelConfig.getTableType());
+
             if (!modelConfig.getTableType().equalsIgnoreCase(config.TABLE_TYPE_SINGLE)) {
                 ModelField modelField = new ModelField();
                 modelField.setAccessType("private");
@@ -241,12 +269,9 @@ public class CodeGenerator {
                     } else {
                         template = serviceMapCacheTemplate;
                     }
-
                 } else {
                     template = serviceTemplate;
                 }
-
-
                 model.setCurrentService(true);
                 generateFile(template, model, serviceFile, modelConfig.isCoverService());
                 model.setCurrentService(false);
@@ -263,7 +288,23 @@ public class CodeGenerator {
             } else {
                 logger.info("{} 不生成criteria", model.getName());
             }
+            if (modelConfig.isGenerateResult()) {
+                File recordFile = new File(javaPart, config.getResultPartName() + "/" + model.getName() + config.getResultRecordSuffix() + ".java");
+                generateFile(resultRecordTemplate, model, recordFile, modelConfig.isCoverResult());
+                File pageFile = new File(javaPart, config.getResultPartName() + "/" + model.getName() + config.getResultPageSuffix() + ".java");
+                generateFile(resultPageTemplate, model, pageFile, modelConfig.isCoverResult());
 
+            } else {
+                logger.info("{} 不生成Result", model.getName());
+            }
+
+            if (modelConfig.isGenerateController()) {
+                File controllerFile = new File(javaPart, config.getControllerPartName() + "/" + model.getName() + config.getControllerSuffix() + ".java");
+                generateFile(controllerTemplate, model, controllerFile, modelConfig.isCoverController());
+
+            } else {
+                logger.info("{} 不生成Controller", model.getName());
+            }
         }
         generateSpringCacheConfiguration(part, javaPart, config, configurationTemplate);
         if (exists.size() > 0) {

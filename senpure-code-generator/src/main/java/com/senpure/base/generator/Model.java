@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class Model  {
+public class Model {
     /**
      * 是否有注释
      */
@@ -36,6 +36,7 @@ public class Model  {
     private String criteriaPackage;
     private String servicePackage;
     private String controllerPackage;
+    private String resultPackage;
     /**
      * 模块
      */
@@ -51,10 +52,11 @@ public class Model  {
      * 生成菜单的id
      */
     private int menuId = 0;
+
+    private boolean generatePermission;
+    private boolean generateMenu;
     private boolean useCriteriaStr = true;
-
     private boolean currentService;
-
 
 
     //class 和super class
@@ -88,7 +90,8 @@ public class Model  {
 
     private List<ModelField> allFields = new ArrayList<>();
 
-private ModelConfig config;
+    private ModelConfig config;
+    private GeneratorConfig globalConfig;
 
 
     public boolean isHasDate() {
@@ -212,8 +215,6 @@ private ModelConfig config;
     }
 
 
-
-
     public ModelField getTable() {
         return table;
     }
@@ -317,7 +318,6 @@ private ModelConfig config;
     }
 
 
-
     public int getMenuId() {
         return menuId;
     }
@@ -359,8 +359,6 @@ private ModelConfig config;
     }
 
 
-
-
     public String getTableType() {
         return tableType;
     }
@@ -394,12 +392,47 @@ private ModelConfig config;
     }
 
 
+    public String getResultPackage() {
+        return resultPackage;
+    }
+
+    public void setResultPackage(String resultPackage) {
+        this.resultPackage = resultPackage;
+    }
+
     public ModelConfig getConfig() {
         return config;
     }
 
     public void setConfig(ModelConfig config) {
         this.config = config;
+    }
+
+
+    public GeneratorConfig getGlobalConfig() {
+        return globalConfig;
+    }
+
+    public void setGlobalConfig(GeneratorConfig globalConfig) {
+        this.globalConfig = globalConfig;
+    }
+
+    public boolean isGeneratePermission() {
+        return generatePermission;
+    }
+
+    public Model setGeneratePermission(boolean generatePermission) {
+        this.generatePermission = generatePermission;
+        return this;
+    }
+
+    public boolean isGenerateMenu() {
+        return generateMenu;
+    }
+
+    public Model setGenerateMenu(boolean generateMenu) {
+        this.generateMenu = generateMenu;
+        return this;
     }
 
     @Override
