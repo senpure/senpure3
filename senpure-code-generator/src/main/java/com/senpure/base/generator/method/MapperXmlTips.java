@@ -32,7 +32,7 @@ public class MapperXmlTips implements TemplateMethodModelEx {
         String lowName = StringUtil.toLowerFirstLetter(name);
         sb.append("该xml为[senpure-code-generator]于[")
                 .append(DateFormatUtil.format(new Date())).
-                append("]自动生成，不建议修改。如果该xml不能满足需要可新建一个mxl，如")
+                append("]自动生成，如果预计字段经常变动，不建议修改。如果该xml不能满足需要可新建一个mxl，如")
                 .append(name).append("ExpandMapper.xml，").
                 append("将命名空间指向").append(pageName)
                 .append(".ModelAMapper即可，该xml中定义的")

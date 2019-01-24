@@ -31,7 +31,9 @@ public class GeneratorConfig {
      * class 与项目相隔几个路径
      */
     private int classLevel = 2;
-
+    /**
+     *
+     */
     private String class2SourceClass = "target\\classes";
     private String class2SourceSource = "src\\main\\java";
 
@@ -77,13 +79,18 @@ public class GeneratorConfig {
     private int menuStartId = 0;
 
     /**
-     * model 生成根路径
+     * model 生成根路径 可以是绝对路径，可以是相对路径相对于工程目录 user.dir
      */
     private String modelRootPath;
     /**
      * 条件生成 根路径
      */
     private String criteriaRootPath;
+
+    /**
+     * result生成 根路径
+     */
+    private String resultRootPath;
 
     //命名策略
     private NamingStrategy namingStrategy;
@@ -450,5 +457,14 @@ public class GeneratorConfig {
 
     public void setModelConfigMap(Map<String, ModelConfig> modelConfigMap) {
         this.modelConfigMap = modelConfigMap;
+    }
+
+    public String getResultRootPath() {
+        return resultRootPath;
+    }
+
+    public GeneratorConfig setResultRootPath(String resultRootPath) {
+        this.resultRootPath = resultRootPath;
+        return this;
     }
 }

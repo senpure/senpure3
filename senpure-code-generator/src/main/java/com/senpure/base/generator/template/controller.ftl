@@ -8,8 +8,14 @@ import ${criteriaPackage}.${name}CriteriaStr;
 import ${criteriaPackage}.${name}Criteria;
 import ${servicePackage}.${name}Service;
 import ${modelPackage}.${name};
+import com.senpure.base.result.ActionResult;
 import ${resultPackage}.${name}${globalConfig.resultPageSuffix};
+import ${resultPackage}.${name}${globalConfig.resultRecordSuffix};
 import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -50,7 +56,6 @@ public class ${name}Controller extends BaseController {
 <#if generateMenu>
     @MenuGenerator(id = ${(menuId+1)?c}, text = "${name} Detail")
 </#if>
-
 <#if useCriteriaStr>
     <#assign criteriaClazz>${name}CriteriaStr</#assign>
     <#assign criteriaName>criteriaStr</#assign>
@@ -58,6 +63,8 @@ public class ${name}Controller extends BaseController {
     <#assign criteriaClazz>${name}Criteria</#assign>
     <#assign criteriaName>criteria</#assign>
 </#if>
+    @ApiImplicitParams(@ApiImplicitParam(name = "page", value = "页数", dataType = "int", paramType = "path", example = "1"))
+    @ApiResponses(@ApiResponse(code = 200, message = "OK", response = ${modelPackage}.${name}.class))
     public ModelAndView read${pluralize(nameRule(name))?cap_first}(HttpServletRequest request, @ModelAttribute("criteria") @Valid ${criteriaClazz} ${criteriaName}, BindingResult result) {
         if (result.hasErrors()) {
             logger.warn("客户端输入不正确{}", result);
@@ -79,6 +86,8 @@ public class ${name}Controller extends BaseController {
     @PermissionVerify(name = "/${module}/${nameRule(name)}_read", value = "${nameRule(name)}_read")
     </#if>
     @ResponseBody
+    @ApiImplicitParams(@ApiImplicitParam(name = "${id.name}", value = "主键", required = true, example = "888888", <#if id.clazzType="String"><#elseif id.clazzType="Integer">dataType = "int", <#else>dataType = "${id.clazzType?uncap_first}", </#if>paramType = "path"))
+    @ApiResponses(@ApiResponse(code = 200, message = "OK", response = ${name}${globalConfig.resultRecordSuffix}.class))
     public ResultMap read${name}(HttpServletRequest request, @PathVariable String ${id.name}) {
         <#if id.clazzType !="String">
         ${id.clazzType} number${id.name?cap_first};
@@ -92,7 +101,7 @@ public class ${name}Controller extends BaseController {
         logger.debug("查询${name}:{}", ${id.name});
         ${name} ${nameRule(name)} = ${nameRule(name)}Service.find(<#if id.clazzType !="String">number${id.name?cap_first}<#else>${id.name}</#if>);
         if (${nameRule(name)} != null) {
-            return wrapMessage(request, ResultMap.success().putItem(${nameRule(name)}));
+            return wrapMessage(request, ResultMap.success().put("${nameRule(name)}",${nameRule(name)}));
         } else {
             return wrapMessage(request, ResultMap.notExist(), id);
         }
@@ -104,6 +113,7 @@ public class ${name}Controller extends BaseController {
     @PermissionVerify(value = "${nameRule(name)}_create")
     </#if>
     @ResponseBody
+     @ApiResponses(@ApiResponse(code = 200, message = "OK", response = ${name}${globalConfig.resultRecordSuffix}.class))
     public ResultMap create${name}(HttpServletRequest request, @ModelAttribute("criteria") @Valid ${criteriaClazz} ${criteriaName}, BindingResult result) {
         if (result.hasErrors()) {
             logger.warn("客户端输入不正确{}", result);
@@ -125,6 +135,8 @@ public class ${name}Controller extends BaseController {
     @PermissionVerify(value = "${nameRule(name)}_update")
     </#if>
     @ResponseBody
+    @ApiImplicitParams(@ApiImplicitParam(name = "${id.name}", value = "主键", required = true, example = "888888", <#if id.clazzType="String"><#elseif id.clazzType="Integer">dataType = "int", <#else>dataType = "${id.clazzType?uncap_first}", </#if>paramType = "path"))
+    @ApiResponses(@ApiResponse(code = 200, message = "OK", response = ActionResult.class))
     public ResultMap update${name}(HttpServletRequest request, @PathVariable String ${id.name}, @ModelAttribute("criteria") @Valid ${criteriaClazz} ${criteriaName}, BindingResult result) {
         if (result.hasErrors()) {
             logger.warn("客户端输入不正确{}", result);
@@ -175,6 +187,8 @@ public class ${name}Controller extends BaseController {
     @PermissionVerify(value = "${nameRule(name)}_delete")
 </#if>
     @ResponseBody
+    @ApiImplicitParams(@ApiImplicitParam(name = "${id.name}", value = "主键", required = true, example = "888888", <#if id.clazzType="String"><#elseif id.clazzType="Integer">dataType = "int", <#else>dataType = "${id.clazzType?uncap_first}", </#if>paramType = "path"))
+    @ApiResponses(@ApiResponse(code = 200, message = "OK", response = ActionResult.class))
     public ResultMap delete${name}(HttpServletRequest request, @PathVariable String ${id.name}) {
         <#if id.clazzType !="String">
         ${id.clazzType} number${id.name?cap_first};

@@ -183,7 +183,7 @@ public class CodeGenerator {
             resultPageTemplate = cfg.getTemplate(
                     config.getResultPageTemplate(),
                     "utf-8");
-            controllerTemplate= cfg.getTemplate(
+            controllerTemplate = cfg.getTemplate(
                     config.getControllerTemplate(),
                     "utf-8");
 
@@ -192,11 +192,11 @@ public class CodeGenerator {
             logger.error("", e);
         }
         File file = new File(AppEvn.getClassRootPath());
-        File parent = file;
+        File project = file;
         for (int i = 0; i < config.getClassLevel(); i++) {
-            parent = parent.getParentFile();
+            project = project.getParentFile();
         }
-        File javaPart = new File(parent,
+        File javaPart = new File(project,
                 config.getProjectJavaCodePath() + "/" + part.replace(".", "/"));
         Map<String, Model> modelMap = reader.read(part + "." + config.getEntityPartName());
 
@@ -237,7 +237,12 @@ public class CodeGenerator {
             }
             if (modelConfig.isGenerateModel()) {
                 int startPosition = apiModelProperty.getStartPosition();
-                File modelFile = new File(javaPart, config.getModelPartName() + "/" + model.getName() + ".java");
+                File modelFile = null;
+                if (config.getModelRootPath() == null) {
+                    modelFile = new File(javaPart, config.getModelPartName() + "/" + model.getName() + ".java");
+                } else {
+                    modelFile = new File(file(config.getModelRootPath(), project), config.getModelPartName() + "/" + model.getName() + ".java");
+                }
                 generateFile(modelTemplate, model, modelFile, modelConfig.isCoverModel());
                 apiModelProperty.setStartPosition(startPosition);
 
@@ -279,7 +284,13 @@ public class CodeGenerator {
                 logger.info("{} 不生成service", model.getName());
             }
             if (modelConfig.isGenerateCriteria()) {
-                File criteriaFile = new File(javaPart, config.getCriteriaPartName() + "/" + model.getName() + config.getCriteriaSuffix() + ".java");
+                File criteriaFile = null;
+                if (config.getCriteriaRootPath() == null) {
+                    criteriaFile = new File(javaPart, config.getCriteriaPartName() + "/" + model.getName() + config.getCriteriaSuffix() + ".java");
+                } else {
+                    criteriaFile = new File(file(config.getCriteriaRootPath(), project), config.getCriteriaPartName() + "/" + model.getName() + config.getCriteriaSuffix() + ".java");
+                }
+
                 generateFile(criteriaTemplate, model, criteriaFile, modelConfig.isCoverCriteria());
                 if (modelConfig.isUseCriteriaStr()) {
                     criteriaFile = new File(javaPart, config.getCriteriaPartName() + "/" + model.getName() + config.getCriteriaStrSuffix() + ".java");
@@ -289,9 +300,20 @@ public class CodeGenerator {
                 logger.info("{} 不生成criteria", model.getName());
             }
             if (modelConfig.isGenerateResult()) {
-                File recordFile = new File(javaPart, config.getResultPartName() + "/" + model.getName() + config.getResultRecordSuffix() + ".java");
+                File recordFile = null;
+                File pageFile = null;
+                if (config.getResultRootPath() == null) {
+                    recordFile = new File(javaPart, config.getResultPartName() + "/" + model.getName() + config.getResultRecordSuffix() + ".java");
+                    pageFile = new File(javaPart, config.getResultPartName() + "/" + model.getName() + config.getResultPageSuffix() + ".java");
+
+                }
+                else {
+                    File p = file(config.getResultRootPath(), project);
+                    recordFile = new File(p, config.getResultPartName() + "/" + model.getName() + config.getResultRecordSuffix() + ".java");
+                    pageFile = new File(p, config.getResultPartName() + "/" + model.getName() + config.getResultPageSuffix() + ".java");
+
+                }
                 generateFile(resultRecordTemplate, model, recordFile, modelConfig.isCoverResult());
-                File pageFile = new File(javaPart, config.getResultPartName() + "/" + model.getName() + config.getResultPageSuffix() + ".java");
                 generateFile(resultPageTemplate, model, pageFile, modelConfig.isCoverResult());
 
             } else {
@@ -366,6 +388,28 @@ public class CodeGenerator {
         AnsiOutput.setEnabled(AnsiOutput.Enabled.ALWAYS);
         AppEvn.tryMarkClassRootPath();
 
+    }
+
+    public static File file(String path, File project) {
+        File file;
+        path = path.replace("\\", "/");
+        String upperPath = path.toUpperCase();
+        if (path.startsWith("/") || upperPath.startsWith("C:") || upperPath.startsWith("D:") || upperPath.startsWith("E:")
+                || upperPath.startsWith("F:") || upperPath.startsWith("G:") || upperPath.startsWith("H:")
+                || upperPath.startsWith("H:") || upperPath.startsWith("I:") || upperPath.startsWith("G:")
+        ) {
+            file = new File(path);
+        } else if (path.startsWith("../")) {
+            int count = StringUtil.count(path, "../");
+            File parent = project;
+            for (int i = 0; i < count; i++) {
+                parent = parent.getParentFile();
+            }
+            file = new File(parent, path.replace("../", ""));
+        } else {
+            file = new File(path, path);
+        }
+        return file;
     }
 
     public static void main(String[] args) {

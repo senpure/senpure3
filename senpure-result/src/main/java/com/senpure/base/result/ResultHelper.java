@@ -91,7 +91,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
         try {
             syncResults();
         } catch (Exception e) {
-            //logger.error("result解析出错，关闭服务器", e);
+            logger.error("result解析出错", e);
             // act.close();
         }
 
@@ -112,12 +112,15 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
         File i18n = null;
         try {
             if (url != null) {
-                i18n = new File(url.toURI().getPath());
+                String path = url.toURI().getPath();
+                if (path != null) {
+                    i18n = new File(path);
+                }
             } else {
                 logger.warn("资源文件不存在 {} ", BASE_NAME);
             }
 
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             logger.error("", e);
         }
         if (develop) {
@@ -139,23 +142,22 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
         }
         Properties props = new Properties();
         SortProperties save = new SortProperties();
-        if (exist) {
-            logger.debug("{} 资源文件完整路径：{}", i18n.exists(), i18n.getAbsolutePath());
-            InputStream in = null;
-            try {
+        try {
+            if (exist) {
+                logger.debug("{} 资源文件完整路径：{}", i18n.exists(), i18n.getAbsolutePath());
+                InputStream in = null;
                 in = new FileInputStream(i18n);
                 props.load(in);
                 in.close();
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } else if (url != null) {
+                logger.debug("资源文件完整路径：{}", url);
+                props.load(url.openStream());
+            } else {
+                logger.warn("资源文件不存在 {} ", BASE_NAME);
+              //  logger.warn("{}", ResourceBundle.getBundle(BASE_NAME));
             }
-
-        } else {
-            logger.warn("资源文件不存在 {} ", BASE_NAME);
-            logger.warn("{}", ResourceBundle.getBundle(BASE_NAME));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         List<CodeAndInstance> codeAndInstanceList = new ArrayList<>();
@@ -271,7 +273,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
             for (int i = codeLen; i < codeMaxLen; i++) {
                 info.append(" ");
             }
-            info.append(":").append(getMessage(codeAndInstance.code, Locale.CHINA)).append("\n");
+            info.append(":").append(save.get(key)).append("\n");
         }
         logger.debug("结果集对照表\n{}", info.toString());
 
@@ -369,19 +371,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
         //AppEvn.markClassRootPath();
         devSyncResult(new Result());
 
-        URL url = ResultHelper.class.getClassLoader().getResource(BASE_NAME + "2.properties");
 
-        System.out.println(url.toURI().getPath());
-
-        File file = new File(url.toURI().getPath());
-
-        System.out.println(file.getAbsolutePath());
-        System.out.println(file.exists());
-        // ResultMap result = ResultMap.result(Result.ACCOUNT_OTHER_LOGIN);
-
-        // ResultHelper.wrapMessage(result, Locale.CANADA,"77");
-
-        // System.out.println(result);
     }
 
 

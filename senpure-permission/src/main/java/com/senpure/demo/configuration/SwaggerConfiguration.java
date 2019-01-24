@@ -34,6 +34,7 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SPRING_WEB)
                 .apiInfo(apiInfo())
 
+
                 .select()
 
                 //.apis(RequestHandlerSelectors.basePackage("com.senpure"))
