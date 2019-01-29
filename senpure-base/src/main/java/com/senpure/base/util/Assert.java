@@ -6,7 +6,7 @@ public abstract class Assert {
 	
 	public static void error( String message) {
 		
-			throw new IllegalArgumentException(message);
+			throw new RuntimeException(message);
 		
 	}
 	

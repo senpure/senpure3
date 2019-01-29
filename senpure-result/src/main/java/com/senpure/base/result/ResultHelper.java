@@ -89,7 +89,9 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
-            syncResults();
+            if (event.getApplicationContext().getParent() == null) {
+                syncResults();
+            }
         } catch (Exception e) {
             logger.error("result解析出错", e);
             // act.close();
@@ -154,7 +156,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
                 props.load(url.openStream());
             } else {
                 logger.warn("资源文件不存在 {} ", BASE_NAME);
-              //  logger.warn("{}", ResourceBundle.getBundle(BASE_NAME));
+                //  logger.warn("{}", ResourceBundle.getBundle(BASE_NAME));
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -21,7 +21,13 @@ public class GeneratorConfig {
         return config;
     }
 
+    /**
+     * 一个实体多个表 如按年 月分表
+     */
     public static final String TABLE_TYPE_MIX = "MIX";
+    /**
+     * 单表
+     */
     public static final String TABLE_TYPE_SINGLE = "SINGLE";
     /**
      * 项目下的java代码根路径
@@ -32,7 +38,7 @@ public class GeneratorConfig {
      */
     private int classLevel = 2;
     /**
-     *
+     *与 classlevel 和 class2SourceSource  一定要同步
      */
     private String class2SourceClass = "target\\classes";
     private String class2SourceSource = "src\\main\\java";
@@ -52,6 +58,9 @@ public class GeneratorConfig {
     private String resultRecordTemplate = "com/senpure/base/generator/template/resultRecord.ftl";
     private String resultPageTemplate = "com/senpure/base/generator/template/resultPage.ftl";
 
+
+    //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
     //下面这些数据最好不要改，有些是写死在模板文件里，
     // 没来得及该，如果要改一定要确认模板文件的同步
     private String entityPartName = "entity";
@@ -72,6 +81,8 @@ public class GeneratorConfig {
     private String controllerSuffix = "Controller";
     private String resultRecordSuffix = "RecordResult";
     private String resultPageSuffix = "PageResult";
+    //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
     private boolean generatePermission =true;
     private boolean generateMenu =true;
@@ -79,7 +90,7 @@ public class GeneratorConfig {
     private int menuStartId = 0;
 
     /**
-     * model 生成根路径 可以是绝对路径，可以是相对路径相对于工程目录 user.dir
+     * model 生成根路径 可以是绝对路径，可以是相对路径相对于工程目录 user.dir 支持../
      */
     private String modelRootPath;
     /**
@@ -94,13 +105,14 @@ public class GeneratorConfig {
 
     //命名策略
     private NamingStrategy namingStrategy;
-    //数据库方言
+    //数据库方言 默认mysql8
     private Dialect dialect;
 
-    //生成页面视图
 
 
+    //默认配置
     private ModelConfig defaultModelConfig = new ModelConfig();
+    //单独配置，key是model类名
     private Map<String, ModelConfig> modelConfigMap = new HashMap<>();
 
 

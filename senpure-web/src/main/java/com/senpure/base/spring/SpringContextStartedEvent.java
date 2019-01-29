@@ -4,9 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextStartedEvent;
-import org.springframework.stereotype.Repository;
 
-@Repository
+
 public class SpringContextStartedEvent implements
         ApplicationListener<ContextStartedEvent> {
     protected Logger logger;
@@ -18,7 +17,10 @@ public class SpringContextStartedEvent implements
     @Override
     public void onApplicationEvent(ContextStartedEvent event) {
 
-        logger.debug("{}: startedEvent :{}",   event.getApplicationContext().getId(),event.toString());
+        if (event.getApplicationContext().getParent() == null) {
+            logger.debug("{}: startedEvent :{}",   event.getApplicationContext().getId(),event.toString());
+        }
+
     }
 
 }

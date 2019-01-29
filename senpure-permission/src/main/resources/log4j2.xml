@@ -28,8 +28,8 @@
     </appenders>
     <loggers>
         <!--  -->
-        <logger name="org.springframework" level="info"></logger>
-        <logger name="springfox" level="info"></logger>
+        <logger name="org.springframework" level="debug"></logger>
+        <logger name="springfox" level="debug"></logger>
         <logger name="org.eclipse.jetty" level="info"/>
 
         <logger name="druid.sql" level="trace" additivity="false">

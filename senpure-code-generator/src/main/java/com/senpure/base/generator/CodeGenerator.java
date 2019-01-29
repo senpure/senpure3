@@ -26,7 +26,10 @@ import java.util.Map;
  * @time 2019-01-03 16:04:24
  */
 public class CodeGenerator {
+    static {
+        AppEvn.markPid();
 
+    }
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     private List<String> exists = new ArrayList<>();
@@ -241,7 +244,7 @@ public class CodeGenerator {
                 if (config.getModelRootPath() == null) {
                     modelFile = new File(javaPart, config.getModelPartName() + "/" + model.getName() + ".java");
                 } else {
-                    modelFile = new File(file(config.getModelRootPath(), project), config.getModelPartName() + "/" + model.getName() + ".java");
+                    modelFile = new File(file(config.getModelRootPath(), project, part), config.getModelPartName() + "/" + model.getName() + ".java");
                 }
                 generateFile(modelTemplate, model, modelFile, modelConfig.isCoverModel());
                 apiModelProperty.setStartPosition(startPosition);
@@ -285,16 +288,21 @@ public class CodeGenerator {
             }
             if (modelConfig.isGenerateCriteria()) {
                 File criteriaFile = null;
+                File criteriaStrFile = null;
                 if (config.getCriteriaRootPath() == null) {
                     criteriaFile = new File(javaPart, config.getCriteriaPartName() + "/" + model.getName() + config.getCriteriaSuffix() + ".java");
+                    if (modelConfig.isUseCriteriaStr()) {
+                        criteriaStrFile = new File(javaPart, config.getCriteriaPartName() + "/" + model.getName() + config.getCriteriaStrSuffix() + ".java");
+                    }
                 } else {
-                    criteriaFile = new File(file(config.getCriteriaRootPath(), project), config.getCriteriaPartName() + "/" + model.getName() + config.getCriteriaSuffix() + ".java");
+                    criteriaFile = new File(file(config.getCriteriaRootPath(), project, part), config.getCriteriaPartName() + "/" + model.getName() + config.getCriteriaSuffix() + ".java");
+                    if (modelConfig.isUseCriteriaStr()) {
+                        criteriaStrFile = new File(file(config.getCriteriaRootPath(), project, part), config.getCriteriaPartName() + "/" + model.getName() + config.getCriteriaStrSuffix() + ".java");
+                    }
                 }
-
                 generateFile(criteriaTemplate, model, criteriaFile, modelConfig.isCoverCriteria());
                 if (modelConfig.isUseCriteriaStr()) {
-                    criteriaFile = new File(javaPart, config.getCriteriaPartName() + "/" + model.getName() + config.getCriteriaStrSuffix() + ".java");
-                    generateFile(criteriaTemplateStr, model, criteriaFile, modelConfig.isCoverCriteria());
+                    generateFile(criteriaTemplateStr, model, criteriaStrFile, modelConfig.isCoverCriteria());
                 }
             } else {
                 logger.info("{} 不生成criteria", model.getName());
@@ -306,9 +314,8 @@ public class CodeGenerator {
                     recordFile = new File(javaPart, config.getResultPartName() + "/" + model.getName() + config.getResultRecordSuffix() + ".java");
                     pageFile = new File(javaPart, config.getResultPartName() + "/" + model.getName() + config.getResultPageSuffix() + ".java");
 
-                }
-                else {
-                    File p = file(config.getResultRootPath(), project);
+                } else {
+                    File p = file(config.getResultRootPath(), project, part);
                     recordFile = new File(p, config.getResultPartName() + "/" + model.getName() + config.getResultRecordSuffix() + ".java");
                     pageFile = new File(p, config.getResultPartName() + "/" + model.getName() + config.getResultPageSuffix() + ".java");
 
@@ -387,29 +394,39 @@ public class CodeGenerator {
     private void prepLog() {
         AnsiOutput.setEnabled(AnsiOutput.Enabled.ALWAYS);
         AppEvn.tryMarkClassRootPath();
-
     }
 
-    public static File file(String path, File project) {
+    public static File file(String path, File project, String part) {
         File file;
         path = path.replace("\\", "/");
         String upperPath = path.toUpperCase();
+        //绝对路径
         if (path.startsWith("/") || upperPath.startsWith("C:") || upperPath.startsWith("D:") || upperPath.startsWith("E:")
                 || upperPath.startsWith("F:") || upperPath.startsWith("G:") || upperPath.startsWith("H:")
                 || upperPath.startsWith("H:") || upperPath.startsWith("I:") || upperPath.startsWith("G:")
         ) {
-            file = new File(path);
-        } else if (path.startsWith("../")) {
-            int count = StringUtil.count(path, "../");
+
+            file = new File(path, part.replace(".", "/"));
+        }
+        //相对路径
+        else {
             File parent = project;
-            for (int i = 0; i < count; i++) {
-                parent = parent.getParentFile();
+            if (path.startsWith("../")) {
+                int count = StringUtil.count(path, "../");
+                for (int i = 0; i < count; i++) {
+                    parent = parent.getParentFile();
+                }
             }
-            file = new File(parent, path.replace("../", ""));
-        } else {
-            file = new File(path, path);
+            file = new File(parent, fullFileEnd(path.replace("../", "")) + part.replace(".", "/"));
         }
         return file;
+    }
+
+    public static String fullFileEnd(String path) {
+        if (!(path.endsWith("/") || path.endsWith(File.separator))) {
+            path = path + "/";
+        }
+        return path;
     }
 
     public static void main(String[] args) {

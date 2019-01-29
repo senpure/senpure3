@@ -45,10 +45,16 @@ import javax.validation.Valid;
 </#if>
 public class ${name}Controller extends BaseController {
 
-    @Autowired
     private ${name}Service ${nameRule(name)}Service;
+    // Field can be converted to a local variable 警告，不用管，方便以后修改
     private String view = "/${module}/${nameRule(name)}";
 
+    @Autowired
+    public void set${name?cap_first}Service(${name}Service ${nameRule(name)}Service) {
+        this.${nameRule(name)}Service = ${nameRule(name)}Service;
+    }
+
+    //Cannot resolve @PathVariable 'page' 警告，不用管
     @RequestMapping(value = {"/${pluralize(nameRule(name))}", "/${pluralize(nameRule(name))}/{page}"}, method = {RequestMethod.GET, RequestMethod.POST})
     <#if generatePermission>
     @PermissionVerify(name = "/${module}/${nameRule(name)}_read", value = "${pluralize(nameRule(name))}_read")
@@ -101,7 +107,7 @@ public class ${name}Controller extends BaseController {
         logger.debug("查询${name}:{}", ${id.name});
         ${name} ${nameRule(name)} = ${nameRule(name)}Service.find(<#if id.clazzType !="String">number${id.name?cap_first}<#else>${id.name}</#if>);
         if (${nameRule(name)} != null) {
-            return wrapMessage(request, ResultMap.success().put("${nameRule(name)}",${nameRule(name)}));
+            return wrapMessage(request, ResultMap.success()).put("${nameRule(name)}",${nameRule(name)});
         } else {
             return wrapMessage(request, ResultMap.notExist(), id);
         }
@@ -124,7 +130,7 @@ public class ${name}Controller extends BaseController {
 </#if>
         logger.debug("创建${name}:{}", criteria);
         if (${nameRule(name)}Service.save(criteria)) {
-            return wrapMessage(request, ResultMap.success().put("${id.name}", criteria.get${id.name?cap_first}()));
+            return wrapMessage(request, ResultMap.success()).put("${id.name}", criteria.get${id.name?cap_first}());
         } else {
             return wrapMessage(request, ResultMap.dim());
         }

@@ -5,7 +5,6 @@ import ${modelPackage}.${name};
 <#if hasDate>
 import com.senpure.base.util.DateFormatUtil;
 </#if>
-import io.swagger.annotations.ApiModelProperty;
 
 <#if table??>
 import javax.validation.constraints.Null;
@@ -107,8 +106,10 @@ public class ${name}Criteria extends Criteria implements Serializable {
         }
     </#if>
     <#else>
+        <#if field.strShow>
         ${nameRule(name)}.set${field.name?cap_first}(<#if field.clazzType=="boolean">is<#else>get</#if>${field.name?cap_first}());
-    </#if>
+         </#if>
+        </#if>
 </#list>
     <#if version??>
         <#assign field = version />
@@ -175,7 +176,9 @@ public class ${name}Criteria extends Criteria implements Serializable {
         }
     </#if>
     <#else >
+        <#if field.strShow>
         sb.append("${field.name}=").append(${field.name}).append(",");
+        </#if>
     </#if>
 </#list>
     }

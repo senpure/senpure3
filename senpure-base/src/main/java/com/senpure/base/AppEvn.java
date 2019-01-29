@@ -262,6 +262,10 @@ public class AppEvn {
         return getClassPath(getCallerClass());
     }
 
+    public static void markPid() {
+        System.getProperties().setProperty("PID", AppEvn.getPid());
+    }
+
     public static String getPid() {
         try {
             String jvmName = ManagementFactory.getRuntimeMXBean().getName();

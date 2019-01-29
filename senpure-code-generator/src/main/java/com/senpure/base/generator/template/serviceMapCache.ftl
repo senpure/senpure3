@@ -293,14 +293,14 @@ public class ${name}Service extends BaseService {
         ${name}Criteria criteria = new ${name}Criteria();
         criteria.setUsePage(false);
         criteria.set${field.name?cap_first}(${field.name});
-        List<${name}> ${pluralize(nameRule(name))} = ${nameRule(name)}Mapper.findByCriteria(criteria);
     <#if field.findOne>
+        List<${name}> ${pluralize(nameRule(name))} = ${nameRule(name)}Mapper.findByCriteria(criteria);
         if (${pluralize(nameRule(name))}.size() == 0) {
             return null;
         }
         return ${pluralize(nameRule(name))}.get(0);
     <#else>
-        return ${pluralize(nameRule(name))};
+        return ${nameRule(name)}Mapper.findByCriteria(criteria);
     </#if>
     }
 </#list>

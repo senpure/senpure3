@@ -72,6 +72,7 @@ public class ${name}CriteriaStr extends CriteriaStr implements Serializable {
         </#if>
     </#if>
 </#list>
+
     public ${name}Criteria to${name}Criteria() {
         ${name}Criteria criteria = new ${name}Criteria();
         criteria.setPage(Integer.valueOf(getPage()));
