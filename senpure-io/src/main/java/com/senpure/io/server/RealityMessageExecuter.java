@@ -36,7 +36,7 @@ public class RealityMessageExecuter {
             long userId = gsMessage.getUserId();
             RealityMessageHandler handler = RealityMessageHandlerUtil.getHandler(gsMessage.getMessageId());
             if (handler == null) {
-                logger.warn("没有找到消息出来程序{} userId:{}", gsMessage.getMessageId(), userId);
+                logger.warn("没有找到消息处理程序{} userId:{}", gsMessage.getMessageId(), userId);
                 return;
             }
             Message message = handler.getEmptyMessage();

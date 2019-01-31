@@ -219,7 +219,7 @@ public class CodeGenerator {
             menuId += 100;
             model.setGenerateMenu(config.isGenerateMenu());
             model.setGeneratePermission(config.isGeneratePermission());
-            model.setUseCriteriaStr(config.isUseCriteriaStr());
+            model.setUseCriteriaStr(modelConfig.isUseCriteriaStr());
             model.setModule(module);
 
             model.setModelPackage(part + "." + config.getModelPartName());
@@ -258,9 +258,9 @@ public class CodeGenerator {
             } else {
                 logger.info("{} 不生成mapperJava", model.getName());
             }
-            if (modelConfig.isGenerateMapperJava()) {
+            if (modelConfig.isGenerateMapperXml()) {
                 File xmlFile = new File(javaPart, config.getMapperPartName() + "/" + model.getName() + config.getMapperSuffix() + ".xml");
-                generateFile(mapperXmlTemplate, model, xmlFile, modelConfig.isCoverMapperJava());
+                generateFile(mapperXmlTemplate, model, xmlFile, modelConfig.isCoverMapperXml());
             } else {
                 logger.info("{} 不生成mapperXml", model.getName());
             }

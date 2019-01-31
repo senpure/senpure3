@@ -26,18 +26,15 @@ public class ModelConfig {
     private boolean generateMapperJava = true;
     private boolean generateMapperXml = true;
     //生成service
-    private boolean generateService = true;
+    private boolean generateService = false;
     //生成controller
-    private boolean generateController = true;
+    private boolean generateController = false;
 
 
     private boolean generateCriteria = true;
     private boolean generateResult= true;
 
-    //生成权限
-    private boolean generatePermission = true;
-    //生成菜单
-    private boolean generateMenu = true;
+
 
     private boolean useCriteriaStr = true;
 
@@ -57,10 +54,13 @@ public class ModelConfig {
 
     //表类型 mix single
     private String tableType = GeneratorConfig.TABLE_TYPE_SINGLE;
-
-    private boolean cache=true;
+    //service 开启缓存
+    private boolean cache=false;
+    //cache =true 时生效 spring cache
     private boolean remoteCache=true;
+    //cache =true 时生效 spring cache local混合
     private boolean localCache;
+    //cache =true 时生效 本地map缓存
     private boolean mapCache;
 
 
@@ -112,21 +112,7 @@ public class ModelConfig {
         this.generateController = generateController;
     }
 
-    public boolean isGeneratePermission() {
-        return generatePermission;
-    }
 
-    public void setGeneratePermission(boolean generatePermission) {
-        this.generatePermission = generatePermission;
-    }
-
-    public boolean isGenerateMenu() {
-        return generateMenu;
-    }
-
-    public void setGenerateMenu(boolean generateMenu) {
-        this.generateMenu = generateMenu;
-    }
 
     public boolean isGenerateModel() {
         return generateModel;

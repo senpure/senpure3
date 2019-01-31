@@ -274,15 +274,15 @@ public class EntityReader {
                 } else if (modelField.getName().endsWith("Nick")) {
                     find(model, modelField, false);
                 } else if (modelField.getName().endsWith("Id")) {
-                    find(model, modelField, true);
-//                    if (model.getName().endsWith("Info")
-//                            || model.getName().endsWith("info")
-//                            || model.getName().endsWith("Ext")
-//                            || model.getName().endsWith("ext")) {
-//                        find(model, modelField, true);
-//                    } else {
-//                        find(model, modelField, false);
-//                    }
+                    if (model.getName().endsWith("Info")
+                            || model.getName().endsWith("info")
+                            || model.getName().endsWith("Ext")
+                            || model.getName().endsWith("ext")
+                    ) {
+                        find(model, modelField, true);
+                    } else {
+                        find(model, modelField, false);
+                    }
                 } else if (modelField.getName().equals("type")) {
                     find(model, modelField, false);
                 } else if (modelField.getName().endsWith("Type")) {

@@ -68,6 +68,9 @@
             return this;
         }
         this.start${field.name?cap_first} = start${field.name?cap_first};
+        <#if field.clazzType=="Date">
+        this.start${field.name?cap_first}Valid.setDateStr(start${field.name?cap_first});
+        </#if>
         return this;
     }
 
@@ -94,6 +97,9 @@
             return this;
         }
         this.end${field.name?cap_first} = end${field.name?cap_first};
+        <#if field.clazzType=="Date">
+        this.end${field.name?cap_first}Valid.setDateStr(end${field.name?cap_first});
+        </#if>
         return this;
     }
 

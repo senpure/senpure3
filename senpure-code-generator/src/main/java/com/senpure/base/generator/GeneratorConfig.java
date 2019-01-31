@@ -84,9 +84,9 @@ public class GeneratorConfig {
     //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
     //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
-    private boolean generatePermission =true;
-    private boolean generateMenu =true;
-    private boolean useCriteriaStr =true;
+    private boolean generatePermission =false;
+    private boolean generateMenu =false;
+
     private int menuStartId = 0;
 
     /**
@@ -133,14 +133,7 @@ public class GeneratorConfig {
         return modelConfig;
     }
 
-    public boolean isUseCriteriaStr() {
-        return useCriteriaStr;
-    }
 
-    public GeneratorConfig setUseCriteriaStr(boolean useCriteriaStr) {
-        this.useCriteriaStr = useCriteriaStr;
-        return this;
-    }
 
     public NamingStrategy getNamingStrategy() {
         return namingStrategy;
