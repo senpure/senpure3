@@ -113,7 +113,6 @@ public class EntityReader {
                 classPath = classPath.replace(File.separatorChar, '.');
                 if (classPath.startsWith(".")) {
                     classPath = classPath.replaceFirst("\\.", "");
-
                 }
                 // classPath =classPath  .replace('/','.');
                 logger.debug("classPath {}", classPath);
