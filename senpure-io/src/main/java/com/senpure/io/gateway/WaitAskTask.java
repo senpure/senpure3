@@ -11,16 +11,26 @@ import com.senpure.io.message.Client2GatewayMessage;
 public class WaitAskTask {
 
 
+    /**
+     * 询问key
+     */
     private long askToken;
 
     private String value;
 
     private long startTime;
     private long answerTime;
+    /**
+     * 询问了多少个服务器
+     */
     private int askTimes;
+    /**
+     * 应答了多少个服务器
+     */
     private int answerTimes;
     private long maxDelay = 5000;
 
+    private  long fromMessageId;
     private ServerChannelManager serverChannelManager;
 
     private ServerManager serverManager;
@@ -38,7 +48,6 @@ public class WaitAskTask {
             }
             this.serverManager = serverManager;
             this.serverChannelManager = serverChannelManager;
-
             return;
         }
     }
@@ -118,5 +127,17 @@ public class WaitAskTask {
 
     public void setAskTimes(int askTimes) {
         this.askTimes = askTimes;
+    }
+
+    public long getFromMessageId() {
+        return fromMessageId;
+    }
+
+    public void setFromMessageId(long fromMessageId) {
+        this.fromMessageId = fromMessageId;
+    }
+
+    public long getMaxDelay() {
+        return maxDelay;
     }
 }

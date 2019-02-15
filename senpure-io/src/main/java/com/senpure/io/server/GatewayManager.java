@@ -78,7 +78,6 @@ public class GatewayManager {
     }
 
 
-
     /**
      * 将消息发送给所有的网关
      *
@@ -91,38 +90,70 @@ public class GatewayManager {
 
     }
 
+    public void sendLoginMessage2Gateway(Long token, Long userId, Message message) {
+        if (userId == 0) {
+            return;
+        }
+        Server2GatewayMessage toGateway = new Server2GatewayMessage();
+        toGateway.setToken(token);
+        toGateway.setUserIds(new Long[]{userId});
+        toGateway.setMessage(message);
+        toGateway.setMessageId(message.getMessageId());
+        GatewayRelation gatewayRelation = tokenGatewayMap.get(token);
+        if (gatewayRelation != null) {
+            gatewayRelation.gatewayChannelManager.sendMessage(toGateway);
+            //关联userId
+            userGatewayMap.put(userId, gatewayRelation);
+        } else {
+            logger.warn("token {} 不存在 GatewayRelation", token);
+        }
+    }
+
     public void sendMessage2GatewayByToken(Long token, Message message) {
         Server2GatewayMessage toGateway = new Server2GatewayMessage();
         toGateway.setToken(token);
         toGateway.setUserIds(new Long[0]);
         toGateway.setMessage(message);
         toGateway.setMessageId(message.getMessageId());
-        GatewayChannelManager channelServer = tokenGatewayMap.get(token).gatewayChannelManager;
-        channelServer.sendMessage(toGateway);
-
+        GatewayRelation gatewayRelation = tokenGatewayMap.get(token);
+        if (gatewayRelation != null) {
+            gatewayRelation.gatewayChannelManager.sendMessage(toGateway);
+        } else {
+            logger.warn("token {} 不存在 GatewayRelation", token);
+        }
     }
+
 
     public void sendMessage2Gateway(Long userId, Message message) {
         Server2GatewayMessage toGateway = new Server2GatewayMessage();
         toGateway.setUserIds(new Long[]{userId});
         toGateway.setMessage(message);
         toGateway.setMessageId(message.getMessageId());
-        userGatewayMap.get(userId).gatewayChannelManager.sendMessage(toGateway);
+        GatewayRelation gatewayRelation = userGatewayMap.get(userId);
+        if (gatewayRelation != null) {
+            gatewayRelation.gatewayChannelManager.sendMessage(toGateway);
+        } else {
+            logger.warn("userId {} 不存在 GatewayRelation", userId);
+        }
 
     }
 
     public void sendMessage2Gateway(List<Long> userIds, Message message) {
         Map<Integer, GatewayUsers> map = new HashMap<>();
         for (Long userId : userIds) {
-            GatewayChannelManager gatewayChannelManager = userGatewayMap.get(userId).gatewayChannelManager;
-            Integer number = gatewayChannelManager.getNumber();
-            GatewayUsers gatewayUsers = map.get(number);
-            if (gatewayUsers == null) {
-                gatewayUsers = new GatewayUsers();
-                gatewayUsers.gatewayChannelManager = gatewayChannelManager;
-                map.put(number, gatewayUsers);
+            GatewayRelation gatewayRelation = userGatewayMap.get(userId);
+            if (gatewayRelation != null) {
+                Integer number = gatewayRelation.gatewayChannelManager.getNumber();
+                GatewayUsers gatewayUsers = map.get(number);
+                if (gatewayUsers == null) {
+                    gatewayUsers = new GatewayUsers();
+                    gatewayUsers.gatewayChannelManager = gatewayRelation.gatewayChannelManager;
+                    map.put(number, gatewayUsers);
+                }
+                gatewayUsers.userIds.add(userId);
+            } else {
+                logger.warn("userIds -> userId {} 不存在 GatewayRelation", userId);
             }
-            gatewayUsers.userIds.add(userId);
         }
         map.values().forEach(gatewayUsers -> {
             Server2GatewayMessage toGateway = new Server2GatewayMessage();
@@ -130,6 +161,7 @@ public class GatewayManager {
             toGateway.setMessageId(message.getMessageId());
             Long[] users = new Long[gatewayUsers.userIds.size()];
             gatewayUsers.userIds.toArray(users);
+            toGateway.setUserIds(users);
             gatewayUsers.gatewayChannelManager.sendMessage(toGateway);
         });
     }

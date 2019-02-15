@@ -7,6 +7,8 @@ import com.senpure.io.protocol.Bean;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class HandleMessageManager {
 
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
     private boolean direct;
     private boolean serverShare;
     private List<ServerManager> serverManagers = new ArrayList<>();
@@ -70,10 +73,11 @@ public class HandleMessageManager {
             buf.writeBytes(message.getData());
             String value = null;
             try {
+                Bean.readTag(buf, buf.writerIndex());
                 value = Bean.readString(buf);
             } catch (Exception e) {
-
-                Assert.error("读取询问值出错 询问值只能是string 类型 messageId  " + message.getMessageId());
+                logger.error("读取询问值出错询问值只能是string 类型 messageId " + message.getMessageId(), e);
+                // Assert.error("读取询问值出错 询问值只能是string 类型 messageId  " + message.getMessageId());
                 return;
             }
             CSAskHandleMessage askHandleMessage = new CSAskHandleMessage();
@@ -90,6 +94,9 @@ public class HandleMessageManager {
 
             WaitAskTask waitAskTask = new WaitAskTask();
             waitAskTask.setAskToken(askHandleMessage.getToken());
+            waitAskTask.setFromMessageId(askHandleMessage.getFromMessageId());
+            waitAskTask.setValue(value);
+
             int askTimes = 0;
             for (ServerManager serverManager : serverManagers) {
                 askTimes += serverManager.getUseChannelManagers().size();

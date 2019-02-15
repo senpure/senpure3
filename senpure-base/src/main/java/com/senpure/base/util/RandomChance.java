@@ -33,6 +33,9 @@ public class RandomChance<T> implements Nameable {
 	}
 	public RandomChance<T> put(T item, String chance) {
 		BigDecimal bigDecimal = new BigDecimal(chance);
+		if (count.compareTo(BigDecimal.ZERO) <= 0) {
+			Assert.error("概率错误 "+chance);
+		}
 		count = count.add(bigDecimal);
 		if (count.compareTo(BigDecimal.ONE) > 0) {
 			Assert.error("概率溢出(大于1)");

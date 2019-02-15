@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author senpure
  * @time 2018-10-19 16:14:32
  */
-public class CSBreakUserGatewayMessageHandler extends AbstractRealityMessageHandler<CSBreakUserGatewayMessage> {
+public class CSBreakUserGatewayMessageHandler extends AbstractInnerMessageHandler<CSBreakUserGatewayMessage> {
     @Autowired
     private GatewayManager gatewayManager;
 

@@ -146,7 +146,7 @@ public class ServerManager {
         userId = userId == null ? 0 : userId;
         ServerRelation serverRelation = tokenServerChannelManagerMap.remove(token);
         if (serverRelation != null) {
-            logger.info("{}{} 取消 对{} :token{} userId:{}的 关联",
+            logger.info("{} {} 取消 对{} :token{} userId:{}的 关联",
                     serverName, serverRelation.serverChannelManager.getServerKey(), channel, token, userId);
             CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
             breakUserGatewayMessage.setRelationToken(serverRelation.relationToken);

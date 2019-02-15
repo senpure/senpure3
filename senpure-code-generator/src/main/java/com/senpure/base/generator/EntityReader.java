@@ -82,8 +82,6 @@ public class EntityReader {
             files = new File[1];
             files[0] = file;
         }
-
-
         List<String> javaSourceFiles = new ArrayList<>();
         for (File entity : files) {
             if (entity.getName().endsWith(".class")) {
@@ -105,7 +103,6 @@ public class EntityReader {
         }
         CommentReader.readComment(javaSourceFiles);
         System.setOut(out);
-
         for (File entity : files) {
             if (entity.getName().endsWith(".class")) {
                 String classPath = entity.getAbsolutePath().replace(classRootPath, "");

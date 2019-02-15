@@ -3,6 +3,7 @@ package com.senpure.io.gateway;
 import com.senpure.base.util.IDGenerator;
 import com.senpure.base.util.NameThreadFactory;
 import com.senpure.io.ChannelAttributeUtil;
+import com.senpure.io.MessageIdReader;
 import com.senpure.io.bean.HandleMessage;
 import com.senpure.io.message.*;
 import com.senpure.io.protocol.Message;
@@ -32,10 +33,6 @@ public class GatewayMessageExecuter {
     private int scBreakUserGatewayMessageId = new SCBreakUserGatewayMessage().getMessageId();
     private int csBreakUserGatewayMessageId = new CSBreakUserGatewayMessage().getMessageId();
 
-
-    public void setScLoginMessageId(int scLogoutMessageId) {
-        this.scLoginMessageId = scLogoutMessageId;
-    }
 
     private int scAskMessageId = new SCAskHandleMessage().getMessageId();
 
@@ -88,6 +85,11 @@ public class GatewayMessageExecuter {
         }
 
 
+    }
+
+
+    public void report() {
+        logger.info("csLoginMessageId: {} scLoginMessageId:{} ", csLoginMessageId, scLoginMessageId);
     }
 
     public void channelActive(Channel channel) {
@@ -184,30 +186,6 @@ public class GatewayMessageExecuter {
         service.execute(runnable);
     }
 
-    public void askMessage(Channel channel, Server2GatewayMessage server2GatewayMessage) {
-        SCAskHandleMessage message = new SCAskHandleMessage();
-        readMessage(message, server2GatewayMessage);
-        WaitAskTask waitAskTask = waitAskMap.get(message.getToken());
-        if (waitAskTask != null) {
-            if (message.isHandle()) {
-                String serverName = ChannelAttributeUtil.getServerName(channel);
-                String serverKey = ChannelAttributeUtil.getServerKey(channel);
-                ServerManager serverManager = serverInstanceMap.get(serverName);
-                for (ServerChannelManager useChannelManager : serverManager.getUseChannelManagers()) {
-                    if (useChannelManager.getServerKey().equalsIgnoreCase(serverKey)) {
-                        waitAskTask.answer(serverManager, useChannelManager, true);
-                        return;
-                    }
-                }
-                waitAskTask.answer(null, null, false);
-            } else {
-                waitAskTask.answer(null, null, false);
-            }
-
-            // waitAskTask.answer(channel, message.isHandle());
-        }
-
-    }
 
     public void clientOffline(Channel channel) {
         service.execute(() -> {
@@ -226,36 +204,6 @@ public class GatewayMessageExecuter {
         message.read(buf, buf.writerIndex());
     }
 
-    /**
-     * 处具体服务器返回的关联用户信息
-     *
-     * @param channel
-     * @param server2GatewayMessage
-     */
-    public void relationMessage(Channel channel, Server2GatewayMessage server2GatewayMessage) {
-        SCRelationUserGatewayMessage message = new SCRelationUserGatewayMessage();
-        readMessage(message, server2GatewayMessage);
-        WaitRelationTask waitRelationTask = waitRelationMap.get(message.getRelationToken());
-        if (waitRelationTask != null) {
-            if (message.getRelationToken() == waitRelationTask.getRelationToken().longValue()) {
-                waitRelationTask.setRelationTime(System.currentTimeMillis());
-                waitRelationTask.setRelation(true);
-            }
-        } else {
-            CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
-            breakUserGatewayMessage.setToken(message.getToken());
-            breakUserGatewayMessage.setUserId(message.getUserId());
-            breakUserGatewayMessage.setRelationToken(message.getRelationToken());
-            Client2GatewayMessage toMessage = new Client2GatewayMessage();
-            toMessage.setMessageId(breakUserGatewayMessage.getMessageId());
-            ByteBuf bf = Unpooled.buffer();
-            bf.ensureWritable(breakUserGatewayMessage.getSerializedSize());
-            message.write(bf);
-            toMessage.setData(bf.array());
-            channel.writeAndFlush(toMessage);
-        }
-
-    }
 
     //todo 一个服务只允许一个ask id
     public synchronized void regServerInstance(Channel channel, Server2GatewayMessage server2GatewayMessage) {
@@ -334,7 +282,7 @@ public class GatewayMessageExecuter {
         for (HandleMessage handleMessage : handleMessages) {
             HandleMessageManager handleMessageManager = handleMessageManagerMap.get(handleMessage.getHandleMessageId());
             if (handleMessageManager == null) {
-                handleMessageManager = new HandleMessageManager(handleMessage.getHandleMessageId(), true, false, this);
+                handleMessageManager = new HandleMessageManager(handleMessage.getHandleMessageId(), handleMessage.isDirect(), handleMessage.isServerShare(), this);
                 handleMessageManagerMap.put(handleMessage.getHandleMessageId(), handleMessageManager);
             }
             handleMessageManager.addServerManager(handleMessage.getHandleMessageId(), serverManager);
@@ -350,6 +298,37 @@ public class GatewayMessageExecuter {
         message.write(bf);
         toMessage.setData(bf.array());
         serverChannelManager.sendMessage(toMessage);
+    }
+
+    /**
+     * 处具体服务器返回的关联用户信息
+     *
+     * @param channel
+     * @param server2GatewayMessage
+     */
+    public void relationMessage(Channel channel, Server2GatewayMessage server2GatewayMessage) {
+        SCRelationUserGatewayMessage message = new SCRelationUserGatewayMessage();
+        readMessage(message, server2GatewayMessage);
+        WaitRelationTask waitRelationTask = waitRelationMap.get(message.getRelationToken());
+        if (waitRelationTask != null) {
+            if (message.getRelationToken() == waitRelationTask.getRelationToken().longValue()) {
+                waitRelationTask.setRelationTime(System.currentTimeMillis());
+                waitRelationTask.setRelation(true);
+            }
+        } else {
+            CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
+            breakUserGatewayMessage.setToken(message.getToken());
+            breakUserGatewayMessage.setUserId(message.getUserId());
+            breakUserGatewayMessage.setRelationToken(message.getRelationToken());
+            Client2GatewayMessage toMessage = new Client2GatewayMessage();
+            toMessage.setMessageId(breakUserGatewayMessage.getMessageId());
+            ByteBuf bf = Unpooled.buffer();
+            bf.ensureWritable(breakUserGatewayMessage.getSerializedSize());
+            message.write(bf);
+            toMessage.setData(bf.array());
+            channel.writeAndFlush(toMessage);
+        }
+
     }
 
     private void checkWaitRelationTask() {
@@ -372,15 +351,53 @@ public class GatewayMessageExecuter {
         }
     }
 
+    public void askMessage(Channel channel, Server2GatewayMessage server2GatewayMessage) {
+        SCAskHandleMessage message = new SCAskHandleMessage();
+        readMessage(message, server2GatewayMessage);
+        WaitAskTask waitAskTask = waitAskMap.get(message.getToken());
+        if (waitAskTask != null) {
+            if (message.isHandle()) {
+                String serverName = ChannelAttributeUtil.getServerName(channel);
+                String serverKey = ChannelAttributeUtil.getServerKey(channel);
+                logger.debug("{} {} 可以处理 {} 值位 {} 的请求", serverName, serverKey,
+                        MessageIdReader.read(waitAskTask.getFromMessageId()), waitAskTask.getValue());
+                ServerManager serverManager = serverInstanceMap.get(serverName);
+                for (ServerChannelManager useChannelManager : serverManager.getUseChannelManagers()) {
+                    if (useChannelManager.getServerKey().equalsIgnoreCase(serverKey)) {
+                        waitAskTask.answer(serverManager, useChannelManager, true);
+                        return;
+                    }
+                }
+                waitAskTask.answer(null, null, false);
+            } else {
+                if (logger.isDebugEnabled()) {
+                    String serverName = ChannelAttributeUtil.getServerName(channel);
+                    String serverKey = ChannelAttributeUtil.getServerKey(channel);
+                    logger.debug("{} {} 无法处理 {} 值位 {} 的请求", serverName, serverKey,
+                            MessageIdReader.read(waitAskTask.getFromMessageId()), waitAskTask.getValue());
+                }
+                waitAskTask.answer(null, null, false);
+
+            }
+        }
+    }
+
     private void checkWaitAskTask() {
         List<Long> tokens = new ArrayList<>();
+        long now = System.currentTimeMillis();
         for (Map.Entry<Long, WaitAskTask> entry : waitAskMap.entrySet()) {
             WaitAskTask waitAskTask = entry.getValue();
             if (waitAskTask.getServerChannelManager() != null) {
                 tokens.add(entry.getKey());
                 waitAskTask.sendMessage();
             } else {
-
+                //超时
+                if (now - waitAskTask.getStartTime() > waitAskTask.getMaxDelay()) {
+                    logger.debug("没有服务器处理 {} 值位{} 的请求 询问服务器 {} 应答服务器 {}",
+                            MessageIdReader.read(waitAskTask.getFromMessageId()), waitAskTask.getValue(),
+                            waitAskTask.getAskTimes(), waitAskTask.getAnswerTimes());
+                    tokens.add(entry.getKey());
+                }
             }
         }
         for (Long token : tokens) {
@@ -389,16 +406,30 @@ public class GatewayMessageExecuter {
     }
 
     private void startCheck() {
-
         service.scheduleWithFixedDelay(() -> {
-
             checkWaitRelationTask();
             checkWaitAskTask();
-
         }, 0, 10, TimeUnit.MILLISECONDS);
     }
 
     public void destroy() {
         service.shutdown();
+    }
+
+
+    public int getCsLoginMessageId() {
+        return csLoginMessageId;
+    }
+
+    public void setCsLoginMessageId(int csLoginMessageId) {
+        this.csLoginMessageId = csLoginMessageId;
+    }
+
+    public int getScLoginMessageId() {
+        return scLoginMessageId;
+    }
+
+    public void setScLoginMessageId(int scLoginMessageId) {
+        this.scLoginMessageId = scLoginMessageId;
     }
 }
