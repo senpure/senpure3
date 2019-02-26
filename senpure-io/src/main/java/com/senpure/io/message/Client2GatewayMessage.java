@@ -1,5 +1,7 @@
 package com.senpure.io.message;
 
+import com.senpure.io.support.MessageIdReader;
+
 import java.util.Arrays;
 
 
@@ -48,7 +50,7 @@ public class Client2GatewayMessage {
     @Override
     public String toString() {
         return "Client2GatewayMessage{" +
-                "messageId=" + messageId +
+                "messageId=" + MessageIdReader.read(messageId) +
                 ", userId=" + userId +
                 ", data=" + Arrays.toString(data) +
                 '}';

@@ -18,16 +18,17 @@ public class RealityMessageHandlerUtil {
         return handlerMap.get(messageId);
     }
 
-
     private static List<Integer> regMessageIds = new ArrayList<>(128);
 
     public static void regMessageHandler(RealityMessageHandler handler) {
         Assert.isNull(handlerMap.get(handler.handlerId()), handler.handlerId() + " -> " + handler.getEmptyMessage().getClass().getName() + "  处理程序已经存在");
+
         handlerMap.put(handler.handlerId(), handler);
-
         if (handler.regToGateway()) {
+            if (handler.handlerId() < 10000) {
+                Assert.error("10000 以下为保留id不允许使用 " + handler.handlerId() + " " + handler.getEmptyMessage().getClass().getName());
+            }
             regMessageIds.add(handler.handlerId());
-
         }
     }
 

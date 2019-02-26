@@ -5,11 +5,13 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * 应答是否可以请求
- *
+ * 
  * @author senpure
- * @time 2018-11-5 18:06:48
+ * @time 2019-2-20 17:02:08
  */
-public class SCAskHandleMessage extends Message {
+public class SCAskHandleMessage extends  Message {
+
+    public static final int MESSAGE_ID = 1106;
     //是否可以处理
     private boolean handle;
     //token
@@ -18,22 +20,21 @@ public class SCAskHandleMessage extends Message {
     private int fromMessageId;
     //值
     private String value;
-
     /**
      * 写入字节缓存
      */
     @Override
-    public void write(ByteBuf buf) {
+    public void write(ByteBuf buf){
         getSerializedSize();
         //是否可以处理
-        writeBoolean(buf, 8, handle);
+        writeBoolean(buf,8,handle);
         //token
-        writeVar64(buf, 16, token);
+        writeVar64(buf,16,token);
         //消息ID
-        writeVar32(buf, 24, fromMessageId);
+        writeVar32(buf,24,fromMessageId);
         //值
-        if (value != null) {
-            writeString(buf, 32, value);
+        if (value != null){
+            writeString(buf,32,value);
         }
     }
 
@@ -41,27 +42,27 @@ public class SCAskHandleMessage extends Message {
      * 读取字节缓存
      */
     @Override
-    public void read(ByteBuf buf, int endIndex) {
-        while (true) {
+    public void read(ByteBuf buf,int endIndex){
+        while(true){
             int tag = readTag(buf, endIndex);
             switch (tag) {
                 case 0://end
-                    return;
+                return;
                 //是否可以处理
                 case 8:// 1 << 3 | 0
-                    handle = readBoolean(buf);
+                        handle = readBoolean(buf);
                     break;
                 //token
                 case 16:// 2 << 3 | 0
-                    token = readVar64(buf);
+                        token = readVar64(buf);
                     break;
                 //消息ID
                 case 24:// 3 << 3 | 0
-                    fromMessageId = readVar32(buf);
+                        fromMessageId = readVar32(buf);
                     break;
                 //值
                 case 32:// 4 << 3 | 0
-                    value = readString(buf);
+                        value = readString(buf);
                     break;
                 default://skip
                     skip(buf, tag);
@@ -73,32 +74,31 @@ public class SCAskHandleMessage extends Message {
     private int serializedSize = -1;
 
     @Override
-    public int getSerializedSize() {
-        int size = serializedSize;
-        if (size != -1) {
+    public int getSerializedSize(){
+        int size = serializedSize ;
+        if (size != -1 ){
             return size;
         }
-        size = 0;
+        size = 0 ;
         //是否可以处理
-        size += computeBooleanSize(1, handle);
+        size += computeBooleanSize(1,handle);
         //token
-        size += computeVar64Size(1, token);
+        size += computeVar64Size(1,token);
         //消息ID
-        size += computeVar32Size(1, fromMessageId);
+        size += computeVar32Size(1,fromMessageId);
         //值
-        if (value != null) {
-            size += computeStringSize(1, value);
+        if (value != null){
+            size += computeStringSize(1,value);
         }
-        serializedSize = size;
-        return size;
+        serializedSize = size ;
+        return size ;
     }
 
     /**
-     * is 是否可以处理
-     *
+     *  is 是否可以处理
      * @return
      */
-    public boolean isHandle() {
+    public  boolean  isHandle() {
         return handle;
     }
 
@@ -106,16 +106,14 @@ public class SCAskHandleMessage extends Message {
      * set 是否可以处理
      */
     public SCAskHandleMessage setHandle(boolean handle) {
-        this.handle = handle;
+        this.handle=handle;
         return this;
     }
-
     /**
      * get token
-     *
      * @return
      */
-    public long getToken() {
+    public  long getToken() {
         return token;
     }
 
@@ -123,16 +121,14 @@ public class SCAskHandleMessage extends Message {
      * set token
      */
     public SCAskHandleMessage setToken(long token) {
-        this.token = token;
+        this.token=token;
         return this;
     }
-
     /**
      * get 消息ID
-     *
      * @return
      */
-    public int getFromMessageId() {
+    public  int getFromMessageId() {
         return fromMessageId;
     }
 
@@ -140,16 +136,15 @@ public class SCAskHandleMessage extends Message {
      * set 消息ID
      */
     public SCAskHandleMessage setFromMessageId(int fromMessageId) {
-        this.fromMessageId = fromMessageId;
+        this.fromMessageId=fromMessageId;
         return this;
     }
-
-    public String getValue() {
+    public  String getValue() {
         return value;
     }
 
     public SCAskHandleMessage setValue(String value) {
-        this.value = value;
+        this.value=value;
         return this;
     }
 
@@ -161,12 +156,12 @@ public class SCAskHandleMessage extends Message {
     @Override
     public String toString() {
         return "SCAskHandleMessage[1106]{"
-                + "handle=" + handle
-                + ",token=" + token
-                + ",fromMessageId=" + fromMessageId
-                + ",value=" + value
+                +"handle=" + handle
+                +",token=" + token
+                +",fromMessageId=" + fromMessageId
+                +",value=" + value
                 + "}";
-    }
+   }
 
     //最长字段长度 13
     private int filedPad = 13;

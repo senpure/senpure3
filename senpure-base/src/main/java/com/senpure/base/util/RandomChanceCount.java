@@ -43,29 +43,23 @@ private RandomChance<T> randomChance;
 	public String count(boolean printToConsole) {
 		String result;
 		StringBuilder sb = new StringBuilder();
-
-		if(randomChance instanceof Nameable)
-		{
-			
+		if(randomChance instanceof Nameable) {
 			sb.append(	((Nameable)randomChance).getName()).append("，");
 		}
-		
 		else {
 			sb.append(randomChance).append("，");
 		}
-		
 		if (countRandom == 0) {
 			sb.append("尚未进行随机！");
 			result = sb.toString();
 			if (printToConsole) {
-
 				System.out.println(result);
 			}
 			return result;
 		}
 		sb.append("共随机").append(ReadNumber.read(countRandom)).append("(").append(countRandom).append(")")
-				.append("次,耗时：").append(time / 1000000).append("毫秒，统计结果如下：\n");
-
+				//.append("次,耗时：").append(time / 1000000).append("毫秒，统计结果如下：\n");
+			.append("次,统计结果如下：\n");
 		List<T> items=randomChance.getItems();
 		int itemSize=items.size();
 		for (int i = 0; i < itemSize; i++) {

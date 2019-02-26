@@ -32,6 +32,12 @@ public class GatewayAndClientServerHandler extends SimpleChannelInboundHandler<C
     }
 
     @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        //解决强断的错误 远程主机强迫关闭了一个现有的连接
+        ctx.flush();
+    }
+
+    @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
         logger.debug("客户端{} 断开连接", channel);

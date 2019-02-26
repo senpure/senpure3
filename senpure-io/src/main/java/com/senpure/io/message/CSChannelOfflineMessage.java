@@ -5,45 +5,46 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * 客户端掉线
- *
+ * 
  * @author senpure
- * @time 2018-11-5 18:06:48
+ * @time 2019-2-20 17:02:08
  */
-public class CSChannelOfflineMessage extends Message {
+public class CSChannelOfflineMessage extends  Message {
+
+    public static final int MESSAGE_ID = 1103;
     //channel token
     private long token;
     //用户Id
     private long userId;
-
     /**
      * 写入字节缓存
      */
     @Override
-    public void write(ByteBuf buf) {
+    public void write(ByteBuf buf){
         getSerializedSize();
         //channel token
-        writeVar64(buf, 8, token);
+        writeVar64(buf,8,token);
         //用户Id
-        writeVar64(buf, 16, userId);
+        writeVar64(buf,16,userId);
     }
 
     /**
      * 读取字节缓存
      */
     @Override
-    public void read(ByteBuf buf, int endIndex) {
-        while (true) {
+    public void read(ByteBuf buf,int endIndex){
+        while(true){
             int tag = readTag(buf, endIndex);
             switch (tag) {
                 case 0://end
-                    return;
+                return;
                 //channel token
                 case 8:// 1 << 3 | 0
-                    token = readVar64(buf);
+                        token = readVar64(buf);
                     break;
                 //用户Id
                 case 16:// 2 << 3 | 0
-                    userId = readVar64(buf);
+                        userId = readVar64(buf);
                     break;
                 default://skip
                     skip(buf, tag);
@@ -55,26 +56,25 @@ public class CSChannelOfflineMessage extends Message {
     private int serializedSize = -1;
 
     @Override
-    public int getSerializedSize() {
-        int size = serializedSize;
-        if (size != -1) {
+    public int getSerializedSize(){
+        int size = serializedSize ;
+        if (size != -1 ){
             return size;
         }
-        size = 0;
+        size = 0 ;
         //channel token
-        size += computeVar64Size(1, token);
+        size += computeVar64Size(1,token);
         //用户Id
-        size += computeVar64Size(1, userId);
-        serializedSize = size;
-        return size;
+        size += computeVar64Size(1,userId);
+        serializedSize = size ;
+        return size ;
     }
 
     /**
      * get channel token
-     *
      * @return
      */
-    public long getToken() {
+    public  long getToken() {
         return token;
     }
 
@@ -82,16 +82,14 @@ public class CSChannelOfflineMessage extends Message {
      * set channel token
      */
     public CSChannelOfflineMessage setToken(long token) {
-        this.token = token;
+        this.token=token;
         return this;
     }
-
     /**
      * get 用户Id
-     *
      * @return
      */
-    public long getUserId() {
+    public  long getUserId() {
         return userId;
     }
 
@@ -99,7 +97,7 @@ public class CSChannelOfflineMessage extends Message {
      * set 用户Id
      */
     public CSChannelOfflineMessage setUserId(long userId) {
-        this.userId = userId;
+        this.userId=userId;
         return this;
     }
 
@@ -111,10 +109,10 @@ public class CSChannelOfflineMessage extends Message {
     @Override
     public String toString() {
         return "CSChannelOfflineMessage[1103]{"
-                + "token=" + token
-                + ",userId=" + userId
+                +"token=" + token
+                +",userId=" + userId
                 + "}";
-    }
+   }
 
     //最长字段长度 6
     private int filedPad = 6;

@@ -3,10 +3,11 @@ package com.senpure.io.gateway;
 import com.senpure.base.util.IDGenerator;
 import com.senpure.base.util.NameThreadFactory;
 import com.senpure.io.ChannelAttributeUtil;
-import com.senpure.io.MessageIdReader;
+import com.senpure.io.Constant;
 import com.senpure.io.bean.HandleMessage;
 import com.senpure.io.message.*;
 import com.senpure.io.protocol.Message;
+import com.senpure.io.support.MessageIdReader;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -33,6 +34,7 @@ public class GatewayMessageExecuter {
     private int scBreakUserGatewayMessageId = new SCBreakUserGatewayMessage().getMessageId();
     private int csBreakUserGatewayMessageId = new CSBreakUserGatewayMessage().getMessageId();
 
+    private int scIdNameMessageId = SCIdNameMessage.MESSAGE_ID;
 
     private int scAskMessageId = new SCAskHandleMessage().getMessageId();
 
@@ -83,8 +85,6 @@ public class GatewayMessageExecuter {
         } else {
             logger.warn("server 持有引用{}，请先释放后关闭", serviceRefCount);
         }
-
-
     }
 
 
@@ -101,7 +101,6 @@ public class GatewayMessageExecuter {
 
     //将客户端消息转发给具体的服务器
     public void execute(final Channel channel, final Client2GatewayMessage message) {
-
         service.execute(() -> {
             logger.debug("{} messageId {} data {}", channel, message.getMessageId(), message.getData().length);
             //登录
@@ -117,17 +116,42 @@ public class GatewayMessageExecuter {
             HandleMessageManager handleMessageManager = handleMessageManagerMap.get(message.getMessageId());
             if (handleMessageManager == null) {
                 logger.warn("没有找到消息的接收服务器{}", message.getMessageId());
+                SCInnerErrorMessage errorMessage = new SCInnerErrorMessage();
+                errorMessage.setType(Constant.ERROR_NOT_FOUND_SERVER);
+                errorMessage.setId(message.getMessageId());
+                errorMessage.setMessage("没有服务器处理" + MessageIdReader.read(message.getMessageId()));
+                sendMessage2Client(errorMessage, message.getToken());
                 return;
             }
             try {
                 handleMessageManager.execute(message);
             } catch (Exception e) {
                 logger.error("转发消息出错 " + message.getMessageId(), e);
+                SCInnerErrorMessage errorMessage = new SCInnerErrorMessage();
+                errorMessage.setType(Constant.ERROR_SERVER_ERROR);
+                errorMessage.setId(message.getMessageId());
+                errorMessage.setMessage(MessageIdReader.read(message.getMessageId()) + "," + e.getMessage());
+                sendMessage2Client(errorMessage, message.getToken());
             }
-
         });
     }
 
+    private void sendMessage2Client(Message message, Long token) {
+        Channel clientChannel = tokenChannel.get(token);
+        if (clientChannel == null) {
+            logger.warn("没有找到channel token {}", token);
+        } else {
+            Server2GatewayMessage m = new Server2GatewayMessage();
+            ByteBuf buf = Unpooled.buffer();
+            message.write(buf);
+            byte data[] = new byte[message.getSerializedSize()];
+            buf.readBytes(data);
+            m.setToken(token);
+            m.setData(data);
+            m.setMessageId(message.getMessageId());
+            clientChannel.writeAndFlush(m);
+        }
+    }
 
     //处理服务器发过来的消息
     public void execute(Channel channel, final Server2GatewayMessage message) {
@@ -140,6 +164,9 @@ public class GatewayMessageExecuter {
                 return;
             } else if (message.getMessageId() == scAskMessageId) {
                 askMessage(channel, message);
+                return;
+            } else if (message.getMessageId() == scIdNameMessageId) {
+                idNameMessage(message);
                 return;
             }
             if (message.getMessageId() == scLoginMessageId) {
@@ -173,13 +200,9 @@ public class GatewayMessageExecuter {
                             clientChannel.writeAndFlush(message);
                         }
                     }
-
                 }
             }
-
         });
-
-
     }
 
     public void execute(Runnable runnable) {
@@ -192,9 +215,7 @@ public class GatewayMessageExecuter {
             for (Map.Entry<String, ServerManager> entry : serverInstanceMap.entrySet()) {
                 ServerManager serverManager = entry.getValue();
                 serverManager.clientOffLine(channel);
-
             }
-
         });
     }
 
@@ -230,24 +251,6 @@ public class GatewayMessageExecuter {
             }
             serverManager.setServerName(message.getServerName());
         }
-
-//        for (HandleMessage handleMessage : handleMessages) {
-//            HandleMessageManager handleMessageManager = null;
-//            if (handleMessage.isServerShare()) {
-//                handleMessageManager = handleMessageManagerMap.get(handleMessage.getHandleMessageId());
-//                if (handleMessage == null) {
-//                    List<ServerManager> serverManagers = new ArrayList<>();
-//                      handleMessageManager = new HandleMessageManager(handleMessage.getMessageType());
-//                }
-//
-//            } else {
-//                 handleMessageManager = new HandleMessageManager(handleMessage.getMessageType());
-//            }
-//            handleMessageManager.setNumStart(handleMessage.getNumStart());
-//            handleMessageManager.setNumEnd(handleMessage.getNumEnd());
-//            handleMessageManager.setMessageType(handleMessage.getMessageType());
-//            handleMessageManager.setValueType(handleMessage.getValueType());
-//        }
         //如果同一个服务处理消息id不一致，旧得实例停止接收新的连接
         for (HandleMessage handleMessage : handleMessages) {
             if (!serverManager.handleId(handleMessage.getHandleMessageId())) {
@@ -286,7 +289,6 @@ public class GatewayMessageExecuter {
                 handleMessageManagerMap.put(handleMessage.getHandleMessageId(), handleMessageManager);
             }
             handleMessageManager.addServerManager(handleMessage.getHandleMessageId(), serverManager);
-
         }
     }
 
@@ -298,6 +300,13 @@ public class GatewayMessageExecuter {
         message.write(bf);
         toMessage.setData(bf.array());
         serverChannelManager.sendMessage(toMessage);
+    }
+
+
+    public void idNameMessage(Server2GatewayMessage server2GatewayMessage) {
+        SCIdNameMessage message = new SCIdNameMessage();
+        readMessage(message, server2GatewayMessage);
+        MessageIdReader.relation(message.getIdNames());
     }
 
     /**
@@ -328,7 +337,6 @@ public class GatewayMessageExecuter {
             toMessage.setData(bf.array());
             channel.writeAndFlush(toMessage);
         }
-
     }
 
     private void checkWaitRelationTask() {
@@ -342,7 +350,6 @@ public class GatewayMessageExecuter {
                 if (task.cancel()) {
                     tokens.add(entry.getKey());
                     service.execute(() -> task.sendCancelMessage(this));
-
                 }
             }
         }
@@ -377,7 +384,6 @@ public class GatewayMessageExecuter {
                             MessageIdReader.read(waitAskTask.getFromMessageId()), waitAskTask.getValue());
                 }
                 waitAskTask.answer(null, null, false);
-
             }
         }
     }
@@ -397,6 +403,12 @@ public class GatewayMessageExecuter {
                             MessageIdReader.read(waitAskTask.getFromMessageId()), waitAskTask.getValue(),
                             waitAskTask.getAskTimes(), waitAskTask.getAnswerTimes());
                     tokens.add(entry.getKey());
+                    SCInnerErrorMessage errorMessage = new SCInnerErrorMessage();
+                    errorMessage.setType(Constant.ERROR_NOT_HANDLE_REQUEST);
+                    errorMessage.setId(waitAskTask.getFromMessageId());
+                    errorMessage.setMessage(MessageIdReader.read(waitAskTask.getFromMessageId()));
+                    errorMessage.setValue(waitAskTask.getValue());
+                    sendMessage2Client(errorMessage, waitAskTask.getMessage().getToken());
                 }
             }
         }

@@ -30,7 +30,7 @@ public class WaitAskTask {
     private int answerTimes;
     private long maxDelay = 5000;
 
-    private  long fromMessageId;
+    private  int  fromMessageId;
     private ServerChannelManager serverChannelManager;
 
     private ServerManager serverManager;
@@ -129,11 +129,11 @@ public class WaitAskTask {
         this.askTimes = askTimes;
     }
 
-    public long getFromMessageId() {
+    public int  getFromMessageId() {
         return fromMessageId;
     }
 
-    public void setFromMessageId(long fromMessageId) {
+    public void setFromMessageId(int  fromMessageId) {
         this.fromMessageId = fromMessageId;
     }
 

@@ -19,5 +19,9 @@ public class RealityServerHandler extends SimpleChannelInboundHandler<Gateway2Se
     protected void channelRead0(ChannelHandlerContext ctx, Gateway2ServerMessage msg) throws Exception {
         messageExecuter.execute(ctx.channel(), msg);
     }
-
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        //解决强断的错误 远程主机强迫关闭了一个现有的连接
+        ctx.flush();
+    }
 }

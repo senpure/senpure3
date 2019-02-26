@@ -5,9 +5,9 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * @author senpure
- * @time 2018-11-5 18:06:48
+ * @time 2019-2-20 17:02:07
  */
-public class HandleMessage extends Bean {
+public class HandleMessage extends  Bean {
     //可以处理的消息ID
     private int handleMessageId;
     //消息类名
@@ -16,50 +16,49 @@ public class HandleMessage extends Bean {
     private boolean serverShare;
     //true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
     private boolean direct;
-
     /**
      * 写入字节缓存
      */
     @Override
-    public void write(ByteBuf buf) {
+    public void write(ByteBuf buf){
         getSerializedSize();
         //可以处理的消息ID
-        writeVar32(buf, 8, handleMessageId);
+        writeVar32(buf,8,handleMessageId);
         //消息类名
-        if (messageClasses != null) {
-            writeString(buf, 16, messageClasses);
+        if (messageClasses != null){
+            writeString(buf,16,messageClasses);
         }
         //是否共享messageId 不同的服务都可以处理
-        writeBoolean(buf, 24, serverShare);
+        writeBoolean(buf,24,serverShare);
         //true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
-        writeBoolean(buf, 32, direct);
+        writeBoolean(buf,32,direct);
     }
 
     /**
      * 读取字节缓存
      */
     @Override
-    public void read(ByteBuf buf, int endIndex) {
-        while (true) {
+    public void read(ByteBuf buf,int endIndex){
+        while(true){
             int tag = readTag(buf, endIndex);
             switch (tag) {
                 case 0://end
-                    return;
+                return;
                 //可以处理的消息ID
                 case 8:// 1 << 3 | 0
-                    handleMessageId = readVar32(buf);
+                        handleMessageId = readVar32(buf);
                     break;
                 //消息类名
                 case 16:// 2 << 3 | 0
-                    messageClasses = readString(buf);
+                        messageClasses = readString(buf);
                     break;
                 //是否共享messageId 不同的服务都可以处理
                 case 24:// 3 << 3 | 0
-                    serverShare = readBoolean(buf);
+                        serverShare = readBoolean(buf);
                     break;
                 //true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
                 case 32:// 4 << 3 | 0
-                    direct = readBoolean(buf);
+                        direct = readBoolean(buf);
                     break;
                 default://skip
                     skip(buf, tag);
@@ -71,32 +70,31 @@ public class HandleMessage extends Bean {
     private int serializedSize = -1;
 
     @Override
-    public int getSerializedSize() {
-        int size = serializedSize;
-        if (size != -1) {
+    public int getSerializedSize(){
+        int size = serializedSize ;
+        if (size != -1 ){
             return size;
         }
-        size = 0;
+        size = 0 ;
         //可以处理的消息ID
-        size += computeVar32Size(1, handleMessageId);
+        size += computeVar32Size(1,handleMessageId);
         //消息类名
-        if (messageClasses != null) {
-            size += computeStringSize(1, messageClasses);
+        if (messageClasses != null){
+            size += computeStringSize(1,messageClasses);
         }
         //是否共享messageId 不同的服务都可以处理
-        size += computeBooleanSize(1, serverShare);
+        size += computeBooleanSize(1,serverShare);
         //true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
-        size += computeBooleanSize(1, direct);
-        serializedSize = size;
-        return size;
+        size += computeBooleanSize(1,direct);
+        serializedSize = size ;
+        return size ;
     }
 
     /**
      * get 可以处理的消息ID
-     *
      * @return
      */
-    public int getHandleMessageId() {
+    public  int getHandleMessageId() {
         return handleMessageId;
     }
 
@@ -104,16 +102,14 @@ public class HandleMessage extends Bean {
      * set 可以处理的消息ID
      */
     public HandleMessage setHandleMessageId(int handleMessageId) {
-        this.handleMessageId = handleMessageId;
+        this.handleMessageId=handleMessageId;
         return this;
     }
-
     /**
      * get 消息类名
-     *
      * @return
      */
-    public String getMessageClasses() {
+    public  String getMessageClasses() {
         return messageClasses;
     }
 
@@ -121,16 +117,14 @@ public class HandleMessage extends Bean {
      * set 消息类名
      */
     public HandleMessage setMessageClasses(String messageClasses) {
-        this.messageClasses = messageClasses;
+        this.messageClasses=messageClasses;
         return this;
     }
-
     /**
-     * is 是否共享messageId 不同的服务都可以处理
-     *
+     *  is 是否共享messageId 不同的服务都可以处理
      * @return
      */
-    public boolean isServerShare() {
+    public  boolean  isServerShare() {
         return serverShare;
     }
 
@@ -138,16 +132,14 @@ public class HandleMessage extends Bean {
      * set 是否共享messageId 不同的服务都可以处理
      */
     public HandleMessage setServerShare(boolean serverShare) {
-        this.serverShare = serverShare;
+        this.serverShare=serverShare;
         return this;
     }
-
     /**
-     * is true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
-     *
+     *  is true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
      * @return
      */
-    public boolean isDirect() {
+    public  boolean  isDirect() {
         return direct;
     }
 
@@ -155,19 +147,19 @@ public class HandleMessage extends Bean {
      * set true网关直接选择服务器转发，false 网关会对所有处理该消息的服务器进行一次询问
      */
     public HandleMessage setDirect(boolean direct) {
-        this.direct = direct;
+        this.direct=direct;
         return this;
     }
 
     @Override
     public String toString() {
         return "HandleMessage{"
-                + "handleMessageId=" + handleMessageId
-                + ",messageClasses=" + messageClasses
-                + ",serverShare=" + serverShare
-                + ",direct=" + direct
+                +"handleMessageId=" + handleMessageId
+                +",messageClasses=" + messageClasses
+                +",serverShare=" + serverShare
+                +",direct=" + direct
                 + "}";
-    }
+   }
 
     //最长字段长度 15
     private int filedPad = 15;

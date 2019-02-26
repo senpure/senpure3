@@ -9,9 +9,12 @@ import io.netty.channel.SimpleChannelInboundHandler;
 public class ClientHandler extends SimpleChannelInboundHandler<Message> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message message) throws Exception {
-
-
         MessageHandlerUtil.execute(ctx.channel(), message);
+    }
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        //解决强断的错误 远程主机强迫关闭了一个现有的连接
+        ctx.flush();
     }
 
 }

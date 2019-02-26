@@ -28,6 +28,10 @@ public class MessageHandlerUtil {
         service.execute(runnable);
     }
 
+
+    public static boolean isShutdown() {
+       return service.isShutdown();
+    }
     public static void execute(Channel channel, Message message) {
 
         service.execute(() -> {

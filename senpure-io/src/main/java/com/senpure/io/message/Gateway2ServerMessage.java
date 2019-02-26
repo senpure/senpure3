@@ -1,5 +1,6 @@
 package com.senpure.io.message;
 
+import com.senpure.io.support.MessageIdReader;
 import io.netty.buffer.ByteBuf;
 
 
@@ -50,7 +51,7 @@ public class Gateway2ServerMessage {
     public String toString() {
         return "Gateway2ServerMessage{" +
                 "token=" + token +
-                ", messageId=" + messageId +
+                ", messageId=" +  MessageIdReader.read(messageId)  +
                 ", userId=" + userId +
                 ", buf=" + buf.writerIndex() +
                 '}';

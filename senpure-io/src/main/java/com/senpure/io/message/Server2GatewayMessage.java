@@ -1,6 +1,7 @@
 package com.senpure.io.message;
 
 import com.senpure.io.protocol.Message;
+import com.senpure.io.support.MessageIdReader;
 
 import java.util.Arrays;
 
@@ -61,15 +62,14 @@ public class Server2GatewayMessage {
     public String toString() {
         if (message != null) {
             return "Server2GatewayMessage{" +
-                    "messageId=" + messageId +
-                    ", token=" + token +
+                    "token=" + token +
                     ", userIds=" + Arrays.toString(userIds) +
                     ", message=" + message +
                     '}';
         }
         return "Server2GatewayMessage{" +
-                "messageId=" + messageId +
-                ", token=" + token +
+                "messageId=" + MessageIdReader.read(messageId) +
+                ",token=" + token +
                 ", userIds=" + Arrays.toString(userIds) +
                 ", dataLen=" + (data == null ? 0 : data.length) +
                 '}';
@@ -80,7 +80,7 @@ public class Server2GatewayMessage {
             return toString();
         }
         return "Server2GatewayMessage{" +
-                "messageId=" + messageId +
+                "messageId=" + MessageIdReader.read(messageId) +
                 ", token=" + token +
                 ", userIds=" + Arrays.toString(userIds) +
                 "\n" + message.toString(indent == null ? "    " : indent) +
