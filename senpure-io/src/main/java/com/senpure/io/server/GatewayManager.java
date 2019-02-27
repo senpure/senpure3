@@ -109,6 +109,20 @@ public class GatewayManager {
         }
     }
 
+
+    public void sendMessage2Gateway(String gatewayKey, Long userId, Message message) {
+        Server2GatewayMessage toGateway = new Server2GatewayMessage();
+        toGateway.setUserIds(new Long[]{userId});
+        toGateway.setMessage(message);
+        toGateway.setMessageId(message.getMessageId());
+        GatewayChannelManager gatewayChannelManager = gatewayChannelMap.get(gatewayKey);
+        if (gatewayChannelManager != null) {
+            gatewayChannelManager.sendMessage(toGateway);
+        } else {
+            logger.info("{} 不存在网关", gatewayKey);
+        }
+    }
+
     public void sendMessage2GatewayByToken(Long token, Message message) {
         Server2GatewayMessage toGateway = new Server2GatewayMessage();
         toGateway.setToken(token);

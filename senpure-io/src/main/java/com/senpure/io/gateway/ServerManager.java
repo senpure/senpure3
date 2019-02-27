@@ -1,7 +1,6 @@
 package com.senpure.io.gateway;
 
 
-import com.senpure.io.ChannelAttributeUtil;
 import com.senpure.io.message.CSBreakUserGatewayMessage;
 import com.senpure.io.message.CSRelationUserGatewayMessage;
 import com.senpure.io.message.Client2GatewayMessage;
@@ -83,9 +82,11 @@ public class ServerManager {
         message.setRelationToken(relationToken);
         Client2GatewayMessage toMessage = new Client2GatewayMessage();
         toMessage.setMessageId(csRelationMessageId);
-        ByteBuf buf = Unpooled.buffer();
+        ByteBuf buf = Unpooled.buffer(message.getSerializedSize());
         message.write(buf);
-        toMessage.setData(buf.array());
+        byte[] data = new byte[message.getSerializedSize()];
+        buf.readBytes(data);
+        toMessage.setData(data);
         WaitRelationTask waitRelationTask = new WaitRelationTask();
         waitRelationTask.setRelationToken(relationToken);
         waitRelationTask.setMessage(client2GatewayMessage);
@@ -140,9 +141,7 @@ public class ServerManager {
     }
 
 
-    public void clientOffLine(Channel channel) {
-        Long token = ChannelAttributeUtil.getToken(channel);
-        Long userId = ChannelAttributeUtil.getUserId(channel);
+    public void clientOffLine(Channel channel,   Long token , Long userId ) {
         userId = userId == null ? 0 : userId;
         ServerRelation serverRelation = tokenServerChannelManagerMap.remove(token);
         if (serverRelation != null) {
@@ -156,10 +155,11 @@ public class ServerManager {
             client2GatewayMessage.setMessageId(breakUserGatewayMessage.getMessageId());
             client2GatewayMessage.setUserId(breakUserGatewayMessage.getUserId());
             client2GatewayMessage.setToken(breakUserGatewayMessage.getToken());
-            ByteBuf bf = Unpooled.buffer();
-            bf.ensureWritable(breakUserGatewayMessage.getSerializedSize());
-            breakUserGatewayMessage.write(bf);
-            client2GatewayMessage.setData(bf.array());
+            ByteBuf buf = Unpooled.buffer(breakUserGatewayMessage.getSerializedSize());
+            breakUserGatewayMessage.write(buf);
+            byte[] data = new byte[breakUserGatewayMessage.getSerializedSize()];
+            buf.readBytes(data);
+            client2GatewayMessage.setData(data);
             serverRelation.serverChannelManager.sendMessage(client2GatewayMessage);
         }
     }

@@ -69,7 +69,7 @@ public class HandleMessageManager {
         if (direct) {
             serverManager.sendMessage(message);
         } else {
-            ByteBuf buf = Unpooled.buffer();
+            ByteBuf buf = Unpooled.buffer(message.getData().length);
             buf.writeBytes(message.getData());
             String value = null;
             try {
@@ -89,9 +89,11 @@ public class HandleMessageManager {
             temp.setToken(message.getToken());
             temp.setUserId(message.getUserId());
             buf = Unpooled.buffer();
+            buf.ensureWritable(askHandleMessage.getSerializedSize());
             askHandleMessage.write(buf);
-            temp.setData(buf.array());
-
+            byte[] data = new byte[askHandleMessage.getSerializedSize()];
+            buf.readBytes(data);
+            temp.setData(data);
             WaitAskTask waitAskTask = new WaitAskTask();
             waitAskTask.setAskToken(askHandleMessage.getToken());
             waitAskTask.setFromMessageId(askHandleMessage.getFromMessageId());

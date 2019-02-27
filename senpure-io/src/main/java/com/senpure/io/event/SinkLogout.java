@@ -1,6 +1,6 @@
 package com.senpure.io.event;
 
-import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.messaging.SubscribableChannel;
 
 /**
@@ -13,6 +13,6 @@ public interface SinkLogout {
 
     String LOGOUT_INPUT = "logout-input";
 
-    @Output(LOGOUT_INPUT)
+    @Input(LOGOUT_INPUT)
     SubscribableChannel input();
 }

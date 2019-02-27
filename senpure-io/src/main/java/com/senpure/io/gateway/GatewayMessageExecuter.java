@@ -102,17 +102,22 @@ public class GatewayMessageExecuter {
     //将客户端消息转发给具体的服务器
     public void execute(final Channel channel, final Client2GatewayMessage message) {
         service.execute(() -> {
-            logger.debug("{} messageId {} data {}", channel, message.getMessageId(), message.getData().length);
             //登录
+            Long userId = ChannelAttributeUtil.getUserId(channel);
             if (message.getMessageId() == csLoginMessageId) {
+                if (userId != null) {
+
+                }
                 prepLoginChannels.put(ChannelAttributeUtil.getToken(channel), channel);
+            } else {
+
+                if (userId != null) {
+                    message.setUserId(userId);
+                }
             }
             message.setToken(ChannelAttributeUtil.getToken(channel));
+
             //转发到具体的子服务器
-            Long userId = ChannelAttributeUtil.getUserId(channel);
-            if (userId != null) {
-                message.setUserId(userId);
-            }
             HandleMessageManager handleMessageManager = handleMessageManagerMap.get(message.getMessageId());
             if (handleMessageManager == null) {
                 logger.warn("没有找到消息的接收服务器{}", message.getMessageId());
@@ -142,7 +147,7 @@ public class GatewayMessageExecuter {
             logger.warn("没有找到channel token {}", token);
         } else {
             Server2GatewayMessage m = new Server2GatewayMessage();
-            ByteBuf buf = Unpooled.buffer();
+            ByteBuf buf = Unpooled.buffer(message.getSerializedSize());
             message.write(buf);
             byte data[] = new byte[message.getSerializedSize()];
             buf.readBytes(data);
@@ -156,51 +161,55 @@ public class GatewayMessageExecuter {
     //处理服务器发过来的消息
     public void execute(Channel channel, final Server2GatewayMessage message) {
         service.execute(() -> {
-            if (message.getMessageId() == regServerInstanceMessageId) {
-                regServerInstance(channel, message);
-                return;
-            } else if (message.getMessageId() == scrRelationUserGatewayMessageId) {
-                relationMessage(channel, message);
-                return;
-            } else if (message.getMessageId() == scAskMessageId) {
-                askMessage(channel, message);
-                return;
-            } else if (message.getMessageId() == scIdNameMessageId) {
-                idNameMessage(message);
-                return;
-            }
-            if (message.getMessageId() == scLoginMessageId) {
-                long userId = message.getUserIds()[0];
-                Channel clientChannel = prepLoginChannels.remove(message.getToken());
-                if (clientChannel != null) {
-                    ChannelAttributeUtil.setUserId(clientChannel, userId);
-                    userClientChannel.putIfAbsent(userId, clientChannel);
+            try {
+                if (message.getMessageId() == regServerInstanceMessageId) {
+                    regServerInstance(channel, message);
+                    return;
+                } else if (message.getMessageId() == scrRelationUserGatewayMessageId) {
+                    relationMessage(channel, message);
+                    return;
+                } else if (message.getMessageId() == scAskMessageId) {
+                    askMessage(channel, message);
+                    return;
+                } else if (message.getMessageId() == scIdNameMessageId) {
+                    idNameMessage(message);
+                    return;
                 }
-            }
-            if (message.getUserIds().length == 0) {
-                Channel clientChannel = tokenChannel.get(message.getToken());
-                if (clientChannel == null) {
-                    logger.warn("没有找到channel{}", message.getToken());
-                } else {
-                    clientChannel.writeAndFlush(message);
+                if (message.getMessageId() == scLoginMessageId) {
+                    long userId = message.getUserIds()[0];
+                    Channel clientChannel = prepLoginChannels.remove(message.getToken());
+                    if (clientChannel != null) {
+                        ChannelAttributeUtil.setUserId(clientChannel, userId);
+                        userClientChannel.put(userId, clientChannel);
+                    }
                 }
-            } else {
-                for (Long userId : message.getUserIds()) {
-                    //全消息
-                    if (userId == 0L) {
-                        for (Map.Entry<Long, Channel> entry : userClientChannel.entrySet()) {
-                            entry.getValue().writeAndFlush(message);
-                        }
-                        break;
+                if (message.getUserIds().length == 0) {
+                    Channel clientChannel = tokenChannel.get(message.getToken());
+                    if (clientChannel == null) {
+                        logger.warn("没有找到channel{}", message.getToken());
                     } else {
-                        Channel clientChannel = userClientChannel.get(userId);
-                        if (clientChannel == null) {
-                            logger.warn("没有找到用户{}", userId);
+                        clientChannel.writeAndFlush(message);
+                    }
+                } else {
+                    for (Long userId : message.getUserIds()) {
+                        //全消息
+                        if (userId == 0L) {
+                            for (Map.Entry<Long, Channel> entry : userClientChannel.entrySet()) {
+                                entry.getValue().writeAndFlush(message);
+                            }
+                            break;
                         } else {
-                            clientChannel.writeAndFlush(message);
+                            Channel clientChannel = userClientChannel.get(userId);
+                            if (clientChannel == null) {
+                                logger.warn("没有找到用户{}", userId);
+                            } else {
+                                clientChannel.writeAndFlush(message);
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+                logger.error("处理服务器到网关的消息出错", e);
             }
         });
     }
@@ -212,15 +221,22 @@ public class GatewayMessageExecuter {
 
     public void clientOffline(Channel channel) {
         service.execute(() -> {
+            Long token = ChannelAttributeUtil.getToken(channel);
+            Long userId = ChannelAttributeUtil.getUserId(channel);
+            userId = userId == null ? 0 : userId;
+            tokenChannel.remove(token);
+            if (userId != 0) {
+                userClientChannel.remove(userId);
+            }
             for (Map.Entry<String, ServerManager> entry : serverInstanceMap.entrySet()) {
                 ServerManager serverManager = entry.getValue();
-                serverManager.clientOffLine(channel);
+                serverManager.clientOffLine(channel,token,userId);
             }
         });
     }
 
     private void readMessage(Message message, Server2GatewayMessage server2GatewayMessage) {
-        ByteBuf buf = Unpooled.buffer();
+        ByteBuf buf = Unpooled.buffer(server2GatewayMessage.getData().length);
         buf.writeBytes(server2GatewayMessage.getData());
         message.read(buf, buf.writerIndex());
     }
@@ -229,7 +245,7 @@ public class GatewayMessageExecuter {
     //todo 一个服务只允许一个ask id
     public synchronized void regServerInstance(Channel channel, Server2GatewayMessage server2GatewayMessage) {
         SCRegServerHandleMessageMessage message = new SCRegServerHandleMessageMessage();
-        ByteBuf buf = Unpooled.buffer();
+        ByteBuf buf = Unpooled.buffer(server2GatewayMessage.getData().length);
         buf.writeBytes(server2GatewayMessage.getData());
         logger.info("writerIndex {} readerIndex {} ", buf.writerIndex(), buf.readerIndex());
         message.read(buf, buf.writerIndex());
@@ -296,9 +312,11 @@ public class GatewayMessageExecuter {
     public void sendMessage(ServerChannelManager serverChannelManager, Message message) {
         Client2GatewayMessage toMessage = new Client2GatewayMessage();
         toMessage.setMessageId(message.getMessageId());
-        ByteBuf bf = Unpooled.buffer();
-        message.write(bf);
-        toMessage.setData(bf.array());
+        ByteBuf buf = Unpooled.buffer(message.getSerializedSize());
+        message.write(buf);
+        byte[] data = new byte[message.getSerializedSize()];
+        buf.readBytes(data);
+        toMessage.setData(data);
         serverChannelManager.sendMessage(toMessage);
     }
 
@@ -331,10 +349,12 @@ public class GatewayMessageExecuter {
             breakUserGatewayMessage.setRelationToken(message.getRelationToken());
             Client2GatewayMessage toMessage = new Client2GatewayMessage();
             toMessage.setMessageId(breakUserGatewayMessage.getMessageId());
-            ByteBuf bf = Unpooled.buffer();
-            bf.ensureWritable(breakUserGatewayMessage.getSerializedSize());
-            message.write(bf);
-            toMessage.setData(bf.array());
+            ByteBuf buf = Unpooled.buffer();
+            buf.ensureWritable(breakUserGatewayMessage.getSerializedSize());
+            byte[] data = new byte[breakUserGatewayMessage.getSerializedSize()];
+            message.write(buf);
+            buf.readBytes(data);
+            toMessage.setData(data);
             channel.writeAndFlush(toMessage);
         }
     }

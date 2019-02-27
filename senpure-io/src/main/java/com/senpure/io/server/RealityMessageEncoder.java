@@ -15,7 +15,7 @@ public class RealityMessageEncoder extends MessageToByteEncoder<Server2GatewayMe
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Server2GatewayMessage message, ByteBuf out) throws Exception {
-        ByteBuf buf = Unpooled.buffer();
+        ByteBuf buf = Unpooled.buffer(message.getMessage().getSerializedSize());
         message.getMessage().write(buf);
         int length = buf.writerIndex();
         //head 4 +messageId 4 token 8+ playerLen 2+userLen*8+ content length

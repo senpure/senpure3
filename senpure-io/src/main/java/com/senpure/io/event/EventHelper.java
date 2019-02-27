@@ -55,7 +55,9 @@ public class EventHelper {
         ByteBuf byteBuf = Unpooled.buffer(Bean.computeVar32Size(event.getEventId()) + event.getSerializedSize());
         Bean.writeVar32(byteBuf, event.getEventId());
         event.write(byteBuf);
-        return byteBuf.array();
+        byte[] data = new byte[byteBuf.writerIndex()];
+        byteBuf.readBytes(data);
+        return data;
     }
 
     public static Event read(byte[] bytes) {
@@ -104,7 +106,9 @@ public class EventHelper {
     public static byte[] getBytes(Event event) {
         ByteBuf byteBuf = Unpooled.buffer(event.getSerializedSize());
         event.write(byteBuf);
-        return byteBuf.array();
+        byte[] data = new byte[event.getSerializedSize()];
+        byteBuf.readBytes(data);
+        return data;
     }
 
 
