@@ -15,7 +15,7 @@
     <message id="104" type="SC" name="RegServerHandleMessage" explain="服务器注册消息处理器到网关">
         <field type="String" name="serverName" explain="服务器名"></field>
         <field type="String" name="ipAndFirstPort" explain="ip和第一个实例端口号"></field>
-        <field type="String" name="readableServerName" explain="服务器名"></field>
+        <field type="String" name="readableName" explain="服务器名"></field>
         <list type="HandleMessage" name="messages" explain="可以处理的消息"></list>
     </message>
     <message id="101" type="CS" name="RelationUserGateway" explain="关联用户与网关">

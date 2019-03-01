@@ -12,12 +12,13 @@ public class IOServerProperties {
     private String host = "127.0.0.1";
     private boolean inFormat = false;
     private boolean outFormat = false;
-
+    private String gatewayAddress = "127.0.0.1:3333";
 
     private int csPort = 2222;
     private int scPort = 3333;
 
-    private String gatewayAddress = "127.0.0.1:3333";
+    private int csLoginMessageId = 100010;
+    private int scLoginMessageId = 100011;
 
     public boolean isSsl() {
         return ssl;
@@ -82,5 +83,21 @@ public class IOServerProperties {
 
     public void setHost(String host) {
         this.host = host;
+    }
+
+    public int getCsLoginMessageId() {
+        return csLoginMessageId;
+    }
+
+    public void setCsLoginMessageId(int csLoginMessageId) {
+        this.csLoginMessageId = csLoginMessageId;
+    }
+
+    public int getScLoginMessageId() {
+        return scLoginMessageId;
+    }
+
+    public void setScLoginMessageId(int scLoginMessageId) {
+        this.scLoginMessageId = scLoginMessageId;
     }
 }

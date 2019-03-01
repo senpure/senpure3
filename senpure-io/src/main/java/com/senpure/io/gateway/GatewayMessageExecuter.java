@@ -61,8 +61,12 @@ public class GatewayMessageExecuter {
     public GatewayMessageExecuter(ScheduledExecutorService service) {
         this.service = service;
         startCheck();
+
     }
 
+    /**
+     * 引用计数+1
+     */
     public void retainService() {
         serviceRefCount++;
     }
@@ -230,7 +234,7 @@ public class GatewayMessageExecuter {
             }
             for (Map.Entry<String, ServerManager> entry : serverInstanceMap.entrySet()) {
                 ServerManager serverManager = entry.getValue();
-                serverManager.clientOffLine(channel,token,userId);
+                serverManager.clientOffLine(channel, token, userId);
             }
         });
     }

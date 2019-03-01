@@ -1,7 +1,7 @@
 package com.senpure.io.gateway;
 
 import com.senpure.base.util.Assert;
-import com.senpure.io.*;
+import com.senpure.io.ServerProperties;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -15,42 +15,41 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLException;
-import java.security.cert.CertificateException;
-
 
 public class GatewayAndServerServer {
     protected Logger logger = LoggerFactory.getLogger(getClass());
-    private IOServerProperties properties;
+
     private ChannelFuture channelFuture;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private String serverName = "gatewayServer[sc]";
-    private String readableServerName = "网关[SC]服务器";
+    private String readableServerName = "网关服务器[SC]";
 
     private GatewayMessageExecuter messageExecuter;
-
-    public boolean start() throws CertificateException, SSLException {
+    private ServerProperties.Gateway properties;
+    public boolean start() {
         Assert.notNull(messageExecuter);
-        if (properties == null) {
-            properties = new IOServerProperties();
-        }
-
-        logger.debug("启动{}，监听端口号 {}", getReadableServerName(), properties.getScPort());
-        readableServerName = readableServerName + "[" + properties.getScPort() + "]";
-        final SslContext sslCtx;
+        Assert.notNull(properties);
+        logger.debug("启动{} SC模块，监听端口号 {}", properties.getReadableName(), properties.getScPort());
+        readableServerName = properties.getReadableName() + "[SC][" + properties.getScPort() + "]";
+        SslContext sslCtx = null;
         // Configure SSL.
-        if (properties.isSsl()) {
-            SelfSignedCertificate ssc = new SelfSignedCertificate();
-            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
+        if (properties.isScSsl()) {
+            try {
+                SelfSignedCertificate ssc = new SelfSignedCertificate();
+                sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
+            } catch (Exception e) {
+                logger.error("使用ssl出错", e);
+            }
         } else {
             sslCtx = null;
         }
-        // Configure the server.
-        bossGroup = new NioEventLoopGroup(1);
-        workerGroup = new NioEventLoopGroup();
+
         try {
+            // Configure the server.
+            bossGroup = new NioEventLoopGroup(properties.getIoScBossThreadPoolSize());
+            workerGroup = new NioEventLoopGroup(properties.getIoScWorkThreadPoolSize());
             ServerBootstrap b = new ServerBootstrap();
+            SslContext finalSslCtx = sslCtx;
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 100)
@@ -59,8 +58,8 @@ public class GatewayAndServerServer {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
-                            if (sslCtx != null) {
-                                p.addLast(sslCtx.newHandler(ch.alloc()));
+                            if (finalSslCtx != null) {
+                                p.addLast(finalSslCtx.newHandler(ch.alloc()));
                             }
                             p.addLast(new GatewayAndServerMessageDecoder());
                             p.addLast(new GatewayAndServerMessageEncoder());
@@ -86,9 +85,6 @@ public class GatewayAndServerServer {
 
 
     public void destroy() {
-        if (channelFuture != null) {
-            channelFuture.channel().close();
-        }
         if (bossGroup != null) {
             bossGroup.shutdownGracefully();
         }
@@ -103,19 +99,14 @@ public class GatewayAndServerServer {
         return readableServerName;
     }
 
-    public String getServerName() {
-        return serverName;
-    }
 
     public void setMessageExecuter(GatewayMessageExecuter messageExecuter) {
         this.messageExecuter = messageExecuter;
     }
 
-    public void setProperties(IOServerProperties properties) {
+    public void setProperties(ServerProperties.Gateway properties) {
         this.properties = properties;
     }
 
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-    }
+
 }
