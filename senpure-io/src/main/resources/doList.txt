@@ -1,1 +1,3 @@
-realityServer 对断线的处理
+一、realityServer 对断线的处理
+二、确定网关为0拷贝
+三、token生成器启动检查

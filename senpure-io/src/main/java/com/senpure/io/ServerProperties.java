@@ -12,10 +12,21 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ServerProperties {
 
     private Gateway gateway = new Gateway();
+    private Producer producer = new Producer();
 
     public static class Producer {
-        private String gatewayAddress = "127.0.0.1:3333";
+        private String gatewayName = "gateway";
+        private boolean enableEvent=true;
+        private int eventThreadPoolSize=0;
 
+
+        public String getGatewayName() {
+            return gatewayName;
+        }
+
+        public void setGatewayName(String gatewayName) {
+            this.gatewayName = gatewayName;
+        }
     }
 
     public static class Gateway {
@@ -25,15 +36,15 @@ public class ServerProperties {
         private int executerThreadPoolSize = 0;
         private int ioCsBossThreadPoolSize = 1;
         private int ioScBossThreadPoolSize = 1;
-        private int ioCsWorkThreadPoolSize = -1;
-        private int ioScWorkThreadPoolSize = -1;
+        private int ioCsWorkThreadPoolSize = 0;
+        private int ioScWorkThreadPoolSize = 0;
         private boolean csSsl = false;
-        private boolean ScSsl = false;
+        private boolean scSsl = false;
         private int csPort = 2222;
         private int scPort = 3333;
 
-        private int csLoginMessageId = 100010;
-        private int scLoginMessageId = 100011;
+        private int csLoginMessageId = 1000100;
+        private int scLoginMessageId = 1000101;
 
         public int getCsPort() {
             return csPort;
@@ -95,11 +106,11 @@ public class ServerProperties {
         }
 
         public boolean isScSsl() {
-            return ScSsl;
+            return scSsl;
         }
 
         public void setScSsl(boolean scSsl) {
-            ScSsl = scSsl;
+            this.scSsl = scSsl;
         }
 
         public int getIoCsBossThreadPoolSize() {
@@ -142,6 +153,7 @@ public class ServerProperties {
             this.name = name;
         }
 
+
         @Override
         public String toString() {
             return "Gateway{" +
@@ -153,7 +165,7 @@ public class ServerProperties {
                     ", ioCsWorkThreadPoolSize=" + ioCsWorkThreadPoolSize +
                     ", ioScWorkThreadPoolSize=" + ioScWorkThreadPoolSize +
                     ", csSsl=" + csSsl +
-                    ", ScSsl=" + ScSsl +
+                    ", ScSsl=" + scSsl +
                     ", csPort=" + csPort +
                     ", scPort=" + scPort +
                     ", csLoginMessageId=" + csLoginMessageId +
@@ -170,5 +182,11 @@ public class ServerProperties {
         this.gateway = gateway;
     }
 
+    public Producer getProducer() {
+        return producer;
+    }
 
+    public void setProducer(Producer producer) {
+        this.producer = producer;
+    }
 }

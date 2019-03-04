@@ -47,12 +47,12 @@ public class GatewayServer implements ApplicationRunner {
         if (gateway.getExecuterThreadPoolSize() < 1) {
             gateway.setExecuterThreadPoolSize(logicSize);
         }
-        if (gateway.getIoCsWorkThreadPoolSize() < 0) {
+        if (gateway.getIoCsWorkThreadPoolSize() < 1) {
             int workSize = ioSize << 1;
             workSize = workSize < 1 ? 1 : workSize;
             gateway.setIoCsWorkThreadPoolSize(workSize);
         }
-        if (gateway.getIoScWorkThreadPoolSize() < 0) {
+        if (gateway.getIoScWorkThreadPoolSize() < 1) {
             int workSize = ioSize << 1;
             workSize = workSize < 1 ? 1 : workSize;
             gateway.setIoScWorkThreadPoolSize(workSize);
@@ -65,6 +65,8 @@ public class GatewayServer implements ApplicationRunner {
         ScheduledExecutorService service = Executors.newScheduledThreadPool(gateway.getExecuterThreadPoolSize(),
                 new NameThreadFactory(gateway.getName() + "-executor"));
         messageExecuter = new GatewayMessageExecuter(service);
+        messageExecuter.setCsLoginMessageId(gateway.getCsLoginMessageId());
+        messageExecuter.setScLoginMessageId(gateway.getScLoginMessageId());
     }
 
     @Override
