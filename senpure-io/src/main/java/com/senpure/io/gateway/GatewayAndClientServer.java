@@ -29,7 +29,7 @@ public class GatewayAndClientServer {
     public boolean start() {
         Assert.notNull(messageExecuter);
         Assert.notNull(properties);
-        logger.info("启动{} CS模块，监听端口号 {}", properties.getReadableName(), properties.getCsPort());
+        logger.info("启动 {} CS模块，监听端口号 {}", properties.getReadableName(), properties.getCsPort());
         readableName = properties.getReadableName() + "[CS][" + properties.getCsPort() + "]";
         // Configure SSL.
         SslContext sslCtx = null;
@@ -70,9 +70,9 @@ public class GatewayAndClientServer {
                     });
             // Start the server.
             channelFuture = b.bind(properties.getCsPort()).sync();
-            logger.info("{}启动完成", getReadableName());
+            logger.info("{} 启动完成", getReadableName());
         } catch (Exception e) {
-            logger.error("启动" + getReadableName() + " 失败", e);
+            logger.error("启动 " + getReadableName() + " 失败", e);
             destroy();
             return false;
         }

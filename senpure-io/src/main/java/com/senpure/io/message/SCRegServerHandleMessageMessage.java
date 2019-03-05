@@ -19,7 +19,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
     //服务器名
     private String serverName;
     //ip和第一个实例端口号
-    private String ipAndFirstPort;
+    private String serverKey;
     //服务器名
     private String readableServerName;
     //可以处理的消息
@@ -35,8 +35,8 @@ public class SCRegServerHandleMessageMessage extends  Message {
             writeString(buf,8,serverName);
         }
         //ip和第一个实例端口号
-        if (ipAndFirstPort != null){
-            writeString(buf,16,ipAndFirstPort);
+        if (serverKey != null){
+            writeString(buf,16, serverKey);
         }
         //服务器名
         if (readableServerName != null){
@@ -64,7 +64,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
                     break;
                 //ip和第一个实例端口号
                 case 16:// 2 << 3 | 0
-                        ipAndFirstPort = readString(buf);
+                        serverKey = readString(buf);
                     break;
                 //服务器名
                 case 24:// 3 << 3 | 0
@@ -97,8 +97,8 @@ public class SCRegServerHandleMessageMessage extends  Message {
             size += computeStringSize(1,serverName);
         }
         //ip和第一个实例端口号
-        if (ipAndFirstPort != null){
-            size += computeStringSize(1,ipAndFirstPort);
+        if (serverKey != null){
+            size += computeStringSize(1, serverKey);
         }
         //服务器名
         if (readableServerName != null){
@@ -131,15 +131,15 @@ public class SCRegServerHandleMessageMessage extends  Message {
      * get ip和第一个实例端口号
      * @return
      */
-    public  String getIpAndFirstPort() {
-        return ipAndFirstPort;
+    public  String getServerKey() {
+        return serverKey;
     }
 
     /**
      * set ip和第一个实例端口号
      */
-    public SCRegServerHandleMessageMessage setIpAndFirstPort(String ipAndFirstPort) {
-        this.ipAndFirstPort=ipAndFirstPort;
+    public SCRegServerHandleMessageMessage setServerKey(String serverKey) {
+        this.serverKey = serverKey;
         return this;
     }
     /**
@@ -186,7 +186,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
     public String toString() {
         return "SCRegServerHandleMessageMessage[1104]{"
                 +"serverName=" + serverName
-                +",ipAndFirstPort=" + ipAndFirstPort
+                +",serverKey=" + serverKey
                 +",readableServerName=" + readableServerName
                 +",messages=" + messages
                 + "}";
@@ -207,7 +207,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
         sb.append(indent).append(rightPad("serverName", filedPad)).append(" = ").append(serverName);
         //ip和第一个实例端口号
         sb.append("\n");
-        sb.append(indent).append(rightPad("ipAndFirstPort", filedPad)).append(" = ").append(ipAndFirstPort);
+        sb.append(indent).append(rightPad("serverKey", filedPad)).append(" = ").append(serverKey);
         //服务器名
         sb.append("\n");
         sb.append(indent).append(rightPad("readableServerName", filedPad)).append(" = ").append(readableServerName);

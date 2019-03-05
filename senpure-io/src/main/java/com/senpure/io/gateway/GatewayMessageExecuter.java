@@ -251,13 +251,13 @@ public class GatewayMessageExecuter {
         SCRegServerHandleMessageMessage message = new SCRegServerHandleMessageMessage();
         ByteBuf buf = Unpooled.buffer(server2GatewayMessage.getData().length);
         buf.writeBytes(server2GatewayMessage.getData());
-        logger.info("writerIndex {} readerIndex {} ", buf.writerIndex(), buf.readerIndex());
+       // logger.info("writerIndex {} readerIndex {} ", buf.writerIndex(), buf.readerIndex());
         message.read(buf, buf.writerIndex());
         List<HandleMessage> handleMessages = message.getMessages();
-        String serverKey = message.getServerName() + message.getIpAndFirstPort();
+        String serverKey = message.getServerKey();
         ChannelAttributeUtil.setServerName(channel, message.getServerName());
-        ChannelAttributeUtil.setServerKey(channel, serverKey);
-        logger.info("服务注册:{}:{} [{}]", message.getServerName(), message.getIpAndFirstPort(), message.getReadableServerName());
+        ChannelAttributeUtil.setRemoteServerKey(channel, serverKey);
+        logger.info("服务注册:{}:{} [{}]", message.getServerName(), message.getServerKey(), message.getReadableServerName());
         for (HandleMessage handleMessage : handleMessages) {
             logger.info("{}", handleMessage);
         }
@@ -389,7 +389,7 @@ public class GatewayMessageExecuter {
         if (waitAskTask != null) {
             if (message.isHandle()) {
                 String serverName = ChannelAttributeUtil.getServerName(channel);
-                String serverKey = ChannelAttributeUtil.getServerKey(channel);
+                String serverKey = ChannelAttributeUtil.getRemoteServerKey(channel);
                 logger.debug("{} {} 可以处理 {} 值位 {} 的请求", serverName, serverKey,
                         MessageIdReader.read(waitAskTask.getFromMessageId()), waitAskTask.getValue());
                 ServerManager serverManager = serverInstanceMap.get(serverName);
@@ -403,7 +403,7 @@ public class GatewayMessageExecuter {
             } else {
                 if (logger.isDebugEnabled()) {
                     String serverName = ChannelAttributeUtil.getServerName(channel);
-                    String serverKey = ChannelAttributeUtil.getServerKey(channel);
+                    String serverKey = ChannelAttributeUtil.getRemoteServerKey(channel);
                     logger.debug("{} {} 无法处理 {} 值位 {} 的请求", serverName, serverKey,
                             MessageIdReader.read(waitAskTask.getFromMessageId()), waitAskTask.getValue());
                 }

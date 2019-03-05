@@ -1,7 +1,11 @@
-package com.senpure.io.gateway;
+package com.senpure.io.support;
 
 import com.senpure.base.util.NameThreadFactory;
 import com.senpure.io.ServerProperties;
+import com.senpure.io.gateway.GatewayAndClientServer;
+import com.senpure.io.gateway.GatewayAndServerServer;
+import com.senpure.io.gateway.GatewayMessageExecuter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -21,14 +25,10 @@ public class GatewayServer implements ApplicationRunner {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-
     private ServerProperties properties;
     private GatewayMessageExecuter messageExecuter;
     private GatewayAndClientServer gatewayAndClientServer;
-
     private GatewayAndServerServer gatewayAndServerServer;
-
-
 
 
     public void start() {
@@ -38,12 +38,20 @@ public class GatewayServer implements ApplicationRunner {
     }
 
     private void check() {
+        if (StringUtils.isEmpty(properties.getName())) {
+            properties.setName("gateway");
+        }
+
         ServerProperties.Gateway gateway = properties.getGateway();
+        if (!gateway.isSetReadableName()) {
+            gateway.setReadableName(properties.getName());
+        }
         //io *2 logic *1 综合1.5
         double size = Runtime.getRuntime().availableProcessors() * 1.5;
         int ioSize = (int) (size * 0.6);
         ioSize = ioSize < 1 ? 1 : ioSize;
         int logicSize = (int) (size * 0.4);
+        logicSize = logicSize < 1 ? 1 : logicSize;
         if (gateway.getExecuterThreadPoolSize() < 1) {
             gateway.setExecuterThreadPoolSize(logicSize);
         }
@@ -63,7 +71,7 @@ public class GatewayServer implements ApplicationRunner {
     private void messageExecuter() {
         ServerProperties.Gateway gateway = properties.getGateway();
         ScheduledExecutorService service = Executors.newScheduledThreadPool(gateway.getExecuterThreadPoolSize(),
-                new NameThreadFactory(gateway.getName() + "-executor"));
+                new NameThreadFactory(properties.getName() + "-executor"));
         messageExecuter = new GatewayMessageExecuter(service);
         messageExecuter.setCsLoginMessageId(gateway.getCsLoginMessageId());
         messageExecuter.setScLoginMessageId(gateway.getScLoginMessageId());

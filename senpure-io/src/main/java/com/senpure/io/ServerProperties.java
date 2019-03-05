@@ -1,5 +1,6 @@
 package com.senpure.io;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -10,15 +11,63 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("server.io")
 public class ServerProperties {
-
+    @Value("${spring.application.name:}")
+    private String name;
     private Gateway gateway = new Gateway();
     private Producer producer = new Producer();
 
     public static class Producer {
         private String gatewayName = "gateway";
-        private boolean enableEvent=true;
-        private int eventThreadPoolSize=0;
+        private boolean setReadableName = false;
+        private String readableName = "realityServer";
+        private boolean enableEvent = true;
+        private int eventThreadPoolSize = 0;
+        private int ioWorkThreadPoolSize = 0;
+        private int executerThreadPoolSize = 0;
+        private long connectFailInterval = 20000;
+        private int gatewayChannel = 2;
+        private boolean outFormat = true;
+        private boolean inFormat = true;
+        private boolean ssl = false;
 
+
+        public boolean isSetReadableName() {
+            return setReadableName;
+        }
+
+
+        public String getReadableName() {
+            return readableName;
+        }
+
+        public void setReadableName(String readableName) {
+            this.readableName = readableName;
+            setReadableName = true;
+        }
+
+        public int getExecuterThreadPoolSize() {
+            return executerThreadPoolSize;
+        }
+
+        public void setExecuterThreadPoolSize(int executerThreadPoolSize) {
+            this.executerThreadPoolSize = executerThreadPoolSize;
+        }
+
+        public long getConnectFailInterval() {
+            return connectFailInterval;
+        }
+
+        public void setConnectFailInterval(long connectFailInterval) {
+            this.connectFailInterval = connectFailInterval;
+        }
+
+        public int getIoWorkThreadPoolSize() {
+            return ioWorkThreadPoolSize;
+        }
+
+        public void setIoWorkThreadPoolSize(int ioWorkThreadPoolSize) {
+            this.ioWorkThreadPoolSize = ioWorkThreadPoolSize;
+        }
 
         public String getGatewayName() {
             return gatewayName;
@@ -27,12 +76,60 @@ public class ServerProperties {
         public void setGatewayName(String gatewayName) {
             this.gatewayName = gatewayName;
         }
+
+        public boolean isEnableEvent() {
+            return enableEvent;
+        }
+
+        public void setEnableEvent(boolean enableEvent) {
+            this.enableEvent = enableEvent;
+        }
+
+        public int getEventThreadPoolSize() {
+            return eventThreadPoolSize;
+        }
+
+        public void setEventThreadPoolSize(int eventThreadPoolSize) {
+            this.eventThreadPoolSize = eventThreadPoolSize;
+        }
+
+        public int getGatewayChannel() {
+            return gatewayChannel;
+        }
+
+        public void setGatewayChannel(int gatewayChannel) {
+            this.gatewayChannel = gatewayChannel;
+        }
+
+        public boolean isOutFormat() {
+            return outFormat;
+        }
+
+        public void setOutFormat(boolean outFormat) {
+            this.outFormat = outFormat;
+        }
+
+        public boolean isInFormat() {
+            return inFormat;
+        }
+
+        public void setInFormat(boolean inFormat) {
+            this.inFormat = inFormat;
+        }
+
+        public boolean isSsl() {
+            return ssl;
+        }
+
+        public void setSsl(boolean ssl) {
+            this.ssl = ssl;
+        }
     }
 
     public static class Gateway {
 
-        private String name = "gateway";
-        private String readableName = "网关服务器";
+        private boolean setReadableName = false;
+        private String readableName = "gateway";
         private int executerThreadPoolSize = 0;
         private int ioCsBossThreadPoolSize = 1;
         private int ioScBossThreadPoolSize = 1;
@@ -89,12 +186,17 @@ public class ServerProperties {
         }
 
 
+        public boolean isSetReadableName() {
+            return setReadableName;
+        }
+
         public String getReadableName() {
             return readableName;
         }
 
         public void setReadableName(String readableName) {
             this.readableName = readableName;
+            setReadableName = true;
         }
 
         public boolean isCsSsl() {
@@ -145,19 +247,10 @@ public class ServerProperties {
             this.ioScWorkThreadPoolSize = ioScWorkThreadPoolSize;
         }
 
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
 
         @Override
         public String toString() {
             return "Gateway{" +
-                    "name='" + name + '\'' +
                     ", readableName='" + readableName + '\'' +
                     ", executerThreadPoolSize=" + executerThreadPoolSize +
                     ", ioCsBossThreadPoolSize=" + ioCsBossThreadPoolSize +
@@ -174,6 +267,7 @@ public class ServerProperties {
         }
     }
 
+
     public Gateway getGateway() {
         return gateway;
     }
@@ -188,5 +282,13 @@ public class ServerProperties {
 
     public void setProducer(Producer producer) {
         this.producer = producer;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

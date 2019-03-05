@@ -29,7 +29,7 @@ public class GatewayAndServerServer {
     public boolean start() {
         Assert.notNull(messageExecuter);
         Assert.notNull(properties);
-        logger.debug("启动{} SC模块，监听端口号 {}", properties.getReadableName(), properties.getScPort());
+        logger.debug("启动 {} SC模块，监听端口号 {}", properties.getReadableName(), properties.getScPort());
         readableServerName = properties.getReadableName() + "[SC][" + properties.getScPort() + "]";
         SslContext sslCtx = null;
         // Configure SSL.
@@ -73,9 +73,9 @@ public class GatewayAndServerServer {
                     });
             // Start the server.
             channelFuture = b.bind(properties.getScPort()).sync();
-            logger.info("{}启动完成", getReadableServerName());
+            logger.info("{} 启动完成", getReadableServerName());
         } catch (Exception e) {
-            logger.error("启动" + getReadableServerName() + " 失败", e);
+            logger.error("启动 " + getReadableServerName() + " 失败", e);
             destroy();
             return false;
         }

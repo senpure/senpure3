@@ -8,6 +8,7 @@ import com.senpure.io.handler.CSRelationUserGatewayMessageHandler;
 import com.senpure.io.handler.RealityMessageHandler;
 import com.senpure.io.message.CSBreakUserGatewayMessage;
 import com.senpure.io.server.GatewayManager;
+import com.senpure.io.support.ProducerServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,10 @@ public class ProducerAutoConfiguration {
         return gatewayManager;
     }
 
+    @Bean
+    public ProducerServer producerServer(){
+        return new ProducerServer();
+    }
 
     @Bean
     public HandlerChecker handlerChecker() {

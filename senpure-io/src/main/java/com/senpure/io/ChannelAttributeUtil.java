@@ -13,15 +13,17 @@ public class ChannelAttributeUtil {
     private static String OFFLINE_HANDLER = "offlineHandler";
     private static String CHANNEL_USER = "channelUser";
 
-    private static String IP_AND_PORT = "ipAndPort";
     private static String SERVER_NAME = "serverName";
-    private static String SERVER_KEY = "serverKey";
+    private static String REMOTE_SERVER_KEY = "remoteServerKeyKey";
+    private static String LOCAL_SERVER_KEY = "localServerKeyKey";
     public static AttributeKey<Long> userIdKey = AttributeKey.valueOf(USER_ID);
     public static AttributeKey<Long> tokenKey = AttributeKey.valueOf(TOKEN);
     public static AttributeKey<String> userNameKey = AttributeKey.valueOf(USER_NAME);
-    public static AttributeKey<String> ipAndPortKey = AttributeKey.valueOf(IP_AND_PORT);
+
+
     public static AttributeKey<String> serverNameKey = AttributeKey.valueOf(SERVER_NAME);
-    public static AttributeKey<String> serverKeyKey = AttributeKey.valueOf(SERVER_KEY);
+    public static AttributeKey<String> remoteServerKeyKey = AttributeKey.valueOf(REMOTE_SERVER_KEY);
+    public static AttributeKey<String> localServerKeyKey = AttributeKey.valueOf(LOCAL_SERVER_KEY);
     public static AttributeKey<ChannelPlayer> channelPlayerKey = AttributeKey.valueOf(CHANNEL_USER);
     public static AttributeKey<OffLineHandler> offlineHandlerKey = AttributeKey.valueOf(OFFLINE_HANDLER);
 
@@ -88,38 +90,35 @@ public class ChannelAttributeUtil {
     }
 
     public static void setServerName(Channel channel, String name) {
-
         channel.attr(serverNameKey).set(name);
-
     }
 
     public static String getServerName(Channel channel) {
+        return (String)channel.attr(serverNameKey).get();
+    }
 
-        return channel.attr(serverNameKey).get();
+
+    public static void setRemoteServerKey(Channel channel, String serverKey) {
+
+        channel.attr(remoteServerKeyKey).set(serverKey);
 
     }
 
-    public static void setServerKey(Channel channel, String key) {
+    public static String getRemoteServerKey(Channel channel) {
 
-        channel.attr(serverKeyKey).set(key);
-
-    }
-
-    public static String getServerKey(Channel channel) {
-
-        return channel.attr(serverKeyKey).get();
+        return channel.attr(remoteServerKeyKey).get();
 
     }
 
-    public static String getIpAndPort(Channel channel) {
+    public static String getLocalServerKey(Channel channel) {
 
-        return channel.attr(ipAndPortKey).get();
+        return channel.attr(localServerKeyKey).get();
 
     }
 
-    public static void setIpAndPort(Channel channel, String ipAndPort) {
+    public static void setLocalServerKey(Channel channel, String serverKey) {
 
-        channel.attr(ipAndPortKey).set(ipAndPort);
+        channel.attr(localServerKeyKey).set(serverKey);
 
     }
 

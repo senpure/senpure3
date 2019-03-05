@@ -21,6 +21,10 @@ public class GatewayManager {
 
     private ConcurrentMap<Long, GatewayRelation> tokenGatewayMap = new ConcurrentHashMap<>();
 
+    public String getServerKey(String host, int port) {
+        return host + ":" + port;
+    }
+
     public synchronized GatewayChannelManager getGatewayChannelServer(String serverKey) {
 
         GatewayChannelManager manager = gatewayChannelMap.get(serverKey);
@@ -30,6 +34,12 @@ public class GatewayManager {
             return gatewayChannelMap.get(serverKey);
         }
         return manager;
+    }
+
+    public void report() {
+        for (Map.Entry<String, GatewayChannelManager> entry : gatewayChannelMap.entrySet()) {
+            logger.debug("{} {}",entry.getKey());
+        }
     }
 
     public void relationUser(String serverKey, Long userId, long relationToken) {
@@ -110,7 +120,8 @@ public class GatewayManager {
     }
 
 
-    public void sendMessage2Gateway(String gatewayKey, Long userId, Message message) {
+    @Deprecated
+    private void sendMessage2Gateway(String gatewayKey, Long userId, Message message) {
         Server2GatewayMessage toGateway = new Server2GatewayMessage();
         toGateway.setUserIds(new Long[]{userId});
         toGateway.setMessage(message);
@@ -157,7 +168,7 @@ public class GatewayManager {
         for (Long userId : userIds) {
             GatewayRelation gatewayRelation = userGatewayMap.get(userId);
             if (gatewayRelation != null) {
-                Integer number = gatewayRelation.gatewayChannelManager.getNumber();
+                Integer number = gatewayRelation.gatewayChannelManager.getGatewayChannelKey();
                 GatewayUsers gatewayUsers = map.get(number);
                 if (gatewayUsers == null) {
                     gatewayUsers = new GatewayUsers();

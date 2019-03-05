@@ -20,7 +20,7 @@ public class CSRelationUserGatewayMessageHandler extends AbstractInnerMessageHan
 
     @Override
     public void execute(Channel channel, long token, long userId, CSRelationUserGatewayMessage message) {
-        String gatewayKey = ChannelAttributeUtil.getIpAndPort(channel);
+        String gatewayKey = ChannelAttributeUtil.getRemoteServerKey(channel);
         logger.debug("关联网关 与用户 gatewayKey :{}  token :{}  userId :{}", gatewayKey, message.getToken(), message.getUserId());
         if (message.getUserId() > 0) {
             gatewayManager.relationUser(gatewayKey, message.getUserId(), message.getRelationToken());

@@ -1,7 +1,7 @@
 package com.senpure.io.support.configure;
 
 import com.senpure.io.ServerProperties;
-import com.senpure.io.gateway.GatewayServer;
+import com.senpure.io.support.GatewayServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

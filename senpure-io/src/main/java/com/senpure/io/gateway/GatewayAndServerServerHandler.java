@@ -38,7 +38,7 @@ public class GatewayAndServerServerHandler extends SimpleChannelInboundHandler<S
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
         String serverName = ChannelAttributeUtil.getServerName(channel);
-        logger.debug("{} {} {} 断开连接", serverName, ChannelAttributeUtil.getServerKey(channel), channel);
+        logger.debug("{} {} {} 断开连接", serverName, ChannelAttributeUtil.getRemoteServerKey(channel), channel);
         if (serverName != null) {
             ServerManager serverManager = messageExecuter.serverInstanceMap.get(serverName);
             messageExecuter.execute(() -> serverManager.serverOffLine(channel));
