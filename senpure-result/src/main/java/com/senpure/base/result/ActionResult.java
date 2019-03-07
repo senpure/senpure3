@@ -56,6 +56,8 @@ public class ActionResult implements Serializable {
         this.code = code;
     }
 
+    public ActionResult() {
+    }
 
     public ActionResult setClientFormat(boolean clientFormat) {
         this.clientFormat = clientFormat;
@@ -81,10 +83,10 @@ public class ActionResult implements Serializable {
     public int getCode() {
         return code;
     }
-//
-//    public void setCode(int code) {
-//        this.code = code;
-//    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
 
     public String getMessage() {
         return message;

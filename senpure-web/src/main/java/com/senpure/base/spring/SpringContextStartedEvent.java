@@ -17,7 +17,7 @@ public class SpringContextStartedEvent implements
     @Override
     public void onApplicationEvent(ContextStartedEvent event) {
 
-        if (event.getApplicationContext().getParent() == null) {
+        if (SpringContextUtil.isTopContext(event.getApplicationContext())) {
             logger.debug("{}: startedEvent :{}",   event.getApplicationContext().getId(),event.toString());
         }
 

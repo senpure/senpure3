@@ -1,7 +1,6 @@
 package com.senpure.base.configuration;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+
 import com.senpure.base.cache.LocalRemoteCacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +11,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
@@ -39,8 +39,9 @@ public class LocalRemoteCacheConfiguration {
         logger.debug("cacheNames  {}", cacheNames);
 
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        // redisTemplate.setValueSerializer(new JDK(getClass().getClassLoader()));
-        redisTemplate.setValueSerializer(new FastJsonRedisSerializer());
+         redisTemplate.setValueSerializer(new JDK(getClass().getClassLoader()));
+      //  redisTemplate.setValueSerializer(new FastJsonRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         logger.debug("redisTemplate key {} ", redisTemplate.getKeySerializer());
         Map<String, Long> expires = new HashMap<>(16);
         expires.put("", 0L);
@@ -63,28 +64,30 @@ public class LocalRemoteCacheConfiguration {
         }
     }
 
-    private static class FastJsonRedisSerializer implements RedisSerializer {
 
-        static final byte[] EMPTY_ARRAY = new byte[0];
 
-        @Override
-        public byte[] serialize(Object o) throws SerializationException {
-            if (o == null) {
-                return EMPTY_ARRAY;
-            }
-            //byte[] bytes = JSON.toJSONBytes(o, SerializerFeature.WriteClassName);
-            //System.out.println("put bytes len " + bytes.length);
-            return JSON.toJSONBytes(o, SerializerFeature.WriteClassName);
-        }
-
-        @Override
-        public Object deserialize(byte[] bytes) throws SerializationException {
-            if (bytes == null || bytes.length == 0) {
-                return null;
-            }
-            return JSON.parse(bytes);
-        }
-    }
+//    private static class FastJsonRedisSerializer implements RedisSerializer {
+//
+//        static final byte[] EMPTY_ARRAY = new byte[0];
+//
+//        @Override
+//        public byte[] serialize(Object o) throws SerializationException {
+//            if (o == null) {
+//                return EMPTY_ARRAY;
+//            }
+//            //byte[] bytes = JSON.toJSONBytes(o, SerializerFeature.WriteClassName);
+//            //System.out.println("put bytes len " + bytes.length);
+//            return JSON.toJSONBytes(o, SerializerFeature.WriteClassName);
+//        }
+//
+//        @Override
+//        public Object deserialize(byte[] bytes) throws SerializationException {
+//            if (bytes == null || bytes.length == 0) {
+//                return null;
+//            }
+//            return JSON.parse(bytes);
+//        }
+//    }
 
     private static class JDK extends JdkSerializationRedisSerializer {
 

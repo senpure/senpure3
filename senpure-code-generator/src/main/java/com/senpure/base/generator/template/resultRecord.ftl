@@ -41,6 +41,9 @@ public class ${name}${globalConfig.resultRecordSuffix} extends ActionResult {
         return new ${name}${globalConfig.resultRecordSuffix}(code);
     }
 
+    public ${name}${globalConfig.resultRecordSuffix}() {
+    }
+
     public ${name}${globalConfig.resultRecordSuffix}(int code) {
         super(code);
     }

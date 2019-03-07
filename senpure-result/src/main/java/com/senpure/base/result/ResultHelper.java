@@ -9,6 +9,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 
@@ -78,7 +79,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
     public static ResultMap wrapMessage(ResultMap resultMap, Locale locale, Object... args) {
 
         return
-                resultMap.put(ResultMap.MESSAGE_KEY, ResultHelper.getMessage(resultMap.getCode(), locale, args));
+                resultMap.put(ResultMap.MESSAGE_KEY, ResultHelper.getMessage(resultMap.getCode(), locale, Arrays.toString(args)));
     }
 
 
@@ -89,7 +90,8 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
-            if (event.getApplicationContext().getParent() == null) {
+            if (event.getApplicationContext().getParent() == null ||
+                    event.getApplicationContext().getParent() instanceof AnnotationConfigApplicationContext) {
                 syncResults();
             }
         } catch (Exception e) {
@@ -100,7 +102,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
     }
 
 
-    private static void syncResults() {
+    public static void syncResults() {
         for (Result result : results) {
             report(result);
 

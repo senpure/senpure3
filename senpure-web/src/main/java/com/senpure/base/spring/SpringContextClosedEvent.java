@@ -16,7 +16,7 @@ public class SpringContextClosedEvent implements ApplicationListener<ContextClos
 
 	@Override
 	public void onApplicationEvent(ContextClosedEvent event) {
-		if (event.getApplicationContext().getParent() == null) {
+		if (SpringContextUtil.isTopContext(event.getApplicationContext())) {
 			logger.debug("{}: closedEvent :{}",   event.getApplicationContext().getId(),event.toString());
 		}
 	}

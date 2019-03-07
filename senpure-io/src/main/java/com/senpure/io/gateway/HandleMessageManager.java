@@ -56,7 +56,7 @@ public class HandleMessageManager {
         }
         if (add) {
             if (serverManagers.size() >= 1 && direct) {
-                Assert.error("direct 与 serverShare 不能同时为true ");
+                Assert.error("direct 与 serverShare 不能同时为true 不同的服务处理了相同的消息id ");
             }
             serverManagers.add(serverManager);
         }

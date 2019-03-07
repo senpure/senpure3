@@ -30,7 +30,6 @@ public class RealityServer {
     private boolean setReadableServerName = false;
     private RealityMessageExecuter messageExecuter;
 
-    private String host;
     private Channel channel;
     private GatewayManager gatewayManager;
 
@@ -45,8 +44,6 @@ public class RealityServer {
         Assert.notNull(gatewayManager);
         Assert.notNull(properties);
         Assert.notNull(messageExecuter);
-        this.host = host;
-
         if (ioMessageProperties == null) {
             ioMessageProperties = new IOMessageProperties();
             ioMessageProperties.setInFormat(properties.isInFormat());
@@ -93,7 +90,7 @@ public class RealityServer {
         // Start the client.
         try {
             logger.debug("启动{}，网关地址 {}", properties.getReadableName(), host + ":" + port);
-            readableServerName = properties.getReadableName() + "[" + host + ":" + port + "]";
+            readableServerName = properties.getReadableName() + "->[" + host + ":" + port + "]";
             channelFuture = bootstrap.connect(host, port).sync();
             channel = channelFuture.channel();
             synchronized (groupLock) {
@@ -101,7 +98,7 @@ public class RealityServer {
             }
             InetSocketAddress address = (InetSocketAddress) channel.localAddress();
 
-            String gatewayKey = gatewayManager.getServerKey(host, port);
+            String gatewayKey = gatewayManager.getGatewayKey(host, port);
             String path;
             if (AppEvn.classInJar(AppEvn.getStartClass())) {
                 path = AppEvn.getClassPath(AppEvn.getStartClass());

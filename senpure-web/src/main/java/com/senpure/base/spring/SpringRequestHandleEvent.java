@@ -12,8 +12,6 @@ public class SpringRequestHandleEvent implements
 	private static Logger logger = LoggerFactory.getLogger(SpringRequestHandleEvent.class);
 	@Override
 	public void onApplicationEvent(RequestHandledEvent event) {
-
-
 		logger.debug(event.toString());
 
 	}

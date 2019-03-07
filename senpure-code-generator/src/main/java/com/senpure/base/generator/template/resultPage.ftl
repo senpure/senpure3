@@ -42,6 +42,9 @@ public class ${name}${globalConfig.resultPageSuffix} extends ActionResult {
         return new ${name}${globalConfig.resultPageSuffix}(code);
     }
 
+    public ${name}${globalConfig.resultPageSuffix}() {
+    }
+
     public ${name}${globalConfig.resultPageSuffix}(int code) {
         super(code);
     }

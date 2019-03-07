@@ -5,8 +5,10 @@ import com.senpure.io.ChannelAttributeUtil;
 import com.senpure.io.RealityMessageHandlerUtil;
 import com.senpure.io.ServerProperties;
 import com.senpure.io.bean.HandleMessage;
+import com.senpure.io.bean.IdName;
 import com.senpure.io.event.EventHelper;
 import com.senpure.io.handler.RealityMessageHandler;
+import com.senpure.io.message.SCIdNameMessage;
 import com.senpure.io.message.SCRegServerHandleMessageMessage;
 import com.senpure.io.message.Server2GatewayMessage;
 import com.senpure.io.server.GatewayChannelManager;
@@ -26,9 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * ProducerChecker
@@ -58,6 +58,8 @@ public class ProducerServer implements ApplicationRunner {
     private long lastLogTime = 0;
 
     private void check() {
+
+
         if (StringUtils.isEmpty(serverProperties.getName())) {
             serverProperties.setName("realityServer");
         }
@@ -104,6 +106,11 @@ public class ProducerServer implements ApplicationRunner {
             handleMessage.setMessageClasses(RealityMessageHandlerUtil.getEmptyMessage(id).getClass().getName());
             handleMessages.add(handleMessage);
         }
+        List<IdName> idNames = null;
+        if (StringUtils.isNotEmpty(producer.getIdNamesPackage())) {
+            idNames = MessageScanner.scan(producer.getIdNamesPackage());
+        }
+        List<IdName> finalIdNames = idNames;
         service.scheduleWithFixedDelay(() -> {
             List<ServiceInstance> serviceInstances = discoveryClient.getInstances(producer.getGatewayName());
             for (ServiceInstance instance : serviceInstances) {
@@ -115,14 +122,14 @@ public class ProducerServer implements ApplicationRunner {
                 } else {
                     port = Integer.parseInt(portStr);
                 }
-                String serverKey = gatewayManager.getServerKey(instance.getHost(), port);
-                GatewayChannelManager gatewayChannelManager = gatewayManager.getGatewayChannelServer(serverKey);
+                String gatewayKey = gatewayManager.getGatewayKey(instance.getHost(), port);
+                GatewayChannelManager gatewayChannelManager = gatewayManager.getGatewayChannelServer(gatewayKey);
                 if (gatewayChannelManager.isConnecting()) {
                     continue;
                 }
                 long now = System.currentTimeMillis();
                 if (gatewayChannelManager.getChannelSize() < producer.getGatewayChannel()) {
-                    Long lastFailTime = failGatewayMap.get(serverKey);
+                    Long lastFailTime = failGatewayMap.get(gatewayKey);
                     boolean start = false;
                     if (lastFailTime == null) {
                         start = true;
@@ -137,11 +144,16 @@ public class ProducerServer implements ApplicationRunner {
                         realityServer.setGatewayManager(gatewayManager);
                         realityServer.setProperties(producer);
                         realityServer.setMessageExecuter(messageExecuter);
+                        realityServer.setServerName(serverProperties.getName());
+                        realityServer.setReadableServerName(producer.getReadableName());
                         if (realityServer.start(instance.getHost(), port)) {
                             servers.add(realityServer);
                             regServer(realityServer, handleMessages);
+                            if (gatewayChannelManager.getChannelSize() == 1 && finalIdNames != null && finalIdNames.size() > 0) {
+                                regIdNames(realityServer, finalIdNames);
+                            }
                         } else {
-                            failGatewayMap.put(serverKey, now);
+                            failGatewayMap.put(gatewayKey, now);
                         }
                         gatewayChannelManager.setConnecting(false);
                     }
@@ -149,7 +161,7 @@ public class ProducerServer implements ApplicationRunner {
             }
             long now = System.currentTimeMillis();
             if (now - lastLogTime >= 60000) {
-                lastLogTime=now;
+                lastLogTime = now;
                 logger.debug("");
             }
         }, 2000, 50, TimeUnit.MILLISECONDS);
@@ -157,7 +169,7 @@ public class ProducerServer implements ApplicationRunner {
 
     public void regServer(RealityServer server, List<HandleMessage> handleMessages) {
         SCRegServerHandleMessageMessage message = new SCRegServerHandleMessageMessage();
-        message.setServerName(server.getServerName());
+        message.setServerName(serverProperties.getName());
         message.setReadableServerName(server.getReadableServerName());
         message.setServerKey(ChannelAttributeUtil.getLocalServerKey(server.getChannel()));
         message.setMessages(handleMessages);
@@ -169,4 +181,25 @@ public class ProducerServer implements ApplicationRunner {
         server.getChannel().writeAndFlush(gatewayMessage);
     }
 
+    public void regIdNames(RealityServer server, List<IdName> idNames) {
+        SCIdNameMessage message = new SCIdNameMessage();
+        for (int i = 0; i < idNames.size(); i++) {
+            if (i > 0 && i % 100 == 0) {
+                regIdNames(server, message);
+                message = new SCIdNameMessage();
+            }
+            message.getIdNames().add(idNames.get(i));
+        }
+        if (message.getIdNames().size() > 0) {
+            regIdNames(server, message);
+        }
+    }
+
+    private void regIdNames(RealityServer server, SCIdNameMessage message) {
+        Server2GatewayMessage gatewayMessage = new Server2GatewayMessage();
+        gatewayMessage.setMessageId(message.getMessageId());
+        gatewayMessage.setMessage(message);
+        gatewayMessage.setUserIds(new Long[]{0L});
+        server.getChannel().writeAndFlush(gatewayMessage);
+    }
 }

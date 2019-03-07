@@ -17,7 +17,7 @@ public class SpringContextRefreshEvent implements
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (event.getApplicationContext().getParent() == null) {
+        if (SpringContextUtil.isTopContext(event.getApplicationContext())) {
             logger.debug("{}: refreshedEvent :{}", event.getApplicationContext().getId(), event.toString());
         }
 

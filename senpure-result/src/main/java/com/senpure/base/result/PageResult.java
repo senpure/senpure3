@@ -39,6 +39,10 @@ public class PageResult<T> extends ActionResult {
         return new PageResult(code);
     }
 
+
+    public PageResult() {
+    }
+
     public PageResult(int code) {
         super(code);
     }

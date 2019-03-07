@@ -39,6 +39,9 @@ public class ItemResult<T> extends ActionResult {
     }
 
 
+    public ItemResult() {
+    }
+
     public ItemResult(int code) {
         super(code);
     }

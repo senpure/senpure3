@@ -1,9 +1,10 @@
 package com.senpure.base.spring;
 
-import com.alibaba.fastjson.JSON;
+
 import com.senpure.base.result.ResultMap;
 import com.senpure.base.util.Download;
 import com.senpure.base.util.Http;
+import com.senpure.base.util.JacksonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,7 +31,7 @@ public class BaseMultipleInterceptor extends InterceptorSupport {
             ResultMap result = (ResultMap) model.get("action.result");
             if (result != null) {
                 if (Http.isAjaxRequest(request)) {
-                    Http.returnJson(response, JSON.toJSONString(result));
+                    Http.returnJson(response, JacksonUtil.toJSONString(result));
                     modelAndView.clear();
                     //modelAndView = null;
                     return;

@@ -20,6 +20,7 @@ public class ServerProperties {
         private String gatewayName = "gateway";
         private boolean setReadableName = false;
         private String readableName = "realityServer";
+        private String idNamesPackage;
         private boolean enableEvent = true;
         private int eventThreadPoolSize = 0;
         private int ioWorkThreadPoolSize = 0;
@@ -123,6 +124,14 @@ public class ServerProperties {
 
         public void setSsl(boolean ssl) {
             this.ssl = ssl;
+        }
+
+        public String getIdNamesPackage() {
+            return idNamesPackage;
+        }
+
+        public void setIdNamesPackage(String idNamesPackage) {
+            this.idNamesPackage = idNamesPackage;
         }
     }
 

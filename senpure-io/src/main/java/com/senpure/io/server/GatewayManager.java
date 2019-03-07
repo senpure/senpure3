@@ -21,17 +21,17 @@ public class GatewayManager {
 
     private ConcurrentMap<Long, GatewayRelation> tokenGatewayMap = new ConcurrentHashMap<>();
 
-    public String getServerKey(String host, int port) {
+    public String getGatewayKey(String host, int port) {
         return host + ":" + port;
     }
 
-    public synchronized GatewayChannelManager getGatewayChannelServer(String serverKey) {
+    public synchronized GatewayChannelManager getGatewayChannelServer(String gatewayKey) {
 
-        GatewayChannelManager manager = gatewayChannelMap.get(serverKey);
+        GatewayChannelManager manager = gatewayChannelMap.get(gatewayKey);
         if (manager == null) {
-            manager = new GatewayChannelManager(serverKey);
-            gatewayChannelMap.put(serverKey, manager);
-            return gatewayChannelMap.get(serverKey);
+            manager = new GatewayChannelManager(gatewayKey);
+            gatewayChannelMap.put(gatewayKey, manager);
+            return gatewayChannelMap.get(gatewayKey);
         }
         return manager;
     }
@@ -42,8 +42,8 @@ public class GatewayManager {
         }
     }
 
-    public void relationUser(String serverKey, Long userId, long relationToken) {
-        GatewayChannelManager channelManager = gatewayChannelMap.get(serverKey);
+    public void relationUser(String gatewayKey, Long userId, long relationToken) {
+        GatewayChannelManager channelManager = gatewayChannelMap.get(gatewayKey);
         if (channelManager != null) {
             GatewayRelation relation = new GatewayRelation();
             relation.relationToken = relationToken;
@@ -53,8 +53,8 @@ public class GatewayManager {
 
     }
 
-    public void relationToken(String serverKey, Long token, long relationToken) {
-        GatewayChannelManager channelManager = gatewayChannelMap.get(serverKey);
+    public void relationToken(String gatewayKey, Long token, long relationToken) {
+        GatewayChannelManager channelManager = gatewayChannelMap.get(gatewayKey);
         if (channelManager != null) {
             GatewayRelation relation = new GatewayRelation();
             relation.relationToken = relationToken;
@@ -120,19 +120,7 @@ public class GatewayManager {
     }
 
 
-    @Deprecated
-    private void sendMessage2Gateway(String gatewayKey, Long userId, Message message) {
-        Server2GatewayMessage toGateway = new Server2GatewayMessage();
-        toGateway.setUserIds(new Long[]{userId});
-        toGateway.setMessage(message);
-        toGateway.setMessageId(message.getMessageId());
-        GatewayChannelManager gatewayChannelManager = gatewayChannelMap.get(gatewayKey);
-        if (gatewayChannelManager != null) {
-            gatewayChannelManager.sendMessage(toGateway);
-        } else {
-            logger.info("{} 不存在网关", gatewayKey);
-        }
-    }
+
 
     public void sendMessage2GatewayByToken(Long token, Message message) {
         Server2GatewayMessage toGateway = new Server2GatewayMessage();
