@@ -38,7 +38,7 @@ public class GatewayManager {
 
     public void report() {
         for (Map.Entry<String, GatewayChannelManager> entry : gatewayChannelMap.entrySet()) {
-            logger.debug("{} {}",entry.getKey());
+            logger.debug("{} {}", entry.getKey());
         }
     }
 
@@ -100,7 +100,7 @@ public class GatewayManager {
 
     }
 
-    public void sendLoginMessage2Gateway(Long token, Long userId, Message message) {
+    public void sendLoginSuccessMessage2Gateway(Long token, Long userId, Message message) {
         if (userId == 0) {
             return;
         }
@@ -118,8 +118,6 @@ public class GatewayManager {
             logger.warn("token {} 不存在 GatewayRelation", token);
         }
     }
-
-
 
 
     public void sendMessage2GatewayByToken(Long token, Message message) {

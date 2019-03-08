@@ -38,7 +38,7 @@ public class CSAskHandleMessageHandler extends AbstractInnerMessageHandler<CSAsk
 
     @Override
     public int handlerId() {
-        return 1105;
+        return CSAskHandleMessage.MESSAGE_ID;
     }
 
     @Override

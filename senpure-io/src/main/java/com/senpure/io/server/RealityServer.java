@@ -14,10 +14,12 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
 
 
 public class RealityServer {
@@ -50,9 +52,9 @@ public class RealityServer {
             ioMessageProperties.setOutFormat(properties.isOutFormat());
         }
         // Configure SSL.
-        if (group == null||group.isShuttingDown()||group.isShutdown()) {
+        if (group == null || group.isShuttingDown() || group.isShutdown()) {
             synchronized (groupLock) {
-                if (group == null||group.isShuttingDown()||group.isShutdown()) {
+                if (group == null || group.isShuttingDown() || group.isShutdown()) {
                     group = new NioEventLoopGroup();
                     SslContext sslCtx = null;
                     try {
@@ -78,6 +80,7 @@ public class RealityServer {
                                     p.addLast(new RealityMessageDecoder());
                                     p.addLast(new RealityMessageEncoder());
                                     p.addLast(new RealityMessageLoggingHandler(LogLevel.DEBUG, ioMessageProperties));
+                                    p.addLast(new IdleStateHandler(0, properties.getWriterIdleTime(), 0, TimeUnit.MILLISECONDS));
                                     p.addLast(new RealityServerHandler(messageExecuter, gatewayManager));
                                 }
                             });
@@ -108,7 +111,7 @@ public class RealityServer {
             channelServer.addChannel(channel);
             ChannelAttributeUtil.setRemoteServerKey(channel, gatewayKey);
             ChannelAttributeUtil.setLocalServerKey(channel, serverKey);
-            logger.info("{}启动完成 localServerKey {} address {}", getReadableServerName(),serverKey,address);
+            logger.info("{}启动完成 localServerKey {} address {}", getReadableServerName(), serverKey, address);
         } catch (Exception e) {
             logger.error("启动" + getReadableServerName() + " 失败", e);
             destroy();

@@ -36,8 +36,10 @@ public class GatewayMessageExecuter {
 
     private int scIdNameMessageId = SCIdNameMessage.MESSAGE_ID;
 
-    private int scAskMessageId = new SCAskHandleMessage().getMessageId();
+    private int scAskMessageId = SCAskHandleMessage.MESSAGE_ID;
 
+    private int csHeartMessageId = CSHeartMessage.MESSAGE_ID;
+    private int scHeartMessageId = SCHeartMessage.MESSAGE_ID;
     private ConcurrentMap<Long, Channel> prepLoginChannels = new ConcurrentHashMap<>(2048);
 
     private ConcurrentMap<Long, Channel> userClientChannel = new ConcurrentHashMap<>(32768);
@@ -114,8 +116,10 @@ public class GatewayMessageExecuter {
                     userChange(channel, userId);
                 }
                 prepLoginChannels.put(ChannelAttributeUtil.getToken(channel), channel);
+            } else if (message.getMessageId() == csHeartMessageId) {
+                SCHeartMessage heartMessage = new SCHeartMessage();
+                sendMessage2Client(heartMessage, message.getToken());
             } else {
-
                 if (userId != null) {
                     message.setUserId(userId);
                 }
@@ -179,6 +183,8 @@ public class GatewayMessageExecuter {
                 } else if (message.getMessageId() == scIdNameMessageId) {
                     idNameMessage(message);
                     return;
+                } else if (message.getMessageId() == scHeartMessageId) {
+                    return;
                 }
                 if (message.getMessageId() == scLoginMessageId) {
                     long userId = message.getUserIds()[0];
@@ -191,7 +197,7 @@ public class GatewayMessageExecuter {
                 if (message.getUserIds().length == 0) {
                     Channel clientChannel = tokenChannel.get(message.getToken());
                     if (clientChannel == null) {
-                        logger.warn("没有找到channel{}", message.getToken());
+                        logger.warn("没有找到channel token:{}", message.getToken());
                     } else {
                         clientChannel.writeAndFlush(message);
                     }
@@ -206,7 +212,7 @@ public class GatewayMessageExecuter {
                         } else {
                             Channel clientChannel = userClientChannel.get(userId);
                             if (clientChannel == null) {
-                                logger.warn("没有找到用户{}", userId);
+                                logger.warn("没有找到用户 :{}", userId);
                             } else {
                                 clientChannel.writeAndFlush(message);
                             }

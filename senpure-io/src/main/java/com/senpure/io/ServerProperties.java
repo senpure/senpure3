@@ -30,6 +30,7 @@ public class ServerProperties {
         private boolean outFormat = true;
         private boolean inFormat = true;
         private boolean ssl = false;
+        private long writerIdleTime = 5000;
 
 
         public boolean isSetReadableName() {
@@ -68,6 +69,14 @@ public class ServerProperties {
 
         public void setIoWorkThreadPoolSize(int ioWorkThreadPoolSize) {
             this.ioWorkThreadPoolSize = ioWorkThreadPoolSize;
+        }
+
+        public long getWriterIdleTime() {
+            return writerIdleTime;
+        }
+
+        public void setWriterIdleTime(long writerIdleTime) {
+            this.writerIdleTime = writerIdleTime;
         }
 
         public String getGatewayName() {
