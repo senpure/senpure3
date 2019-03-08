@@ -29,7 +29,7 @@ public class HandleMessageManager {
     private GatewayMessageExecuter messageExecuter;
     private int csAskHandleMessageId = new CSAskHandleMessage().getMessageId();
     private AtomicInteger atomicIndex = new AtomicInteger(-1);
-    private int handId = 0;
+    private int handId;
 
     public HandleMessageManager(int handId, boolean direct, boolean serverShare, GatewayMessageExecuter messageExecuter) {
         this.direct = direct;
@@ -71,7 +71,7 @@ public class HandleMessageManager {
         } else {
             ByteBuf buf = Unpooled.buffer(message.getData().length);
             buf.writeBytes(message.getData());
-            String value = null;
+            String value;
             try {
                 Bean.readTag(buf, buf.writerIndex());
                 value = Bean.readString(buf);
@@ -116,14 +116,6 @@ public class HandleMessageManager {
                 }
             }
         }
-    }
-
-    private int nextIndex() {
-        if (serverManagers.size() == 0) {
-            return 0;
-        }
-        int index = atomicIndex.incrementAndGet();
-        return Math.abs(index % serverManagers.size());
     }
 
 

@@ -17,10 +17,10 @@
                         <label>
                             <#if item.has>
                                 <input type="checkbox" checked permissionId="${item.id?c}">
-                                <span class="text-success">   ${item.readableName}</span>
+                                <span class="text-success">   ${item.readableServerName}</span>
                             <#else>
                                 <input type="checkbox" permissionId="${item.id?c}">
-                                <span class="text-danger">   ${item.readableName}</span>
+                                <span class="text-danger">   ${item.readableServerName}</span>
                             </#if>
 
                         </label>

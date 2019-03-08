@@ -4,21 +4,20 @@ import com.senpure.io.protocol.Message;
 import io.netty.buffer.ByteBuf;
 
 /**
- * 应答是否可以请求
+ * 服务器内部错误提示
  * 
  * @author senpure
  * @time 2019-3-8 16:16:07
  */
-public class SCAskHandleMessage extends  Message {
+public class SCInnerErrorMessage extends  Message {
 
-    public static final int MESSAGE_ID = 1106;
-    //是否可以处理
-    private boolean handle;
-    //token
-    private long token;
-    //消息ID
-    private int fromMessageId;
-    //值
+    public static final int MESSAGE_ID = 1600;
+    //错误类型
+    private String type;
+    //提示内容
+    private String message;
+    //消息id
+    private int id;
     private String value;
     /**
      * 写入字节缓存
@@ -26,13 +25,16 @@ public class SCAskHandleMessage extends  Message {
     @Override
     public void write(ByteBuf buf){
         getSerializedSize();
-        //是否可以处理
-        writeBoolean(buf,8,handle);
-        //token
-        writeVar64(buf,16,token);
-        //消息ID
-        writeVar32(buf,24,fromMessageId);
-        //值
+        //错误类型
+        if (type != null){
+            writeString(buf,8,type);
+        }
+        //提示内容
+        if (message != null){
+            writeString(buf,16,message);
+        }
+        //消息id
+        writeVar32(buf,24,id);
         if (value != null){
             writeString(buf,32,value);
         }
@@ -48,19 +50,18 @@ public class SCAskHandleMessage extends  Message {
             switch (tag) {
                 case 0://end
                 return;
-                //是否可以处理
+                //错误类型
                 case 8:// 1 << 3 | 0
-                        handle = readBoolean(buf);
+                        type = readString(buf);
                     break;
-                //token
+                //提示内容
                 case 16:// 2 << 3 | 0
-                        token = readVar64(buf);
+                        message = readString(buf);
                     break;
-                //消息ID
+                //消息id
                 case 24:// 3 << 3 | 0
-                        fromMessageId = readVar32(buf);
+                        id = readVar32(buf);
                     break;
-                //值
                 case 32:// 4 << 3 | 0
                         value = readString(buf);
                     break;
@@ -80,13 +81,16 @@ public class SCAskHandleMessage extends  Message {
             return size;
         }
         size = 0 ;
-        //是否可以处理
-        size += computeBooleanSize(1,handle);
-        //token
-        size += computeVar64Size(1,token);
-        //消息ID
-        size += computeVar32Size(1,fromMessageId);
-        //值
+        //错误类型
+        if (type != null){
+            size += computeStringSize(1,type);
+        }
+        //提示内容
+        if (message != null){
+            size += computeStringSize(1,message);
+        }
+        //消息id
+        size += computeVar32Size(1,id);
         if (value != null){
             size += computeStringSize(1,value);
         }
@@ -95,92 +99,91 @@ public class SCAskHandleMessage extends  Message {
     }
 
     /**
-     *  is 是否可以处理
+     * get 错误类型
      * @return
      */
-    public  boolean  isHandle() {
-        return handle;
+    public  String getType() {
+        return type;
     }
 
     /**
-     * set 是否可以处理
+     * set 错误类型
      */
-    public SCAskHandleMessage setHandle(boolean handle) {
-        this.handle=handle;
+    public SCInnerErrorMessage setType(String type) {
+        this.type=type;
         return this;
     }
     /**
-     * get token
+     * get 提示内容
      * @return
      */
-    public  long getToken() {
-        return token;
+    public  String getMessage() {
+        return message;
     }
 
     /**
-     * set token
+     * set 提示内容
      */
-    public SCAskHandleMessage setToken(long token) {
-        this.token=token;
+    public SCInnerErrorMessage setMessage(String message) {
+        this.message=message;
         return this;
     }
     /**
-     * get 消息ID
+     * get 消息id
      * @return
      */
-    public  int getFromMessageId() {
-        return fromMessageId;
+    public  int getId() {
+        return id;
     }
 
     /**
-     * set 消息ID
+     * set 消息id
      */
-    public SCAskHandleMessage setFromMessageId(int fromMessageId) {
-        this.fromMessageId=fromMessageId;
+    public SCInnerErrorMessage setId(int id) {
+        this.id=id;
         return this;
     }
     public  String getValue() {
         return value;
     }
 
-    public SCAskHandleMessage setValue(String value) {
+    public SCInnerErrorMessage setValue(String value) {
         this.value=value;
         return this;
     }
 
     @Override
     public int getMessageId() {
-        return 1106;
+        return 1600;
     }
 
     @Override
     public String toString() {
-        return "SCAskHandleMessage[1106]{"
-                +"handle=" + handle
-                +",token=" + token
-                +",fromMessageId=" + fromMessageId
+        return "SCInnerErrorMessage[1600]{"
+                +"type=" + type
+                +",message=" + message
+                +",id=" + id
                 +",value=" + value
                 + "}";
    }
 
-    //最长字段长度 13
-    private int filedPad = 13;
+    //最长字段长度 7
+    private int filedPad = 7;
 
     @Override
     public String toString(String indent) {
         indent = indent == null ? "" : indent;
         StringBuilder sb = new StringBuilder();
-        sb.append("SCAskHandleMessage").append("[1106]").append("{");
-        //是否可以处理
+        sb.append("SCInnerErrorMessage").append("[1600]").append("{");
+        //错误类型
         sb.append("\n");
-        sb.append(indent).append(rightPad("handle", filedPad)).append(" = ").append(handle);
-        //token
+        sb.append(indent).append(rightPad("type", filedPad)).append(" = ").append(type);
+        //提示内容
         sb.append("\n");
-        sb.append(indent).append(rightPad("token", filedPad)).append(" = ").append(token);
-        //消息ID
+        sb.append(indent).append(rightPad("message", filedPad)).append(" = ").append(message);
+        //消息id
         sb.append("\n");
-        sb.append(indent).append(rightPad("fromMessageId", filedPad)).append(" = ").append(fromMessageId);
-        //值
+        sb.append(indent).append(rightPad("id", filedPad)).append(" = ").append(id);
         sb.append("\n");
         sb.append(indent).append(rightPad("value", filedPad)).append(" = ").append(value);
         sb.append("\n");

@@ -19,7 +19,7 @@ public class GatewayAndClientMessageDecoder extends ByteToMessageDecoder {
 
         int rl = in.readableBytes();
         if (rl < 4) {
-            this.logger.debug("数据过短 s{}", Integer.valueOf(rl));
+            this.logger.debug("数据过短 s{}", rl);
         } else {
             in.markReaderIndex();
             int packageLength = in.readInt();
@@ -31,7 +31,7 @@ public class GatewayAndClientMessageDecoder extends ByteToMessageDecoder {
                     ctx.close().sync();
                     return;
                 }
-                this.logger.info("数据不够一个数据包 packageLength ={} ,readableBytes={}", Integer.valueOf(packageLength), Integer.valueOf(in.readableBytes()));
+                this.logger.info("数据不够一个数据包 packageLength ={} ,readableBytes={}", packageLength, in.readableBytes());
                 in.resetReaderIndex();
             } else {
                 int messageId = in.readInt();

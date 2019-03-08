@@ -16,7 +16,7 @@ public class JacksonUtilTest {
         User user=new User();
         user.setAge(15);
         user.setName("user");
-        System.out.println(JacksonUtil.toJSONString(user));
+        System.out.println(JSON.toJSONString(user));
     }
 
     static class User {

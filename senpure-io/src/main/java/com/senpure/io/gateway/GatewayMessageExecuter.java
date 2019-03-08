@@ -106,11 +106,12 @@ public class GatewayMessageExecuter {
     //将客户端消息转发给具体的服务器
     public void execute(final Channel channel, final Client2GatewayMessage message) {
         service.execute(() -> {
-            //登录
+
             Long userId = ChannelAttributeUtil.getUserId(channel);
+            //登录
             if (message.getMessageId() == csLoginMessageId) {
                 if (userId != null) {
-
+                    userChange(channel, userId);
                 }
                 prepLoginChannels.put(ChannelAttributeUtil.getToken(channel), channel);
             } else {
@@ -223,19 +224,28 @@ public class GatewayMessageExecuter {
     }
 
 
+    private void userOffline(Channel channel, Long token, Long userId) {
+        for (Map.Entry<String, ServerManager> entry : serverInstanceMap.entrySet()) {
+            ServerManager serverManager = entry.getValue();
+            serverManager.userOffLine(channel, token, userId);
+        }
+    }
+
+    public void userChange(Channel channel, Long userId) {
+        service.execute(() -> {
+            Long token = ChannelAttributeUtil.getToken(channel);
+            logger.debug("{}  : {} : {} 切换账号", channel, token, userId);
+            userOffline(channel, token, userId);
+        });
+    }
+
     public void clientOffline(Channel channel) {
         service.execute(() -> {
             Long token = ChannelAttributeUtil.getToken(channel);
             Long userId = ChannelAttributeUtil.getUserId(channel);
             userId = userId == null ? 0 : userId;
             tokenChannel.remove(token);
-            if (userId != 0) {
-                userClientChannel.remove(userId);
-            }
-            for (Map.Entry<String, ServerManager> entry : serverInstanceMap.entrySet()) {
-                ServerManager serverManager = entry.getValue();
-                serverManager.clientOffLine(channel, token, userId);
-            }
+            userOffline(channel, token, userId);
         });
     }
 
@@ -251,11 +261,11 @@ public class GatewayMessageExecuter {
         SCRegServerHandleMessageMessage message = new SCRegServerHandleMessageMessage();
         ByteBuf buf = Unpooled.buffer(server2GatewayMessage.getData().length);
         buf.writeBytes(server2GatewayMessage.getData());
-       // logger.info("writerIndex {} readerIndex {} ", buf.writerIndex(), buf.readerIndex());
+        // logger.info("writerIndex {} readerIndex {} ", buf.writerIndex(), buf.readerIndex());
         message.read(buf, buf.writerIndex());
         List<HandleMessage> handleMessages = message.getMessages();
         String serverKey = message.getServerKey();
-        ChannelAttributeUtil.setServerName(channel, message.getServerName());
+        ChannelAttributeUtil.setRemoteServerName(channel, message.getServerName());
         ChannelAttributeUtil.setRemoteServerKey(channel, serverKey);
         logger.info("服务注册:{}:{} [{}]", message.getServerName(), message.getServerKey(), message.getReadableServerName());
         for (HandleMessage handleMessage : handleMessages) {
@@ -388,7 +398,7 @@ public class GatewayMessageExecuter {
         WaitAskTask waitAskTask = waitAskMap.get(message.getToken());
         if (waitAskTask != null) {
             if (message.isHandle()) {
-                String serverName = ChannelAttributeUtil.getServerName(channel);
+                String serverName = ChannelAttributeUtil.getRemoteServerName(channel);
                 String serverKey = ChannelAttributeUtil.getRemoteServerKey(channel);
                 logger.debug("{} {} 可以处理 {} 值位 {} 的请求", serverName, serverKey,
                         MessageIdReader.read(waitAskTask.getFromMessageId()), waitAskTask.getValue());
@@ -402,7 +412,7 @@ public class GatewayMessageExecuter {
                 waitAskTask.answer(null, null, false);
             } else {
                 if (logger.isDebugEnabled()) {
-                    String serverName = ChannelAttributeUtil.getServerName(channel);
+                    String serverName = ChannelAttributeUtil.getRemoteServerName(channel);
                     String serverKey = ChannelAttributeUtil.getRemoteServerKey(channel);
                     logger.debug("{} {} 无法处理 {} 值位 {} 的请求", serverName, serverKey,
                             MessageIdReader.read(waitAskTask.getFromMessageId()), waitAskTask.getValue());

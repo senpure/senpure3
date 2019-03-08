@@ -10,10 +10,7 @@ import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,8 +40,6 @@ public class ServerManager {
     private Map<Integer, Boolean> handleIdsMap = new HashMap<>();
     private String serverName;
     private AtomicInteger atomicIndex = new AtomicInteger(-1);
-    private int relationWaitTime = 200;
-    private int waitTimeFailCount = 0;
 
 
     public void bind(Long token, Long relationToken, ServerChannelManager serverChannelManager) {
@@ -100,8 +95,7 @@ public class ServerManager {
         if (useChannelManagers.size() == 0) {
             return null;
         }
-        ServerChannelManager manager = useChannelManagers.get(nextIndex());
-        return manager;
+        return useChannelManagers.get(nextIndex());
     }
 
     private int nextIndex() {
@@ -128,21 +122,30 @@ public class ServerManager {
     }
 
     private void serverOffLine(Channel channel, List<ServerChannelManager> channelManagers) {
-        for (int i = 0; i < channelManagers.size(); i++) {
-            ServerChannelManager serverChannelManager = channelManagers.get(i);
+        Iterator<ServerChannelManager> iterator = channelManagers.iterator();
+        while (iterator.hasNext()) {
+            ServerChannelManager serverChannelManager = iterator.next();
             if (serverChannelManager.offline(channel)) {
                 if (!serverChannelManager.isActive()) {
-                    channelManagers.remove(i);
+                    iterator.remove();
                     clearRelation(serverChannelManager);
                 }
             }
         }
+//        for (int i = 0; i < channelManagers.size(); i++) {
+////            ServerChannelManager serverChannelManager = channelManagers.get(i);
+////            if (serverChannelManager.offline(channel)) {
+////                if (!serverChannelManager.isActive()) {
+////                    channelManagers.remove(i);
+////                    clearRelation(serverChannelManager);
+////                }
+////            }
+////        }
 
     }
 
 
-    public void clientOffLine(Channel channel,   Long token , Long userId ) {
-        userId = userId == null ? 0 : userId;
+    public void userOffLine(Channel channel, Long token, Long userId) {
         ServerRelation serverRelation = tokenServerChannelManagerMap.remove(token);
         if (serverRelation != null) {
             logger.info("{} {} 取消 对{} :token{} userId:{}的 关联",

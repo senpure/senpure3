@@ -15,7 +15,7 @@ public class GatewayAndClientMessageEncoder extends MessageToByteEncoder<Server2
 
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Server2GatewayMessage msg, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Server2GatewayMessage msg, ByteBuf out) {
         //head 4+messageId 4 +  data
         out.ensureWritable(8 + msg.getData().length);
         out.writeInt(4 + msg.getData().length);

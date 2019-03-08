@@ -36,43 +36,13 @@ public class TimeCalculator {
 	 */
 	private static int calibrationDayOfWeek(Calendar calendar) {
 		int firstDayOfWeek = calendar.getFirstDayOfWeek();
-		int DAY_OF_WEEK = calendar.get(Calendar.DAY_OF_WEEK);
-		int offset = 7;
-		switch (firstDayOfWeek) {
-		case Calendar.MONDAY:
-			offset = -1;
-
-			break;
-		case Calendar.TUESDAY:
-
-			offset = -2;
-			break;
-		case Calendar.WEDNESDAY:
-
-			offset = -3;
-			break;
-		case Calendar.THURSDAY:
-
-			offset = -4;
-			break;
-		case Calendar.FRIDAY:
-
-			offset = -5;
-			break;
-		case Calendar.SATURDAY:
-
-			offset = -6;
-			break;
-		case Calendar.SUNDAY:
-			offset = 0;
-
-			break;
+		int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+		int offset = 1-firstDayOfWeek;
+		dayOfWeek = dayOfWeek + offset;
+		if (dayOfWeek <= 0) {
+			dayOfWeek += 7;
 		}
-		DAY_OF_WEEK = DAY_OF_WEEK + offset;
-		if (DAY_OF_WEEK <= 0) {
-			DAY_OF_WEEK += 7;
-		}
-		return DAY_OF_WEEK;
+		return dayOfWeek;
 	}
 
 	/**

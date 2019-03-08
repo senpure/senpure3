@@ -14,9 +14,9 @@ import java.io.IOException;
  * @author senpure
  * @time 2019-03-07 09:42:10
  */
-public class JacksonUtil {
+public class JSON {
 
-    private static Logger logger = LoggerFactory.getLogger(JacksonUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(JSON.class);
 
     private static ObjectMapper defaultMapper = new ObjectMapper();
 
@@ -29,8 +29,17 @@ public class JacksonUtil {
 
 
     public static String toJSONString(Object object) {
+        return toJSONString(object, false);
+    }
+
+    public static String toJSONString(Object object, boolean pretty) {
         try {
-            return defaultMapper.writeValueAsString(object);
+            if (pretty) {
+                return defaultMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+            } else {
+                return defaultMapper.writeValueAsString(object);
+            }
+
         } catch (JsonProcessingException e) {
             logger.error("jackson 对象序列化json字符串出错 " + object.toString(), e);
         }

@@ -12,14 +12,16 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 
 public class GatewayAndClientServer {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ChannelFuture channelFuture;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private String readableName = "网关服务器[CS]";
@@ -40,10 +42,7 @@ public class GatewayAndClientServer {
             } catch (Exception e) {
                 logger.error("使用ssl出错", e);
             }
-        } else {
-            sslCtx = null;
         }
-
         try {
             // Configure the server.
             bossGroup = new NioEventLoopGroup(properties.getIoCsBossThreadPoolSize());
@@ -56,7 +55,7 @@ public class GatewayAndClientServer {
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        public void initChannel(SocketChannel ch) throws Exception {
+                        public void initChannel(SocketChannel ch) {
                             ChannelPipeline p = ch.pipeline();
                             if (finalSslCtx != null) {
                                 p.addLast(finalSslCtx.newHandler(ch.alloc()));
@@ -64,12 +63,13 @@ public class GatewayAndClientServer {
                             p.addLast(new GatewayAndClientMessageDecoder());
                             p.addLast(new GatewayAndClientMessageEncoder());
                             p.addLast(new LoggingHandler(LogLevel.DEBUG));
+                            p.addLast(new IdleStateHandler(properties.getCsReaderIdleTime(), 0L, 0L, TimeUnit.MILLISECONDS));
                             p.addLast(new GatewayAndClientServerHandler(messageExecuter));
 
                         }
                     });
             // Start the server.
-            channelFuture = b.bind(properties.getCsPort()).sync();
+            b.bind(properties.getCsPort()).sync();
             logger.info("{} 启动完成", getReadableName());
         } catch (Exception e) {
             logger.error("启动 " + getReadableName() + " 失败", e);
@@ -80,7 +80,7 @@ public class GatewayAndClientServer {
     }
 
 
-    private  String getReadableName() {
+    private String getReadableName() {
         return readableName;
     }
 

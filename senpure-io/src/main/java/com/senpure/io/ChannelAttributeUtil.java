@@ -13,7 +13,7 @@ public class ChannelAttributeUtil {
     private static String OFFLINE_HANDLER = "offlineHandler";
     private static String CHANNEL_USER = "channelUser";
 
-    private static String SERVER_NAME = "serverName";
+    private static String REMOTE_SERVER_NAME = "remoteServerName";
     private static String REMOTE_SERVER_KEY = "remoteServerKeyKey";
     private static String LOCAL_SERVER_KEY = "localServerKeyKey";
     public static AttributeKey<Long> userIdKey = AttributeKey.valueOf(USER_ID);
@@ -21,7 +21,7 @@ public class ChannelAttributeUtil {
     public static AttributeKey<String> userNameKey = AttributeKey.valueOf(USER_NAME);
 
 
-    public static AttributeKey<String> serverNameKey = AttributeKey.valueOf(SERVER_NAME);
+    public static AttributeKey<String> remoteServerNameKey = AttributeKey.valueOf(REMOTE_SERVER_NAME);
     public static AttributeKey<String> remoteServerKeyKey = AttributeKey.valueOf(REMOTE_SERVER_KEY);
     public static AttributeKey<String> localServerKeyKey = AttributeKey.valueOf(LOCAL_SERVER_KEY);
     public static AttributeKey<ChannelPlayer> channelPlayerKey = AttributeKey.valueOf(CHANNEL_USER);
@@ -89,12 +89,12 @@ public class ChannelAttributeUtil {
 
     }
 
-    public static void setServerName(Channel channel, String name) {
-        channel.attr(serverNameKey).set(name);
+    public static void setRemoteServerName(Channel channel, String name) {
+        channel.attr(remoteServerNameKey).set(name);
     }
 
-    public static String getServerName(Channel channel) {
-        return (String)channel.attr(serverNameKey).get();
+    public static String getRemoteServerName(Channel channel) {
+        return (String)channel.attr(remoteServerNameKey).get();
     }
 
 

@@ -58,7 +58,7 @@ public class ServerChannelManager {
     public synchronized boolean offline(Channel channel) {
         for (int i = 0; i < channels.size(); i++) {
             if (channel == channels.get(i)) {
-                logger.info("{} {}与网关断开连接", ChannelAttributeUtil.getServerName(channel), channel);
+                logger.info("{} {}与网关断开连接", ChannelAttributeUtil.getRemoteServerName(channel), channel);
                 channels.remove(i);
                 return true;
             }

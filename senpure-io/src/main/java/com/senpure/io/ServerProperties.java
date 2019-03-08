@@ -151,6 +151,8 @@ public class ServerProperties {
 
         private int csLoginMessageId = 1000100;
         private int scLoginMessageId = 1000101;
+        private long csReaderIdleTime = 10000;
+        private long scReaderIdleTime = 10000;
 
         public int getCsPort() {
             return csPort;
@@ -256,6 +258,21 @@ public class ServerProperties {
             this.ioScWorkThreadPoolSize = ioScWorkThreadPoolSize;
         }
 
+        public long getCsReaderIdleTime() {
+            return csReaderIdleTime;
+        }
+
+        public void setCsReaderIdleTime(long csReaderIdleTime) {
+            this.csReaderIdleTime = csReaderIdleTime;
+        }
+
+        public long getScReaderIdleTime() {
+            return scReaderIdleTime;
+        }
+
+        public void setScReaderIdleTime(long scReaderIdleTime) {
+            this.scReaderIdleTime = scReaderIdleTime;
+        }
 
         @Override
         public String toString() {

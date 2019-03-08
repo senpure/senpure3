@@ -15,7 +15,7 @@
     <message id="104" type="SC" name="RegServerHandleMessage" explain="服务器注册消息处理器到网关">
         <field type="String" name="serverName" explain="服务名"></field>
         <field type="String" name="serverKey" explain="服务实例唯一标识"></field>
-        <field type="String" name="readableName" explain="服务名"></field>
+        <field type="String" name="readableServerName" explain="服务名"></field>
         <list type="HandleMessage" name="messages" explain="可以处理的消息"></list>
     </message>
     <message id="101" type="CS" name="RelationUserGateway" explain="关联用户与网关">
@@ -60,20 +60,16 @@
     <message id="108" type="SC" name="IdName" explain="数字id与字符串的关联">
         <list type="IdName" name="idNames"></list>
     </message>
+
+    <message id="301" type="CS" name="Heart" explain="心跳">
+    </message>
+    <message id="302" type="SC" name="Heart" explain="心跳">
+    </message>
     <message id="600" type="SC" name="InnerError" explain="服务器内部错误提示">
         <field type="String" name="type" explain="错误类型"></field>
         <field type="String" name="message" explain="提示内容"></field>
         <field type="int" name="id" explain="消息id"></field>
-        <field type="String" name="value" ></field>
+        <field type="String" name="value"></field>
     </message>
 
-
-    <event id="800" name="Online" explain="上线">
-        <field type="long" name="token" explain="channel token"></field>
-        <field type="long" name="userId" explain="用户Id"></field>
-    </event>
-    <event id="801" name="Offline" explain="离线">
-        <field type="long" name="token" explain="channel token"></field>
-        <field type="long" name="userId" explain="用户Id"></field>
-    </event>
 </messages>

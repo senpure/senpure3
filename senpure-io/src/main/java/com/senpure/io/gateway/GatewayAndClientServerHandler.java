@@ -1,10 +1,12 @@
 package com.senpure.io.gateway;
 
 
+import com.senpure.io.ChannelAttributeUtil;
 import com.senpure.io.message.Client2GatewayMessage;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,5 +45,16 @@ public class GatewayAndClientServerHandler extends SimpleChannelInboundHandler<C
         logger.debug("客户端{} 断开连接", channel);
         messageExecuter.clientOffline(channel);
 
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            Channel channel = ctx.channel();
+            logger.info("客户端{} :{}  :{} 心跳失败", channel, ChannelAttributeUtil.getToken(channel), ChannelAttributeUtil.getUserId(channel));
+            ctx.close();
+            return;
+        }
+        super.userEventTriggered(ctx, evt);
     }
 }

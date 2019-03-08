@@ -7,7 +7,7 @@
         <id     column="id"               property="id"              jdbcType="BIGINT"/>  <!-- 主键 -->
         <result column="version"          property="version"         jdbcType="INTEGER"/> <!-- 乐观锁，版本控制 -->
         <result column="name"             property="name"            jdbcType="VARCHAR"/> <!-- 字符串唯一标识 -->
-        <result column="readable_name"    property="readableName"    jdbcType="VARCHAR"/> <!-- 权限名 -->
+        <result column="readable_name"    property="readableServerName"    jdbcType="VARCHAR"/> <!-- 权限名 -->
         <result column="database_update"  property="databaseUpdate"  jdbcType="BIT"/>     <!-- 是否从数据库更新过 -->
         <result column="type"             property="type"            jdbcType="VARCHAR"/> <!-- NORMAL 正常 ，OWNER 检查所有者，IGNORE 可以忽略(正常放行) -->
         <result column="offset"           property="offset"          jdbcType="VARCHAR"/> <!-- '1,2' type为OWNER 配合verifyName使用 -->
@@ -36,8 +36,8 @@
             <if test="name != null">
                 and name = #{name}
             </if>
-            <if test="readableName != null">
-                and readable_name = #{readableName}
+            <if test="readableServerName != null">
+                and readable_name = #{readableServerName}
             </if>
             <if test="databaseUpdate != null">
                 and database_update = #{databaseUpdate}
@@ -63,7 +63,7 @@
     <!-- 取对象的值，直接插入数据库(包括空值),version字段(版本控制)，被初始化为1-->
     <insert id="save" parameterType="com.senpure.base.model.Permission" >
         insert into senpure_permission (<include refid="permissionAllColumns"/>)
-        values (#{id},1,#{name},#{readableName},#{databaseUpdate},#{type},#{offset},#{verifyName},#{description},#{sort})
+        values (#{id},1,#{name},#{readableServerName},#{databaseUpdate},#{type},#{offset},#{verifyName},#{description},#{sort})
     </insert>
 
     <!-- 取对象的值，直接插入数据库(包括空值),version字段(版本控制)，被初始化为1-->
@@ -71,7 +71,7 @@
         insert into senpure_permission (<include refid="permissionAllColumns"/>)
         values
         <foreach collection="list" item="item" index="index" separator="," >
-            (#{item.id},1,#{item.name},#{item.readableName},#{item.databaseUpdate},#{item.type},#{item.offset},#{item.verifyName},#{item.description},#{item.sort})
+            (#{item.id},1,#{item.name},#{item.readableServerName},#{item.databaseUpdate},#{item.type},#{item.offset},#{item.verifyName},#{item.description},#{item.sort})
         </foreach>
     </insert>
 
@@ -84,8 +84,8 @@
             <if test="name != null">
                 name = #{name},
             </if>
-            <if test="readableName != null">
-                readable_name = #{readableName},
+            <if test="readableServerName != null">
+                readable_name = #{readableServerName},
             </if>
             <if test="databaseUpdate != null">
                 database_update = #{databaseUpdate},
@@ -116,7 +116,7 @@
             <bind name="versionUpdate" value="version + 1"/>
             version = #{versionUpdate},
             name = #{name},
-            readable_name = #{readableName},
+            readable_name = #{readableServerName},
             database_update = #{databaseUpdate},
             type = #{type},
             offset = #{offset},
@@ -143,8 +143,8 @@
                 <if test="name != null">
                     name = #{name},
                 </if>
-                <if test="readableName != null">
-                    readable_name = #{readableName},
+                <if test="readableServerName != null">
+                    readable_name = #{readableServerName},
                 </if>
                 <if test="databaseUpdate != null">
                     database_update = #{databaseUpdate},
@@ -190,8 +190,8 @@
             <if test="name != null">
                 and name = #{name}
             </if>
-            <if test="readableName != null">
-                and readable_name = #{readableName}
+            <if test="readableServerName != null">
+                and readable_name = #{readableServerName}
             </if>
             <if test="databaseUpdate != null">
                 and database_update = #{databaseUpdate}
@@ -222,8 +222,8 @@
             <if test="name != null">
                 and name = #{name}
             </if>
-            <if test="readableName != null">
-                and readable_name = #{readableName}
+            <if test="readableServerName != null">
+                and readable_name = #{readableServerName}
             </if>
             <if test="databaseUpdate != null">
                 and database_update = #{databaseUpdate}

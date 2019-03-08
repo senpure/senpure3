@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
  * 客户端掉线
  * 
  * @author senpure
- * @time 2019-2-20 17:02:08
+ * @time 2019-3-8 16:16:07
  */
 public class CSChannelOfflineMessage extends  Message {
 

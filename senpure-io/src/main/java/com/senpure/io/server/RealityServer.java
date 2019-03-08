@@ -36,7 +36,7 @@ public class RealityServer {
 
     private static EventLoopGroup group;
     private static Bootstrap bootstrap;
-    private static Object groupLock = new Object();
+    private static final Object groupLock = new Object();
 
     private static int serverRefCont = 0;
 
@@ -59,8 +59,6 @@ public class RealityServer {
                         if (properties.isSsl()) {
                             SelfSignedCertificate ssc = new SelfSignedCertificate();
                             sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-                        } else {
-                            sslCtx = null;
                         }
                     } catch (Exception e) {
                         logger.error("使用ssl出错", e);
@@ -72,7 +70,7 @@ public class RealityServer {
                             .option(ChannelOption.TCP_NODELAY, true)
                             .handler(new ChannelInitializer<SocketChannel>() {
                                 @Override
-                                public void initChannel(SocketChannel ch) throws Exception {
+                                public void initChannel(SocketChannel ch) {
                                     ChannelPipeline p = ch.pipeline();
                                     if (finalSslCtx != null) {
                                         p.addLast(finalSslCtx.newHandler(ch.alloc(), host, port));

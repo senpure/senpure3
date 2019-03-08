@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * @author senpure
- * @time 2019-2-20 17:02:07
+ * @time 2019-3-8 16:16:07
  */
 public class HandleMessage extends  Bean {
     //可以处理的消息ID

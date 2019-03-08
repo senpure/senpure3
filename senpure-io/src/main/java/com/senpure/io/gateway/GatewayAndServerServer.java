@@ -12,20 +12,24 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 
 public class GatewayAndServerServer {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ChannelFuture channelFuture;
+
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private String readableServerName = "网关服务器[SC]";
 
     private GatewayMessageExecuter messageExecuter;
     private ServerProperties.Gateway properties;
+
     public boolean start() {
         Assert.notNull(messageExecuter);
         Assert.notNull(properties);
@@ -40,10 +44,7 @@ public class GatewayAndServerServer {
             } catch (Exception e) {
                 logger.error("使用ssl出错", e);
             }
-        } else {
-            sslCtx = null;
         }
-
         try {
             // Configure the server.
             bossGroup = new NioEventLoopGroup(properties.getIoScBossThreadPoolSize());
@@ -56,7 +57,7 @@ public class GatewayAndServerServer {
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        public void initChannel(SocketChannel ch) throws Exception {
+                        public void initChannel(SocketChannel ch) {
                             ChannelPipeline p = ch.pipeline();
                             if (finalSslCtx != null) {
                                 p.addLast(finalSslCtx.newHandler(ch.alloc()));
@@ -64,15 +65,13 @@ public class GatewayAndServerServer {
                             p.addLast(new GatewayAndServerMessageDecoder());
                             p.addLast(new GatewayAndServerMessageEncoder());
                             p.addLast(new LoggingHandler(LogLevel.DEBUG));
-                            // OffLineHandler offLineHandler = new OffLineHandler();
-                            // ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
-                            // p.addLast(offLineHandler);
+                            p.addLast(new IdleStateHandler(properties.getScReaderIdleTime(), 0L, 0L, TimeUnit.MILLISECONDS));
                             p.addLast(new GatewayAndServerServerHandler(messageExecuter));
 
                         }
                     });
             // Start the server.
-            channelFuture = b.bind(properties.getScPort()).sync();
+            b.bind(properties.getScPort()).sync();
             logger.info("{} 启动完成", getReadableServerName());
         } catch (Exception e) {
             logger.error("启动 " + getReadableServerName() + " 失败", e);

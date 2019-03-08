@@ -7,10 +7,9 @@ import com.senpure.io.message.Server2GatewayMessage;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.BlockingDeque;
 
 
 public class GatewayAndServerServerHandler extends SimpleChannelInboundHandler<Server2GatewayMessage> {
@@ -29,34 +28,34 @@ public class GatewayAndServerServerHandler extends SimpleChannelInboundHandler<S
         //  messageExecuter.execute(msg);
         messageExecuter.execute(ctx.channel(), msg);
     }
+
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         //解决强断的错误 远程主机强迫关闭了一个现有的连接
         ctx.flush();
     }
+
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
-        String serverName = ChannelAttributeUtil.getServerName(channel);
+        String serverName = ChannelAttributeUtil.getRemoteServerName(channel);
         logger.debug("{} {} {} 断开连接", serverName, ChannelAttributeUtil.getRemoteServerKey(channel), channel);
         if (serverName != null) {
             ServerManager serverManager = messageExecuter.serverInstanceMap.get(serverName);
             messageExecuter.execute(() -> serverManager.serverOffLine(channel));
         }
-       extraChannelOffline(channel);
-
 
     }
 
-    protected void extraChannelOffline(Channel channel) {
-
-        BlockingDeque blockingDeque;
-       // blockingDeque.take()
-    }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-
-        super.exceptionCaught(ctx, cause);
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            Channel channel = ctx.channel();
+            logger.info("服务器{} :{}  :{} 心跳失败", channel, ChannelAttributeUtil.getRemoteServerName(channel), ChannelAttributeUtil.getRemoteServerKey(channel));
+            ctx.close();
+            return;
+        }
+        super.userEventTriggered(ctx, evt);
     }
 }
