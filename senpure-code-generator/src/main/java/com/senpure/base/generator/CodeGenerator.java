@@ -35,7 +35,7 @@ public class CodeGenerator {
     private List<String> exists = new ArrayList<>();
     private List<String> springLocal = new ArrayList<>();
 
-    public void generate(Object object, Template template, File file) {
+    private void generate(Object object, Template template, File file) {
         try {
             FileOutputStream fos = new FileOutputStream(file);
             template.process(object, new OutputStreamWriter(fos, "utf-8"));

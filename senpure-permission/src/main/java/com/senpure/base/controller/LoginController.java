@@ -1,13 +1,14 @@
 package com.senpure.base.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.senpure.base.criteria.LoginCriteria;
 import com.senpure.base.result.ResultMap;
 import com.senpure.base.service.AuthorizeService;
 import com.senpure.base.spring.BaseController;
 import com.senpure.base.struct.LoginedAccount;
 import com.senpure.base.util.Http;
+import com.senpure.base.util.JSON;
 import com.senpure.base.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -54,11 +55,14 @@ public class LoginController extends BaseController {
             Http.setSubject(request, loginedAccount);
             logger.debug("\n{}\n{}", loginedAccount.getNormalValueMap(), loginedAccount.getPermissions());
             if (criteria.isRemember()) {
-                JSONObject json = new JSONObject();
+
+
+                ObjectNode json = JSON.createObjectNode();
+
                 json.put("account", criteria.getAccount());
                 json.put("password", criteria.getPassword());
                 json.put("time", System.currentTimeMillis());
-                String jsonStr = json.toJSONString();
+                String jsonStr = JSON.toJSONString(json);
                 // logger.debug("json:" + jsonStr);
                 jsonStr = StringUtil.aesEncryptHex(jsonStr, cookieAesKey);
                 Cookie cookie = new Cookie(cookieKey, jsonStr);
@@ -73,8 +77,8 @@ public class LoginController extends BaseController {
 
             }
             String toURI = loginSuccessTo(request);
-           // ModelAndView view = new ModelAndView(toURI);
-           // return result(request, toURI, resultMap);
+            // ModelAndView view = new ModelAndView(toURI);
+            // return result(request, toURI, resultMap);
             return new ModelAndView(toURI);
         }
 
@@ -113,7 +117,7 @@ public class LoginController extends BaseController {
     }
 
     @RequestMapping(value = {"loginout"}, method = {RequestMethod.GET, RequestMethod.POST})
-    public ModelAndView loginOut(HttpServletRequest request, HttpServletResponse response,@ModelAttribute("criteria") LoginCriteria criteria) {
+    public ModelAndView loginOut(HttpServletRequest request, HttpServletResponse response, @ModelAttribute("criteria") LoginCriteria criteria) {
         LoginedAccount account = Http.getSubject(request, LoginedAccount.class);
         if (account != null) {
             authorizeService.loginOut(account);
@@ -123,16 +127,16 @@ public class LoginController extends BaseController {
         cookie.setMaxAge(0);
         response.addCookie(cookie);
         ModelAndView view = new ModelAndView("redirect:/authorize/login");
-       // return view(request, "redirect:/authorize/login");
+        // return view(request, "redirect:/authorize/login");
         return view;
     }
 
 
-    private void loginInfo(HttpServletRequest request,LoginCriteria criteria )
-    {
-        criteria.setLoginIP(Http.getIP(request,true));
+    private void loginInfo(HttpServletRequest request, LoginCriteria criteria) {
+        criteria.setLoginIP(Http.getIP(request, true));
 
     }
+
     public LoginedAccount autoLogin(HttpServletRequest request) {
         CheckCookie checkCookie = readCookie(request.getCookies());
         if (checkCookie.result && checkCookie.account != null && checkCookie.password != null) {
@@ -166,9 +170,10 @@ public class LoginController extends BaseController {
             for (Cookie c : cookie) {
                 if (c.getName().equals(cookieKey)) {
                     try {
-                        JSONObject json = JSON.parseObject(StringUtil.aesDecryptHex(c.getValue(), cookieAesKey));
-                        checkCookie.account = json.getString("account");
-                        checkCookie.password = json.getString("password");
+                        ObjectNode json = JSON.parseObject(StringUtil.aesDecryptHex(c.getValue(), cookieAesKey), ObjectNode.class);
+
+                        checkCookie.account = json.get("account").toString();
+                        checkCookie.password = json.get("password").toString();
                     } catch (Exception e) {
                         logger.error("解析cookie 失败:" + c.getValue(), e);
                         checkCookie.result = false;

@@ -3,6 +3,7 @@ package com.senpure.base.util;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,17 @@ public class JSON {
         }
         return null;
     }
+
+
+    public static ObjectNode createObjectNode() {
+
+        return defaultMapper.createObjectNode();
+    }
+    public static ObjectNode createObjectNode(String jsonStr) {
+        return parseObject(jsonStr, ObjectNode.class);
+    }
+
+
 
     public static ObjectMapper getDefaultMapper() {
         return defaultMapper;

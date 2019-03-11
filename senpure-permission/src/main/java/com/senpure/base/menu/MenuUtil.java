@@ -1,8 +1,9 @@
 package com.senpure.base.menu;
 
-import com.alibaba.fastjson.JSON;
+
 import com.senpure.base.struct.LoginedAccount;
 import com.senpure.base.util.Http;
+import com.senpure.base.util.JSON;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
