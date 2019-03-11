@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    该xml为[senpure-code-generator]于[2019-03-11 17:30:15]自动生成，如果预计字段经常变动，不
+    建议修改。如果该xml不能满足需要可新建一个mxl，如LockExpandMapper.xml，将命名空间指向com.
+    senpure.snowflake.mapper.ModelAMapper即可，该xml中定义的lockResultMap与lockAllColumns等
+    其他可以在新建的xml中直接引用。
+-->
+<mapper namespace="com.senpure.snowflake.mapper.LockMapper">
+    <resultMap id="lockResultMap" type="com.senpure.snowflake.model.Lock">
+        <id     column="id"       property="id"       jdbcType="BIGINT"/>  <!-- (主键) -->
+        <result column="version"  property="version"  jdbcType="INTEGER"/> <!-- 乐观锁，版本控制 -->
+    </resultMap>
+    <sql id="lockAllColumns">
+        id,version
+    </sql>
+
+    <!--主键查找-->
+    <select id="find" resultMap="lockResultMap" parameterType="Long">
+        select <include refid="lockAllColumns"/> from lock where id = #{id}
+    </select>
+
+    <!--主键删除-->
+    <delete id="delete" parameterType="Long">
+        delete from lock where id = #{id}
+    </delete>
+
+
+    <!--按条件删除(不取主键的值进行对比，即主键无效化)-->
+    <delete id="deleteByCriteria" parameterType="com.senpure.snowflake.criteria.LockCriteria">
+        delete from lock
+        <where>
+        </where>
+    </delete>
+
+    <!-- 取对象的值，直接插入数据库(包括空值),version字段(版本控制)，被初始化为1-->
+    <insert id="save" parameterType="com.senpure.snowflake.model.Lock" >
+        insert into lock (<include refid="lockAllColumns"/>)
+        values (#{id},1)
+    </insert>
+
+    <!-- 取对象的值，直接插入数据库(包括空值),version字段(版本控制)，被初始化为1-->
+    <insert id="saveBatch" parameterType="com.senpure.snowflake.model.Lock" >
+        insert into lock (<include refid="lockAllColumns"/>)
+        values
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.id},1)
+        </foreach>
+    </insert>
+
+    <!--会进行对象的空值判断，不为空才更新，以主键进行where判断,version字段(版本控制)，必须有有效值-->
+    <update id="update" parameterType="com.senpure.snowflake.model.Lock">
+        update lock
+        <set>
+            <bind name="versionUpdate" value="version + 1"/>
+            version = #{versionUpdate},
+        </set>
+        where id = #{id}  and version =  #{version}
+    </update>
+
+    <!-- 直接将值覆盖到数据库，不会做为空判断，以主键进行where判断,version字段(版本控制)，必须有有效值-->
+    <update id="cover" parameterType="com.senpure.snowflake.model.Lock">
+        update lock
+        <set>
+            <bind name="versionUpdate" value="version + 1"/>
+            version = #{versionUpdate},
+        </set>
+        where id = #{id}  and version =  #{version}
+    </update>
+
+    <!--会进行对象的空值判断，不为空才更新，主键无值时，可以进行批量更新-->
+    <update id="updateByCriteria" parameterType="com.senpure.snowflake.criteria.LockCriteria">
+        update lock
+        <set>
+            <choose>
+                <when test="version != null">
+                    <bind name="versionUpdate" value="version + 1"/>
+                    version = #{versionUpdate},
+                </when>
+                <otherwise>
+                    version = version + 1,
+                </otherwise>
+            </choose>
+        </set>
+        <where>
+                <if test="id != null">
+                    id = #{id}
+                 </if>
+                <if test="version != null">
+                    and version =  #{version}
+                </if>
+        </where>
+     </update>
+
+    <select id="count" resultType="int">
+        select count(*) from lock
+    </select>
+
+    <select id="findAll" resultMap="lockResultMap" parameterType="Long">
+        select <include refid="lockAllColumns"/> from lock
+    </select>
+
+    <!--主键会无效化,不会进行条件对比-->
+    <select id="countByCriteria" resultType="int" parameterType="com.senpure.snowflake.criteria.LockCriteria">
+        select count(*) from lock
+        <where>
+        </where>
+    </select>
+
+    <!--主键会无效化,不会进行条件对比-->
+    <select id="findByCriteria" parameterType="com.senpure.snowflake.criteria.LockCriteria" resultMap="lockResultMap">
+        select <include refid="lockAllColumns"/>
+        from lock
+        <where>
+        </where>
+        <if test="hasOrder">
+            ORDER BY
+            <foreach collection="criteriaOrder" index="key" item="item" separator=",">
+                <if test="item == 'DESC'">
+                    ${key} DESC
+                </if>
+                <if test="item == 'ASC'">
+                    ${key} ASC
+                </if>
+            </foreach>
+        </if>
+        <if test="usePage">
+            <choose>
+                <when test="firstResult == 0">
+                    limit #{maxResults}
+                </when>
+                <otherwise>
+                    limit #{firstResult}, #{maxResults}
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+</mapper>
