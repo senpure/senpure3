@@ -17,6 +17,8 @@ import java.util.Locale;
 public class ${name}${globalConfig.resultRecordSuffix} extends ActionResult {
     private static final long serialVersionUID = ${serial(modelFieldMap)}L;
 
+    public static final String RECORD_NAME = "${nameRule(name)}";
+
     <#--这里的注释swagger 不会读取，不用注释-->
     @ApiModelProperty(position = 3)
     private ${name} ${nameRule(name)};

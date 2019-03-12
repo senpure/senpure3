@@ -17,6 +17,8 @@ import java.util.Locale;
 public class ${name}${globalConfig.resultPageSuffix} extends ActionResult {
     private static final long serialVersionUID = ${serial(modelFieldMap)}L;
 
+    public static final String RECORDS_NAME = "${pluralize(nameRule(name))}";
+
     @ApiModelProperty(position = 3, value = "结果集总数", example = "1086")
     private int total;
     @ApiModelProperty(position = 4, value = "一页数据")

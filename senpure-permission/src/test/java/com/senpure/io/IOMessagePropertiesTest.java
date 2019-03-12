@@ -1,7 +1,8 @@
 package com.senpure.io;
 
-import com.alibaba.fastjson.JSON;
+
 import com.senpure.base.struct.SpringConfigurationMetadata;
+import com.senpure.base.util.JSON;
 import org.junit.Test;
 
 /**

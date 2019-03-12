@@ -123,8 +123,6 @@ public class BaseController {
 
     private void incorrect(Locale locale, BindingResult bindingResult, Map<String, String> validators) {
         List<ObjectError> es = bindingResult.getAllErrors();
-
-        StringBuilder sb = new StringBuilder();
         //FieldError
         for (ObjectError e : es) {
             Object[] args = e.getArguments();
@@ -134,15 +132,8 @@ public class BaseController {
             if (key.endsWith("Valid")) {
                 key = key.replace("Valid", "");
             }
-            if (e.getDefaultMessage().contains("NumberFormatException")) {
-                validators.put(key, ResultHelper.getMessage(Result.INPUT_NUMBER, locale));
-            } else {
-                validators.put(key, e.getDefaultMessage());
-            }
-            sb.append(e.getDefaultMessage());
-            sb.append("\n");
+            validators.put(key, e.getDefaultMessage());
         }
-        logger.debug(sb.toString());
         logger.warn("validators {} ", validators);
     }
 

@@ -6,13 +6,13 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 
 /**
- * Lock
+ * SnowflakeLock
  * 
  * @author senpure-generator
- * @version 2019-3-11 17:30:15
+ * @version 2019-3-12 13:43:04
  */
-@ApiModel(description = "Lock")
-public class Lock implements Serializable {
+@ApiModel(description = "SnowflakeLock")
+public class SnowflakeLock implements Serializable {
     private static final long serialVersionUID = 0L;
 
     //(主键)
@@ -35,7 +35,7 @@ public class Lock implements Serializable {
      *
      * @return
      */
-    public Lock setId(Long id) {
+    public SnowflakeLock setId(Long id) {
         this.id = id;
         return this;
     }
@@ -56,7 +56,7 @@ public class Lock implements Serializable {
      *
      * @return
      */
-    public Lock setVersion(Integer version) {
+    public SnowflakeLock setVersion(Integer version) {
         this.version = version;
         return this;
     }
@@ -64,7 +64,7 @@ public class Lock implements Serializable {
 
     @Override
     public String toString() {
-        return "Lock{"
+        return "SnowflakeLock{"
                 + "id=" + id
                 + ",version=" + version
                 + "}";

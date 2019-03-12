@@ -6,12 +6,12 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 
 /**
- * Lock
+ * SnowflakeLock
  *
  * @author senpure-generator
- * @version 2019-3-11 17:30:15
+ * @version 2019-3-12 13:43:04
  */
-public class LockCriteriaStr extends CriteriaStr implements Serializable {
+public class SnowflakeLockCriteriaStr extends CriteriaStr implements Serializable {
     private static final long serialVersionUID = 0L;
 
     //(主键)
@@ -21,8 +21,8 @@ public class LockCriteriaStr extends CriteriaStr implements Serializable {
     @ApiModelProperty(hidden = true )
     private String version;
 
-    public LockCriteria toLockCriteria() {
-        LockCriteria criteria = new LockCriteria();
+    public SnowflakeLockCriteria toSnowflakeLockCriteria() {
+        SnowflakeLockCriteria criteria = new SnowflakeLockCriteria();
         criteria.setPage(Integer.valueOf(getPage()));
         criteria.setPageSize(Integer.valueOf(getPageSize()));
         //(主键)
@@ -38,7 +38,7 @@ public class LockCriteriaStr extends CriteriaStr implements Serializable {
 
     @Override
     protected void beforeStr(StringBuilder sb) {
-        sb.append("LockCriteriaStr{");
+        sb.append("SnowflakeLockCriteriaStr{");
         if (id != null) {
             sb.append("id=").append(id).append(",");
         }
@@ -66,7 +66,7 @@ public class LockCriteriaStr extends CriteriaStr implements Serializable {
      *
      * @return
      */
-    public LockCriteriaStr setId(String id) {
+    public SnowflakeLockCriteriaStr setId(String id) {
         if (id != null && id.trim().length() == 0) {
             return this;
         }
@@ -88,7 +88,7 @@ public class LockCriteriaStr extends CriteriaStr implements Serializable {
      *
      * @return
      */
-    public LockCriteriaStr setVersion(String version) {
+    public SnowflakeLockCriteriaStr setVersion(String version) {
         if (version != null && version.trim().length() == 0) {
             return this;
         }

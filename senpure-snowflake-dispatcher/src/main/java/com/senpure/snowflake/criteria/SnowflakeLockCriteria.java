@@ -1,17 +1,17 @@
 package com.senpure.snowflake.criteria;
 
 import com.senpure.base.criterion.Criteria;
-import com.senpure.snowflake.model.Lock;
+import com.senpure.snowflake.model.SnowflakeLock;
 
 import java.io.Serializable;
 
 /**
- * Lock
+ * SnowflakeLock
  *
  * @author senpure-generator
- * @version 2019-3-11 17:30:15
+ * @version 2019-3-12 13:43:04
  */
-public class LockCriteria extends Criteria implements Serializable {
+public class SnowflakeLockCriteria extends Criteria implements Serializable {
     private static final long serialVersionUID = 0L;
 
     //(主键)
@@ -19,35 +19,35 @@ public class LockCriteria extends Criteria implements Serializable {
     //乐观锁，版本控制
     private Integer version;
 
-    public static Lock toLock(LockCriteria criteria, Lock lock) {
-        lock.setId(criteria.getId());
-        lock.setVersion(criteria.getVersion());
-        return lock;
+    public static SnowflakeLock toSnowflakeLock(SnowflakeLockCriteria criteria, SnowflakeLock snowflakeLock) {
+        snowflakeLock.setId(criteria.getId());
+        snowflakeLock.setVersion(criteria.getVersion());
+        return snowflakeLock;
     }
 
-    public Lock toLock() {
-        Lock lock = new Lock();
-        return toLock(this, lock);
+    public SnowflakeLock toSnowflakeLock() {
+        SnowflakeLock snowflakeLock = new SnowflakeLock();
+        return toSnowflakeLock(this, snowflakeLock);
     }
 
     /**
-     * 将LockCriteria 的有效值(不为空),赋值给 Lock
+     * 将SnowflakeLockCriteria 的有效值(不为空),赋值给 SnowflakeLock
      *
-     * @return Lock
+     * @return SnowflakeLock
      */
-    public Lock effective(Lock lock) {
+    public SnowflakeLock effective(SnowflakeLock snowflakeLock) {
         if (getId() != null) {
-            lock.setId(getId());
+            snowflakeLock.setId(getId());
         }
         if (getVersion() != null) {
-            lock.setVersion(getVersion());
+            snowflakeLock.setVersion(getVersion());
         }
-        return lock;
+        return snowflakeLock;
     }
 
     @Override
     protected void beforeStr(StringBuilder sb) {
-        sb.append("LockCriteria{");
+        sb.append("SnowflakeLockCriteria{");
         if (id != null) {
             sb.append("id=").append(id).append(",");
         }
@@ -70,7 +70,7 @@ public class LockCriteria extends Criteria implements Serializable {
      *
      * @return
      */
-    public LockCriteria setId(Long id) {
+    public SnowflakeLockCriteria setId(Long id) {
         this.id = id;
         return this;
     }
@@ -89,7 +89,7 @@ public class LockCriteria extends Criteria implements Serializable {
      *
      * @return
      */
-    public LockCriteria setVersion(Integer version) {
+    public SnowflakeLockCriteria setVersion(Integer version) {
         this.version = version;
         return this;
     }

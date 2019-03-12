@@ -1,19 +1,19 @@
 package com.senpure.snowflake.mapper;
 
-import com.senpure.snowflake.model.Lock;
-import com.senpure.snowflake.criteria.LockCriteria;
+import com.senpure.snowflake.model.SnowflakeLock;
+import com.senpure.snowflake.criteria.SnowflakeLockCriteria;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 /**
  * @author senpure-generator
- * @version 2019-3-11 17:30:15
+ * @version 2019-3-12 13:43:04
  */
 @Mapper
-public interface LockMapper {
+public interface SnowflakeLockMapper {
 
-    Lock find(Long id);
+    SnowflakeLock find(Long id);
 
     /**
      * 根据主键删除
@@ -27,7 +27,7 @@ public interface LockMapper {
      *
      * @return 影响的行数
      */
-    int deleteByCriteria(LockCriteria criteria);
+    int deleteByCriteria(SnowflakeLockCriteria criteria);
 
     /**
      * 取对象的值，直接插入数据库(包括空值)
@@ -35,7 +35,7 @@ public interface LockMapper {
      *
      * @return 影响的行数
      */
-    int save(Lock lock);
+    int save(SnowflakeLock snowflakeLock);
 
     /**
      * 取对象的值，直接插入数据库(包括空值)
@@ -43,7 +43,7 @@ public interface LockMapper {
      *
      * @return 影响的行数
      */
-    int saveBatch(List<Lock> locks);
+    int saveBatch(List<SnowflakeLock> snowflakeLocks);
 
     /**
      * 会进行对象的空值判断，不为空才更新，以主键进行where判断
@@ -51,7 +51,7 @@ public interface LockMapper {
      *
      * @return 影响的行数
      */
-    int update(Lock lock);
+    int update(SnowflakeLock snowflakeLock);
 
     /**
      * 直接将值覆盖到数据库，不会做为空判断，以主键进行where判断
@@ -59,30 +59,30 @@ public interface LockMapper {
      *
      * @return 影响的行数
      */
-    int cover(Lock lock);
+    int cover(SnowflakeLock snowflakeLock);
 
     /**
      * 会进行对象的空值判断，不为空才更新，主键无值时，可以进行批量更新
      *
      * @return 影响的行数
      */
-    int updateByCriteria(LockCriteria criteria);
+    int updateByCriteria(SnowflakeLockCriteria criteria);
 
     int count();
 
-    List<Lock> findAll();
+    List<SnowflakeLock> findAll();
 
     /**
      * <b>主键会无效化,不会进行条件对比</b>
      *
      * @return 满足条件的总行数
      */
-    int countByCriteria(LockCriteria criteria);
+    int countByCriteria(SnowflakeLockCriteria criteria);
 
     /**
      * <b>主键会无效化,不会进行条件对比</b>
      *
      * @return 满足条件的记录
      */
-    List<Lock> findByCriteria(LockCriteria criteria);
+    List<SnowflakeLock> findByCriteria(SnowflakeLockCriteria criteria);
 }

@@ -79,7 +79,7 @@ public class ResultHelper implements ApplicationListener<ContextRefreshedEvent>,
     public static ResultMap wrapMessage(ResultMap resultMap, Locale locale, Object... args) {
 
         return
-                resultMap.put(ResultMap.MESSAGE_KEY, ResultHelper.getMessage(resultMap.getCode(), locale, Arrays.toString(args)));
+                resultMap.put(ResultMap.MESSAGE_KEY, ResultHelper.getMessage(resultMap.getCode(), locale, args));
     }
 
 
