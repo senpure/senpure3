@@ -76,7 +76,7 @@ public class GatewayAutoConfiguration {
                 // logger.error("{} 雪花调度服务没有启动", properties.getGateway().getSnowflakeDispatcherName());
                 Assert.error(properties.getGateway().getSnowflakeDispatcherName() + "雪花调度服务没有启动");
             }
-            String url = "http://" + properties.getGateway().getSnowflakeDispatcherName() + "/snowflake/dispatch?serverKey={serverKey}";
+            String url = "http://" + properties.getGateway().getSnowflakeDispatcherName() + "/snowflake/dispatch?serverName={serverName}&serverKey={serverKey}";
             Map<String, String> params = new LinkedHashMap<>();
             params.put("serverName", properties.getName());
             String serverKey;
