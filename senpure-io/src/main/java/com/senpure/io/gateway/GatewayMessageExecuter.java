@@ -50,18 +50,19 @@ public class GatewayMessageExecuter {
     private ConcurrentMap<Integer, HandleMessageManager> handleMessageManagerMap = new ConcurrentHashMap<>(2048);
 
 
-    protected IDGenerator idGenerator = new IDGenerator(0, 0);
+    protected IDGenerator idGenerator ;
     protected ConcurrentHashMap<Long, WaitRelationTask> waitRelationMap = new ConcurrentHashMap(16);
     protected ConcurrentHashMap<Long, WaitAskTask> waitAskMap = new ConcurrentHashMap(16);
 
     public GatewayMessageExecuter() {
         this(Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() * 2,
-                new NameThreadFactory("gateway-executor")));
+                new NameThreadFactory("gateway-executor")),new IDGenerator(0, 0));
 
     }
 
-    public GatewayMessageExecuter(ScheduledExecutorService service) {
+    public GatewayMessageExecuter(ScheduledExecutorService service,IDGenerator idGenerator) {
         this.service = service;
+        this.idGenerator = idGenerator;
         startCheck();
 
     }

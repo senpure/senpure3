@@ -116,7 +116,7 @@ public class BaseController {
         Map<String, String> validators = new HashMap<>();
         incorrect(locale, bindingResult, validators);
         ResultMap rm = ResultMap.result(Result.FORMAT_INCORRECT);
-        rm.put(ResultMap.VALIDATOR_KEY, validators);
+        rm.put(ResultMap.VALIDATORS_KEY, validators);
         ResultHelper.wrapMessage(rm, locale);
         return rm;
     }

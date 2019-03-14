@@ -13,6 +13,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ServerProperties {
     @Value("${spring.application.name:}")
     private String name;
+
     private Gateway gateway = new Gateway();
     private Producer producer = new Producer();
 
@@ -162,6 +163,10 @@ public class ServerProperties {
         private int scLoginMessageId = 1000101;
         private long csReaderIdleTime = 10000;
         private long scReaderIdleTime = 10000;
+        private String snowflakeDispatcherName = "snowflake-dispatcher";
+        private boolean snowflakeUseCode = false;
+        private int snowflakeDataCenterId = 0;
+        private int snowflakeworkId = 0;
 
         public int getCsPort() {
             return csPort;
@@ -205,6 +210,37 @@ public class ServerProperties {
             this.executerThreadPoolSize = executerThreadPoolSize;
         }
 
+        public String getSnowflakeDispatcherName() {
+            return snowflakeDispatcherName;
+        }
+
+        public boolean isSnowflakeUseCode() {
+            return snowflakeUseCode;
+        }
+
+        public void setSnowflakeUseCode(boolean snowflakeUseCode) {
+            this.snowflakeUseCode = snowflakeUseCode;
+        }
+
+        public int getSnowflakeDataCenterId() {
+            return snowflakeDataCenterId;
+        }
+
+        public void setSnowflakeDataCenterId(int snowflakeDataCenterId) {
+            this.snowflakeDataCenterId = snowflakeDataCenterId;
+        }
+
+        public int getSnowflakeworkId() {
+            return snowflakeworkId;
+        }
+
+        public void setSnowflakeworkId(int snowflakeworkId) {
+            this.snowflakeworkId = snowflakeworkId;
+        }
+
+        public void setSnowflakeDispatcherName(String snowflakeDispatcherName) {
+            this.snowflakeDispatcherName = snowflakeDispatcherName;
+        }
 
         public boolean isSetReadableName() {
             return setReadableName;

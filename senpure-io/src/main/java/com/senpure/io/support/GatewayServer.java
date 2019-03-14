@@ -1,5 +1,6 @@
 package com.senpure.io.support;
 
+import com.senpure.base.util.IDGenerator;
 import com.senpure.base.util.NameThreadFactory;
 import com.senpure.io.ServerProperties;
 import com.senpure.io.gateway.GatewayAndClientServer;
@@ -72,7 +73,7 @@ public class GatewayServer implements ApplicationRunner {
         ServerProperties.Gateway gateway = properties.getGateway();
         ScheduledExecutorService service = Executors.newScheduledThreadPool(gateway.getExecuterThreadPoolSize(),
                 new NameThreadFactory(properties.getName() + "-executor"));
-        messageExecuter = new GatewayMessageExecuter(service);
+        messageExecuter = new GatewayMessageExecuter(service, new IDGenerator(gateway.getSnowflakeDataCenterId(), gateway.getSnowflakeworkId()));
         messageExecuter.setCsLoginMessageId(gateway.getCsLoginMessageId());
         messageExecuter.setScLoginMessageId(gateway.getScLoginMessageId());
     }

@@ -15,7 +15,7 @@ public class ResultMap extends HashMap<String, Object> {
     public static final String FILE_KEY = "file";
     public static final String FILE_NAME_KEY = "fileName";
     public static final String DELETE_FILE_KEY = "deleteFile";
-    public static final String VALIDATOR_KEY = "validator";
+    public static final String VALIDATORS_KEY = "validators";
     public static final String TOTAL_KEY = "total";
     public static final String ITEMS_KEY = "items";
     public static final String ITEM_KEY = "item";
