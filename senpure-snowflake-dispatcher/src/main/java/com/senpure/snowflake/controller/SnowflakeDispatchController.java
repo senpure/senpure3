@@ -31,6 +31,11 @@ public class SnowflakeDispatchController extends BaseController {
     @Autowired
     private SnowflakeDispathService dispathService;
 
+    private String a = "a";
+    private ErrorController errorController = new ErrorController();
+
+
+
     @GetMapping("snowflake/dispatch")
     @ResponseBody
     @ApiResponses(@ApiResponse(code = 200, message = "OK", response = ServerCenterAndWorkRecordResult.class))
@@ -38,6 +43,7 @@ public class SnowflakeDispatchController extends BaseController {
         if (validResult.hasErrors()) {
             return incorrect(request, validResult);
         }
+
         ServerCenterAndWork serverCenterAndWork = dispathService.dispatch(criteria.getServerName(), criteria.getServerKey());
         if (serverCenterAndWork == null) {
             return wrapMessage(request, ResultMap.dim());

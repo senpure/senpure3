@@ -1,5 +1,6 @@
 package com.senpure.snowflake.service;
 
+import com.senpure.base.util.Assert;
 import com.senpure.snowflake.criteria.ServerCenterAndWorkCriteria;
 
 import com.senpure.snowflake.mapper.ServerCenterAndWorkMapper;
@@ -92,6 +93,7 @@ public class SnowflakeDispathServiceMysqlImpl implements SnowflakeDispathService
         result.setServerName(serverName);
         result.setCenterId(find.getCenterId());
         result.setWorkId(find.getWorkId());
+        //lock.setVersion(0);
         int i = lockMapper.update(lock);
         if (i == 1) {
             retry.set(0);
@@ -105,10 +107,11 @@ public class SnowflakeDispathServiceMysqlImpl implements SnowflakeDispathService
                     logger.error("", e);
                 }
                 retry.set(times + 1);
-                logger.info(" {} : {}第{}次重试", serverName, serverKey, retry.get());
+                logger.info(" {} : {} 第 {} 次重试", serverName, serverKey, retry.get());
                 return dispatch(serverName, serverKey);
             }
             logger.info(" {} : {} 重试{}次失败", serverName, serverKey, retry.get());
+            Assert.error("lock 更新失败 version:"+lock.getVersion());
             return null;
         }
     }
