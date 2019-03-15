@@ -10,7 +10,7 @@ package com.senpure.base.util;
  * 得到的值），这里的的开始时间截，一般是我们的id生成器开始使用的时间
  * ，由我们程序来指定的（如下下面程序IdWorker类的startTime属性）。41位的时间截，可以使用69年，年T = (1L << 41) /
  * (1000L * 60 * 60 * 24 * 365) = 69<br>
- * 10位的数据机器位，可以部署在1024个节点，包括5位datacenterId和5位workerId<br>
+ * 10位的数据机器位，可以部署在1024个节点，包括5位dataCenterId和5位workerId<br>
  * 12位序列，毫秒内的计数，12位的计数顺序号支持每个节点每毫秒(同一机器，同一时间截)产生4096个ID序号<br>
  * 加起来刚好64位，为一个Long型。<br>
  * SnowFlake的优点是，整体上按照时间自增排序，并且整个分布式系统内不会产生ID碰撞(由数据中心ID和机器ID作区分)，并且效率较高，经测试，
@@ -31,7 +31,7 @@ public class IDGenerator {
     /**
      * 数据标识id所占的位数
      */
-    private final long datacenterIdBits = 5L;
+    private final long dataCenterIdBits = 5L;
 
     /**
      * 支持的最大机器id，结果是31 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数)
@@ -41,7 +41,7 @@ public class IDGenerator {
     /**
      * 支持的最大数据标识id，结果是31
      */
-    private final long maxDatacenterId = -1L ^ (-1L << datacenterIdBits);
+    private final long maxdataCenterId = -1L ^ (-1L << dataCenterIdBits);
 
     /**
      * 序列在id中占的位数
@@ -56,13 +56,13 @@ public class IDGenerator {
     /**
      * 数据标识id向左移17位(12+5)
      */
-    private final long datacenterIdShift = sequenceBits + workerIdBits;
+    private final long dataCenterIdShift = sequenceBits + workerIdBits;
 
     /**
      * 时间截向左移22位(5+5+12)
      */
     private final long timestampLeftShift = sequenceBits + workerIdBits
-            + datacenterIdBits;
+            + dataCenterIdBits;
 
     /**
      * 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095)
@@ -77,7 +77,7 @@ public class IDGenerator {
     /**
      * 数据中心ID(0~31)
      */
-    private long datacenterId;
+    private long dataCenterId;
 
     /**
      * 毫秒内序列(0~4095)
@@ -93,21 +93,21 @@ public class IDGenerator {
      * 构造函数
      * <p>
      *
-     * @param datacenterId 数据中心ID (0~31)
+     * @param dataCenterId 数据中心ID (0~31)
      * @param workerId     工作ID (0~31)
      */
-    public IDGenerator(long datacenterId, long workerId) {
+    public IDGenerator(long dataCenterId, long workerId) {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format(
                     "worker Id can't be greater than %d or less than 0",
                     maxWorkerId));
         }
-        if (datacenterId > maxDatacenterId || datacenterId < 0) {
+        if (dataCenterId > maxdataCenterId || dataCenterId < 0) {
             throw new IllegalArgumentException(String.format(
                     "datacenter Id can't be greater than %d or less than 0",
-                    maxDatacenterId));
+                    maxdataCenterId));
         }
-        this.datacenterId = datacenterId;
+        this.dataCenterId = dataCenterId;
         this.workerId = workerId;
 
     }
@@ -148,7 +148,7 @@ public class IDGenerator {
 
         // 移位并通过或运算拼到一起组成64位的ID
         return ((timestamp - twepoch) << timestampLeftShift)
-                | (datacenterId << datacenterIdShift)
+                | (dataCenterId << dataCenterIdShift)
                 | (workerId << workerIdShift)
                 | sequence;
     }

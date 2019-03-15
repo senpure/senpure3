@@ -1,8 +1,6 @@
 package com.senpure.base.configuration;
 
 
-import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
-import com.alibaba.druid.support.http.StatViewServlet;
 import com.senpure.base.util.DatabaseUtil;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -46,7 +44,8 @@ public class DataSourceAutoConfiguration extends BaseConfiguration {
     public DataSource dataSource() {
         DataSourceProperties prop = dataSourceProperties();
         DatabaseUtil.checkAndCreateDatabase(prop);
-        return DruidDataSourceBuilder.create().build();
+       // return DruidDataSourceBuilder.create().build();
+        return  null;
     }
 
 
@@ -114,8 +113,9 @@ public class DataSourceAutoConfiguration extends BaseConfiguration {
     // @Bean
     public ServletRegistrationBean DruidStatViewServlet() {
         //org.springframework.boot.context.embedded.ServletRegistrationBean提供类的进行注册.
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new StatViewServlet(), "/druid/*");
-        servletRegistrationBean.setLoadOnStartup(-2);
+        ServletRegistrationBean servletRegistrationBean;
+                //= new ServletRegistrationBean(new StatViewServlet(), "/druid/*");
+        //servletRegistrationBean.setLoadOnStartup(-2);
         //添加初始化参数：initParams
 
         //白名单：
@@ -127,8 +127,9 @@ public class DataSourceAutoConfiguration extends BaseConfiguration {
         // servletRegistrationBean.addInitParameter("loginPassword",passwrod);
         //是否能够重置数据.
         logger.debug("self statViewServlet");
-        servletRegistrationBean.addInitParameter("resetEnable", "false");
-        return servletRegistrationBean;
+       // servletRegistrationBean.addInitParameter("resetEnable", "false");
+        //return servletRegistrationBean;
+        return null;
     }
 
 
