@@ -17,7 +17,6 @@ public class CSBreakUserGatewayMessageHandler extends AbstractInnerMessageHandle
 
     @Override
     public void execute(Channel channel, long token, long userId, CSBreakUserGatewayMessage message) {
-
         gatewayManager.breakToken(message.getToken(), message.getRelationToken());
         gatewayManager.breakUser(message.getUserId(), message.getRelationToken());
 
@@ -25,7 +24,7 @@ public class CSBreakUserGatewayMessageHandler extends AbstractInnerMessageHandle
 
     @Override
     public int handlerId() {
-        return 1201;
+        return CSBreakUserGatewayMessage.MESSAGE_ID;
     }
 
     @Override

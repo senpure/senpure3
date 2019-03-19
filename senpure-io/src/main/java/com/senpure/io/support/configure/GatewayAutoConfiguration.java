@@ -12,7 +12,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
@@ -53,8 +52,8 @@ public class GatewayAutoConfiguration {
 
     @Autowired
     private ServerProperties properties;
-    @Autowired
-    private DiscoveryClient discoveryClient;
+   // @Autowired
+   // private DiscoveryClient discoveryClient;
 
     // @Autowired
     // private RestTemplateBuilder restTemplateBuilder;

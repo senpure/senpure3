@@ -28,13 +28,10 @@ public class ChannelAttributeUtil {
     public static AttributeKey<OffLineHandler> offlineHandlerKey = AttributeKey.valueOf(OFFLINE_HANDLER);
 
     public static void clear(ChannelHandlerContext ctx, AttributeKey<?> key) {
-
         ctx.channel().attr(key).set(null);
-
     }
 
     public static void clear(Channel channel, AttributeKey<?> key) {
-
         channel.attr(key).set(null);
     }
 
@@ -43,32 +40,24 @@ public class ChannelAttributeUtil {
         if (ctx == null) {
             return null;
         }
-
         return ctx.channel().attr(userIdKey).get();
-
     }
 
 
     public static void setToken(Channel channel, Long token) {
         channel.attr(tokenKey).set(token);
-
     }
 
     public static Long getToken(Channel channel) {
-
         return channel.attr(tokenKey).get();
     }
 
     public static void setUserId(Channel channel, Long playerId) {
-
         channel.attr(userIdKey).set(playerId);
-
     }
 
     public static void setUserId(ChannelHandlerContext ctx, Long playerId) {
-
         ctx.channel().attr(userIdKey).set(playerId);
-
     }
 
     public static void setUserName(Channel channel, String name) {
@@ -94,7 +83,7 @@ public class ChannelAttributeUtil {
     }
 
     public static String getRemoteServerName(Channel channel) {
-        return (String)channel.attr(remoteServerNameKey).get();
+        return channel.attr(remoteServerNameKey).get();
     }
 
 
@@ -105,37 +94,26 @@ public class ChannelAttributeUtil {
     }
 
     public static String getRemoteServerKey(Channel channel) {
-
         return channel.attr(remoteServerKeyKey).get();
-
     }
 
     public static String getLocalServerKey(Channel channel) {
-
         return channel.attr(localServerKeyKey).get();
-
     }
 
     public static void setLocalServerKey(Channel channel, String serverKey) {
-
         channel.attr(localServerKeyKey).set(serverKey);
-
     }
 
     public static void setOfflineHandler(Channel channel, OffLineHandler handler) {
-
         channel.attr(offlineHandlerKey).set(handler);
-
     }
 
     public static OffLineHandler getOfflineHandler(Channel channel) {
-
         return channel.attr(offlineHandlerKey).get();
-
     }
 
     public static void setChannelPlayer(Channel channel, ChannelPlayer player) {
-
         channel.attr(channelPlayerKey).set(player);
     }
 

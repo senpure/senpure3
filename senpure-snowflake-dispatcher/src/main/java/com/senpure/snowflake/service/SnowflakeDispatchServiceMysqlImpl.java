@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.concurrent.Executors;
+
 
 /**
  * ServerSnowflakeServiceMysqlImpl
@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
  * @time 2019-03-12 10:21:04
  */
 @Service
-public class SnowflakeDispathServiceMysqlImpl implements SnowflakeDispathService, ApplicationRunner {
+public class SnowflakeDispatchServiceMysqlImpl implements SnowflakeDispatchService, ApplicationRunner {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
@@ -57,7 +57,6 @@ public class SnowflakeDispathServiceMysqlImpl implements SnowflakeDispathService
             find.setCenterId(0);
             find.setWorkId(0);
             saveFind = true;
-            Executors.newSingleThreadScheduledExecutor();
         } else {
             //查找之前是否分配过
             for (ServerCenterAndWork work : serverCenterAndWorks) {
@@ -93,7 +92,7 @@ public class SnowflakeDispathServiceMysqlImpl implements SnowflakeDispathService
         result.setServerName(serverName);
         result.setCenterId(find.getCenterId());
         result.setWorkId(find.getWorkId());
-        lock.setVersion(0);
+        //lock.setVersion(0);
         int i = lockMapper.update(lock);
         if (i == 1) {
             retry.set(0);
@@ -102,7 +101,7 @@ public class SnowflakeDispathServiceMysqlImpl implements SnowflakeDispathService
             int times = retry.get();
             if (times < 3) {
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                     logger.error("", e);
                 }
@@ -111,7 +110,8 @@ public class SnowflakeDispathServiceMysqlImpl implements SnowflakeDispathService
                 return dispatch(serverName, serverKey);
             }
             logger.info(" {} : {} 重试{}次失败", serverName, serverKey, retry.get());
-            Assert.error("lock 更新失败 version:"+lock.getVersion());
+            //抛出异常，进行事务回滚
+            Assert.error("lock 更新失败 version:" + lock.getVersion());
             return null;
         }
     }

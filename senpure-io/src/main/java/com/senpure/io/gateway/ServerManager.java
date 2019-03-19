@@ -145,11 +145,11 @@ public class ServerManager {
     }
 
 
-    public void userOffLine(Channel channel, Long token, Long userId) {
+    public void breakUserGateway(Channel clientChannel, Long token, Long userId) {
         ServerRelation serverRelation = tokenServerChannelManagerMap.remove(token);
         if (serverRelation != null) {
             logger.info("{} {} 取消 对{} :token{} userId:{}的 关联",
-                    serverName, serverRelation.serverChannelManager.getServerKey(), channel, token, userId);
+                    serverName, serverRelation.serverChannelManager.getServerKey(), clientChannel, token, userId);
             CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
             breakUserGatewayMessage.setRelationToken(serverRelation.relationToken);
             breakUserGatewayMessage.setUserId(userId);
@@ -164,6 +164,10 @@ public class ServerManager {
             buf.readBytes(data);
             client2GatewayMessage.setData(data);
             serverRelation.serverChannelManager.sendMessage(client2GatewayMessage);
+        } else {
+            logger.warn("{} {} 没有对{} 没有关联 :token{} userId:{} ",
+                    serverName, serverRelation.serverChannelManager.getServerKey(), clientChannel, token, userId);
+
         }
     }
 

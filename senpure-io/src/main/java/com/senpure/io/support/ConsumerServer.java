@@ -12,6 +12,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
  * @author senpure
  * @time 2019-03-06 14:30:32
  */
+@Deprecated
 public class ConsumerServer {
 
     private Logger logger = LoggerFactory.getLogger(ProducerServer.class);

@@ -1,8 +1,10 @@
 package com.senpure.io.server;
 
 
+import com.senpure.io.message.SCBreakUserGatewayMessage;
 import com.senpure.io.message.Server2GatewayMessage;
 import com.senpure.io.protocol.Message;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class GatewayManager {
 
-    private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
     private ConcurrentMap<String, GatewayChannelManager> gatewayChannelMap = new ConcurrentHashMap<>();
 
     private ConcurrentMap<Long, GatewayRelation> userGatewayMap = new ConcurrentHashMap<>();
@@ -42,6 +44,13 @@ public class GatewayManager {
         }
     }
 
+    /**
+     * 将userId与网关关联起来
+     *
+     * @param gatewayKey
+     * @param userId
+     * @param relationToken
+     */
     public void relationUser(String gatewayKey, Long userId, long relationToken) {
         GatewayChannelManager channelManager = gatewayChannelMap.get(gatewayKey);
         if (channelManager != null) {
@@ -53,6 +62,13 @@ public class GatewayManager {
 
     }
 
+    /**
+     * 将token与网关关联起来
+     *
+     * @param gatewayKey
+     * @param token
+     * @param relationToken
+     */
     public void relationToken(String gatewayKey, Long token, long relationToken) {
         GatewayChannelManager channelManager = gatewayChannelMap.get(gatewayKey);
         if (channelManager != null) {
@@ -100,6 +116,12 @@ public class GatewayManager {
 
     }
 
+    /**
+     * 用户登录成功后调用该方法
+     * @param token
+     * @param userId
+     * @param message
+     */
     public void sendLoginSuccessMessage2Gateway(Long token, Long userId, Message message) {
         if (userId == 0) {
             return;
@@ -119,6 +141,38 @@ public class GatewayManager {
         }
     }
 
+    /**
+     * 用户主动离开该服务器后，调用该方法，断线不要调用
+     * 与bytoken 调用一个就可以了
+     * @param userId
+     */
+    public void sendBreakGatewayMessage2Gateway(Long userId) {
+        GatewayRelation relation = userGatewayMap.get(userId);
+        if (relation != null) {
+            Server2GatewayMessage toGateway = new Server2GatewayMessage();
+            toGateway.setUserIds(new Long[]{userId});
+            toGateway.setMessage(new SCBreakUserGatewayMessage());
+            toGateway.setMessageId(SCBreakUserGatewayMessage.MESSAGE_ID);
+            relation.gatewayChannelManager.sendMessage(toGateway);
+        }
+    }
+
+    /**
+     * 用户主动离开该服务器后，调用该方法，断线不要调用
+     * 与userid 调用一个就可以了
+     * @param token
+     */
+    public void sendBreakGatewayMessageByToken2Gateway(Long token) {
+        GatewayRelation relation = tokenGatewayMap.get(token);
+        if (relation != null) {
+            Server2GatewayMessage toGateway = new Server2GatewayMessage();
+            toGateway.setToken(token);
+            toGateway.setUserIds(new Long[0]);
+            toGateway.setMessage(new SCBreakUserGatewayMessage());
+            toGateway.setMessageId(SCBreakUserGatewayMessage.MESSAGE_ID);
+            relation.gatewayChannelManager.sendMessage(toGateway);
+        }
+    }
 
     public void sendMessage2GatewayByToken(Long token, Message message) {
         Server2GatewayMessage toGateway = new Server2GatewayMessage();

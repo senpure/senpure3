@@ -17,5 +17,6 @@ import java.lang.annotation.Target;
 @Target(value = {java.lang.annotation.ElementType.TYPE})
 @Documented
 @Import({ConsumerAutoConfiguration.class})
+@Deprecated
 public @interface EnableConsumer {
 }

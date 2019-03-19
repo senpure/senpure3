@@ -5,7 +5,7 @@ import com.senpure.base.spring.BaseController;
 import com.senpure.snowflake.criteria.ServerCenterAndWorkCriteriaStr;
 import com.senpure.snowflake.model.ServerCenterAndWork;
 import com.senpure.snowflake.result.ServerCenterAndWorkRecordResult;
-import com.senpure.snowflake.service.SnowflakeDispathService;
+import com.senpure.snowflake.service.SnowflakeDispatchService;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +27,8 @@ import javax.validation.Valid;
 @Controller
 public class SnowflakeDispatchController extends BaseController {
 
-
     @Autowired
-    private SnowflakeDispathService dispathService;
-
-    private String a = "a";
-    private ErrorController errorController = new ErrorController();
-
-
+    private SnowflakeDispatchService dispatchService;
 
     @GetMapping("snowflake/dispatch")
     @ResponseBody
@@ -44,7 +38,7 @@ public class SnowflakeDispatchController extends BaseController {
             return incorrect(request, validResult);
         }
 
-        ServerCenterAndWork serverCenterAndWork = dispathService.dispatch(criteria.getServerName(), criteria.getServerKey());
+        ServerCenterAndWork serverCenterAndWork = dispatchService.dispatch(criteria.getServerName(), criteria.getServerKey());
         if (serverCenterAndWork == null) {
             return wrapMessage(request, ResultMap.dim());
         }
