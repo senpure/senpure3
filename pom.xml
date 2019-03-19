@@ -17,7 +17,6 @@
         <module>senpure-jre</module>
         <module>senpure-log</module>
         <module>senpure-code-generator</module>
-        <module>senpure-web-view</module>
         <module>senpure-snowflake-dispatcher</module>
     </modules>
     <packaging>pom</packaging>
