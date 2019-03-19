@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 当前设计direct 会执行一个具体的服务器绑定
@@ -28,7 +27,7 @@ public class HandleMessageManager {
     private ServerManager serverManager;
     private GatewayMessageExecuter messageExecuter;
     private int csAskHandleMessageId = new CSAskHandleMessage().getMessageId();
-    private AtomicInteger atomicIndex = new AtomicInteger(-1);
+ //   private AtomicInteger atomicIndex = new AtomicInteger(-1);
     private int handId;
 
     public HandleMessageManager(int handId, boolean direct, boolean serverShare, GatewayMessageExecuter messageExecuter) {

@@ -76,6 +76,7 @@ public class GatewayServer implements ApplicationRunner {
         messageExecuter = new GatewayMessageExecuter(service, new IDGenerator(gateway.getSnowflakeDataCenterId(), gateway.getSnowflakeworkId()));
         messageExecuter.setCsLoginMessageId(gateway.getCsLoginMessageId());
         messageExecuter.setScLoginMessageId(gateway.getScLoginMessageId());
+        messageExecuter.init();
     }
 
     @Override

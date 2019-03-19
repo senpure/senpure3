@@ -74,7 +74,7 @@ public class ServerServer {
                             }
                         });
 
-                channelFuture = b.bind(properties.getCsPort()).sync();
+                channelFuture = b.bind(properties.getPort()).sync();
                 logger.info("{}启动完成", getServerName());
             } catch (Exception e) {
                 logger.error("启动" + getServerName() + " 失败", e);

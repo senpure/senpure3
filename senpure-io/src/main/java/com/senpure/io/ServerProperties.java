@@ -32,7 +32,7 @@ public class ServerProperties {
         private boolean inFormat = true;
         private boolean ssl = false;
         private long writerIdleTime = 5000;
-
+        private boolean enableHeartCheck = false;
 
         public boolean isSetReadableName() {
             return setReadableName;
@@ -70,6 +70,14 @@ public class ServerProperties {
 
         public void setIoWorkThreadPoolSize(int ioWorkThreadPoolSize) {
             this.ioWorkThreadPoolSize = ioWorkThreadPoolSize;
+        }
+
+        public boolean isEnableHeartCheck() {
+            return enableHeartCheck;
+        }
+
+        public void setEnableHeartCheck(boolean enableHeartCheck) {
+            this.enableHeartCheck = enableHeartCheck;
         }
 
         public long getWriterIdleTime() {
@@ -162,6 +170,8 @@ public class ServerProperties {
         private int csLoginMessageId = 1000100;
         private int scLoginMessageId = 1000101;
         private long csReaderIdleTime = 10000;
+        private boolean enableCSHeartCheck = true;
+        private boolean enableSCHeartCheck = false;
         private long scReaderIdleTime = 10000;
         private String snowflakeDispatcherName = "snowflake-dispatcher";
         private boolean snowflakeUseCode = false;
@@ -317,6 +327,22 @@ public class ServerProperties {
 
         public void setScReaderIdleTime(long scReaderIdleTime) {
             this.scReaderIdleTime = scReaderIdleTime;
+        }
+
+        public boolean isEnableSCHeartCheck() {
+            return enableSCHeartCheck;
+        }
+
+        public void setEnableSCHeartCheck(boolean enableSCHeartCheck) {
+            this.enableSCHeartCheck = enableSCHeartCheck;
+        }
+
+        public boolean isEnableCSHeartCheck() {
+            return enableCSHeartCheck;
+        }
+
+        public void setEnableCSHeartCheck(boolean enableCSHeartCheck) {
+            this.enableCSHeartCheck = enableCSHeartCheck;
         }
 
         @Override

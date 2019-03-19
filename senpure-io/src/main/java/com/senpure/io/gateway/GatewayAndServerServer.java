@@ -3,7 +3,10 @@ package com.senpure.io.gateway;
 import com.senpure.base.util.Assert;
 import com.senpure.io.ServerProperties;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -65,7 +68,9 @@ public class GatewayAndServerServer {
                             p.addLast(new GatewayAndServerMessageDecoder());
                             p.addLast(new GatewayAndServerMessageEncoder());
                             p.addLast(new LoggingHandler(LogLevel.DEBUG));
-                            p.addLast(new IdleStateHandler(properties.getScReaderIdleTime(), 0L, 0L, TimeUnit.MILLISECONDS));
+                            if (properties.isEnableSCHeartCheck()) {
+                                p.addLast(new IdleStateHandler(properties.getScReaderIdleTime(), 0L, 0L, TimeUnit.MILLISECONDS));
+                            }
                             p.addLast(new GatewayAndServerServerHandler(messageExecuter));
 
                         }

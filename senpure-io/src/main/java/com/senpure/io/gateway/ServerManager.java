@@ -1,9 +1,12 @@
 package com.senpure.io.gateway;
 
 
+import com.senpure.io.Constant;
 import com.senpure.io.message.CSBreakUserGatewayMessage;
 import com.senpure.io.message.CSRelationUserGatewayMessage;
 import com.senpure.io.message.Client2GatewayMessage;
+import com.senpure.io.message.SCInnerErrorMessage;
+import com.senpure.io.support.MessageIdReader;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -57,8 +60,11 @@ public class ServerManager {
         if (serverRelation == null) {
             serverChannelManager = nextServerChannelManager();
             if (serverChannelManager == null) {
-
                 logger.warn("{}没有服务实例可以使用", serverName);
+                SCInnerErrorMessage errorMessage = new SCInnerErrorMessage();
+                errorMessage.setType(Constant.ERROR_NOT_FOUND_SERVER);
+                errorMessage.setId(client2GatewayMessage.getMessageId());
+                errorMessage.setMessage("没有服务器处理" + MessageIdReader.read(client2GatewayMessage.getMessageId()));
             } else {
                 relationAndWaitSendMessage(serverChannelManager, client2GatewayMessage);
             }

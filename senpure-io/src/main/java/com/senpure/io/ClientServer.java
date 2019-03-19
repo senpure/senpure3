@@ -9,11 +9,13 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLException;
 import java.security.cert.CertificateException;
+import java.util.concurrent.TimeUnit;
 
 
 public class ClientServer {
@@ -65,6 +67,7 @@ public class ClientServer {
                         OffLineHandler offLineHandler = new OffLineHandler();
                         ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
                         p.addLast(offLineHandler);
+                        p.addLast(new IdleStateHandler(0, properties.getWriterIdleTime(), 0, TimeUnit.MILLISECONDS));
                         p.addLast(new MessageLoggingHandler(LogLevel.DEBUG, ioMessageProperties));
                         p.addLast(new ClientHandler());
                     }

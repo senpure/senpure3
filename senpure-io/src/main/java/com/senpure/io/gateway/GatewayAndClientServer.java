@@ -63,7 +63,9 @@ public class GatewayAndClientServer {
                             p.addLast(new GatewayAndClientMessageDecoder());
                             p.addLast(new GatewayAndClientMessageEncoder());
                             p.addLast(new LoggingHandler(LogLevel.DEBUG));
-                            p.addLast(new IdleStateHandler(properties.getCsReaderIdleTime(), 0L, 0L, TimeUnit.MILLISECONDS));
+                            if (properties.isEnableCSHeartCheck()) {
+                                p.addLast(new IdleStateHandler(properties.getCsReaderIdleTime(), 0L, 0L, TimeUnit.MILLISECONDS));
+                            }
                             p.addLast(new GatewayAndClientServerHandler(messageExecuter));
 
                         }

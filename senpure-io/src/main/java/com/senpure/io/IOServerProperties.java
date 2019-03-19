@@ -3,22 +3,16 @@ package com.senpure.io;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 
-@ConfigurationProperties("server.io")
+@ConfigurationProperties("io")
 public class IOServerProperties {
 
-
-    private boolean ssl = false;
-    private int port = 1111;
+    private int port = 2222;
     private String host = "127.0.0.1";
-    private boolean inFormat = false;
-    private boolean outFormat = false;
-    private String gatewayAddress = "127.0.0.1:3333";
-
-    private int csPort = 2222;
-    private int scPort = 3333;
-
-    private int csLoginMessageId = 100010;
-    private int scLoginMessageId = 100011;
+    private boolean ssl;
+    private boolean outFormat = true;
+    private boolean inFormat = true;
+    private long writerIdleTime = 5000;
+    private long readIdleTime = 5000;
 
     public boolean isSsl() {
         return ssl;
@@ -26,22 +20,6 @@ public class IOServerProperties {
 
     public void setSsl(boolean ssl) {
         this.ssl = ssl;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public boolean isInFormat() {
-        return inFormat;
-    }
-
-    public void setInFormat(boolean inFormat) {
-        this.inFormat = inFormat;
     }
 
     public boolean isOutFormat() {
@@ -52,29 +30,36 @@ public class IOServerProperties {
         this.outFormat = outFormat;
     }
 
-
-    public int getCsPort() {
-        return csPort;
+    public boolean isInFormat() {
+        return inFormat;
     }
 
-    public void setCsPort(int csPort) {
-        this.csPort = csPort;
+    public void setInFormat(boolean inFormat) {
+        this.inFormat = inFormat;
     }
 
-    public int getScPort() {
-        return scPort;
+    public long getWriterIdleTime() {
+        return writerIdleTime;
     }
 
-    public void setScPort(int scPort) {
-        this.scPort = scPort;
+    public void setWriterIdleTime(long writerIdleTime) {
+        this.writerIdleTime = writerIdleTime;
     }
 
-    public String getGatewayAddress() {
-        return gatewayAddress;
+    public long getReadIdleTime() {
+        return readIdleTime;
     }
 
-    public void setGatewayAddress(String gatewayAddress) {
-        this.gatewayAddress = gatewayAddress;
+    public void setReadIdleTime(long readIdleTime) {
+        this.readIdleTime = readIdleTime;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public String getHost() {
@@ -83,21 +68,5 @@ public class IOServerProperties {
 
     public void setHost(String host) {
         this.host = host;
-    }
-
-    public int getCsLoginMessageId() {
-        return csLoginMessageId;
-    }
-
-    public void setCsLoginMessageId(int csLoginMessageId) {
-        this.csLoginMessageId = csLoginMessageId;
-    }
-
-    public int getScLoginMessageId() {
-        return scLoginMessageId;
-    }
-
-    public void setScLoginMessageId(int scLoginMessageId) {
-        this.scLoginMessageId = scLoginMessageId;
     }
 }

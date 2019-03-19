@@ -1,5 +1,6 @@
 package com.senpure.io.gateway;
 
+import com.senpure.base.util.Assert;
 import com.senpure.base.util.IDGenerator;
 import com.senpure.base.util.NameThreadFactory;
 import com.senpure.io.ChannelAttributeUtil;
@@ -25,10 +26,10 @@ public class GatewayMessageExecuter {
     protected static Logger logger = LoggerFactory.getLogger(GatewayMessageExecuter.class);
     private ScheduledExecutorService service;
     private int serviceRefCount = 0;
-    private int csLoginMessageId = 1;
+    private int csLoginMessageId = 0;
 
 
-    private int scLoginMessageId = 3;
+    private int scLoginMessageId = 0;
 
     private int csHeartMessageId = CSHeartMessage.MESSAGE_ID;
 
@@ -44,9 +45,11 @@ public class GatewayMessageExecuter {
 
     protected IDGenerator idGenerator;
     protected ConcurrentHashMap<Long, WaitRelationTask> waitRelationMap = new ConcurrentHashMap(16);
-    private ConcurrentHashMap<Long, WaitAskTask> waitAskMap = new ConcurrentHashMap(16);
+    protected ConcurrentHashMap<Long, WaitAskTask> waitAskMap = new ConcurrentHashMap(16);
 
     private Map<Integer, SGInnerHandler> sgHandlerMap = new HashMap<>();
+
+    private boolean init = false;
 
     public GatewayMessageExecuter() {
         this(Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() * 2,
@@ -56,7 +59,7 @@ public class GatewayMessageExecuter {
     public GatewayMessageExecuter(ScheduledExecutorService service, IDGenerator idGenerator) {
         this.service = service;
         this.idGenerator = idGenerator;
-        init();
+        // init();
         // startCheck();
 
     }
@@ -103,7 +106,6 @@ public class GatewayMessageExecuter {
     //将客户端消息转发给具体的服务器
     public void execute(final Channel channel, final Client2GatewayMessage message) {
         service.execute(() -> {
-
             Long userId = ChannelAttributeUtil.getUserId(channel);
             //登录
             if (message.getMessageId() == csLoginMessageId) {
@@ -113,14 +115,14 @@ public class GatewayMessageExecuter {
                 prepLoginChannels.put(ChannelAttributeUtil.getToken(channel), channel);
             } else if (message.getMessageId() == csHeartMessageId) {
                 SCHeartMessage heartMessage = new SCHeartMessage();
-                sendMessage2Client(heartMessage, message.getToken());
+                sendMessage2Client(heartMessage, ChannelAttributeUtil.getToken(channel));
+                return;
             } else {
                 if (userId != null) {
                     message.setUserId(userId);
                 }
             }
             message.setToken(ChannelAttributeUtil.getToken(channel));
-
             //转发到具体的子服务器
             HandleMessageManager handleMessageManager = handleMessageManagerMap.get(message.getMessageId());
             if (handleMessageManager == null) {
@@ -145,7 +147,7 @@ public class GatewayMessageExecuter {
         });
     }
 
-    private void sendMessage2Client(Message message, Long token) {
+    protected void sendMessage2Client(Message message, Long token) {
         Channel clientChannel = tokenChannel.get(token);
         if (clientChannel == null) {
             logger.warn("没有找到channel token {}", token);
@@ -162,7 +164,13 @@ public class GatewayMessageExecuter {
         }
     }
 
-    private void init() {
+    public void init() {
+        if (init) {
+            logger.warn("messageExecuter 已经初始化");
+            return;
+        }
+        init = true;
+        Assert.isTrue(csLoginMessageId > 0 && scLoginMessageId > 0, "登录消息为设置");
         sgHandlerMap.put(SCRegServerHandleMessageMessage.MESSAGE_ID, this::regServerInstance);
         sgHandlerMap.put(SCRelationUserGatewayMessage.MESSAGE_ID, this::relationMessage);
         sgHandlerMap.put(SCAskHandleMessage.MESSAGE_ID, this::askMessage);
@@ -422,6 +430,8 @@ public class GatewayMessageExecuter {
         if (clientChannel != null) {
             ChannelAttributeUtil.setUserId(clientChannel, userId);
             userClientChannel.put(userId, clientChannel);
+        } else {
+            logger.warn("登录成功 userId:{} channel缺失 token{}", userId, message.getToken());
         }
         return false;
     }

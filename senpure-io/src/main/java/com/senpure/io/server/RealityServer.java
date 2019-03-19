@@ -80,7 +80,9 @@ public class RealityServer {
                                     p.addLast(new RealityMessageDecoder());
                                     p.addLast(new RealityMessageEncoder());
                                     p.addLast(new RealityMessageLoggingHandler(LogLevel.DEBUG, ioMessageProperties));
-                                    p.addLast(new IdleStateHandler(0, properties.getWriterIdleTime(), 0, TimeUnit.MILLISECONDS));
+                                    if (properties.isEnableHeartCheck()) {
+                                        p.addLast(new IdleStateHandler(0, properties.getWriterIdleTime(), 0, TimeUnit.MILLISECONDS));
+                                    }
                                     p.addLast(new RealityServerHandler(messageExecuter, gatewayManager));
                                 }
                             });
