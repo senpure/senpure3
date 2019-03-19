@@ -9,12 +9,8 @@ import com.senpure.io.handler.RealityMessageHandler;
 import com.senpure.io.message.CSBreakUserGatewayMessage;
 import com.senpure.io.server.GatewayManager;
 import com.senpure.io.support.ProducerServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -25,10 +21,10 @@ import org.springframework.context.annotation.Bean;
  */
 
 public class ProducerAutoConfiguration {
-    private Logger logger = LoggerFactory.getLogger(getClass());
+   // private Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private DiscoveryClient discoveryClient;
+   // @Autowired
+    //private DiscoveryClient discoveryClient;
 
     @Bean
     public CSRelationUserGatewayMessageHandler csRelationUserGatewayMessageHandler() {
