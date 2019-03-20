@@ -65,6 +65,7 @@ public class ServerManager {
                 errorMessage.setType(Constant.ERROR_NOT_FOUND_SERVER);
                 errorMessage.setId(client2GatewayMessage.getMessageId());
                 errorMessage.setMessage("没有服务器处理" + MessageIdReader.read(client2GatewayMessage.getMessageId()));
+                messageExecuter.sendMessage2Client(errorMessage, client2GatewayMessage.getToken());
             } else {
                 relationAndWaitSendMessage(serverChannelManager, client2GatewayMessage);
             }

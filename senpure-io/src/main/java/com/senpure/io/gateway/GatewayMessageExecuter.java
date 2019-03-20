@@ -468,11 +468,14 @@ public class GatewayMessageExecuter {
             userChannel = userClientChannel.get(tempUserId);
         }
         if (userChannel == null) {
-            userChannel = tokenChannel.get(server2GatewayMessage.getToken());
+            userChannel = tokenChannel.get(message.getToken());
         }
         if (userChannel != null) {
             logger.info("{} token:{} uerId:{} 踢下线", userChannel, ChannelAttributeUtil.getToken(userChannel), ChannelAttributeUtil.getUserId(userChannel));
             userChannel.close();
+        }
+        else {
+            logger.info("{} 踢下线失败，找不到channel",message.toString());
         }
         return true;
     }

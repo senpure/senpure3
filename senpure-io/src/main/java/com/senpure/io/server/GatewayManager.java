@@ -181,7 +181,7 @@ public class GatewayManager {
     public void sendKickOffMessage2GatewayByToken(Long token) {
         SCKickOffMessage message = new SCKickOffMessage();
         message.setToken(token);
-        sendMessage2Gateway(token, message);
+        sendMessage2GatewayByToken(token, message);
     }
 
     public void sendMessage2GatewayByToken(Long token, Message message) {
