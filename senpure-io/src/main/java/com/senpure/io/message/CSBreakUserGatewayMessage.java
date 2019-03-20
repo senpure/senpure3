@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
  * 断开用户与网关
  * 
  * @author senpure
- * @time 2019-3-8 16:16:07
+ * @time 2019-3-20 16:36:02
  */
 public class CSBreakUserGatewayMessage extends  Message {
 

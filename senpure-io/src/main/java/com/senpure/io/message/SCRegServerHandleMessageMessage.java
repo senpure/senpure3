@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * 服务器注册消息处理器到网关
  * 
  * @author senpure
- * @time 2019-3-8 16:16:07
+ * @time 2019-3-20 16:36:02
  */
 public class SCRegServerHandleMessageMessage extends  Message {
 
@@ -40,7 +40,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
         }
         //服务名
         if (readableServerName != null){
-            writeString(buf,24, readableServerName);
+            writeString(buf,24,readableServerName);
         }
         //可以处理的消息
         for (int i= 0;i< messages.size();i++){
@@ -102,7 +102,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
         }
         //服务名
         if (readableServerName != null){
-            size += computeStringSize(1, readableServerName);
+            size += computeStringSize(1,readableServerName);
         }
         //可以处理的消息
         for(int i=0;i< messages.size();i++){
@@ -154,7 +154,7 @@ public class SCRegServerHandleMessageMessage extends  Message {
      * set 服务名
      */
     public SCRegServerHandleMessageMessage setReadableServerName(String readableServerName) {
-        this.readableServerName = readableServerName;
+        this.readableServerName=readableServerName;
         return this;
     }
      /**
@@ -192,10 +192,10 @@ public class SCRegServerHandleMessageMessage extends  Message {
                 + "}";
    }
 
-    //12 + 3 = 15 个空格
-    private String nextIndent ="               ";
-    //最长字段长度 12
-    private int filedPad = 12;
+    //18 + 3 = 21 个空格
+    private String nextIndent ="                     ";
+    //最长字段长度 18
+    private int filedPad = 18;
 
     @Override
     public String toString(String indent) {

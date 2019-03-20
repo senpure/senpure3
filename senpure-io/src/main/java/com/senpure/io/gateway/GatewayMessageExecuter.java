@@ -5,6 +5,7 @@ import com.senpure.base.util.IDGenerator;
 import com.senpure.base.util.NameThreadFactory;
 import com.senpure.io.ChannelAttributeUtil;
 import com.senpure.io.Constant;
+import com.senpure.io.ServerProperties;
 import com.senpure.io.bean.HandleMessage;
 import com.senpure.io.message.*;
 import com.senpure.io.protocol.Message;
@@ -28,6 +29,7 @@ public class GatewayMessageExecuter {
     private int serviceRefCount = 0;
     private int csLoginMessageId = 0;
 
+    private ServerProperties.Gateway gateway;
 
     private int scLoginMessageId = 0;
 
@@ -106,22 +108,19 @@ public class GatewayMessageExecuter {
     //将客户端消息转发给具体的服务器
     public void execute(final Channel channel, final Client2GatewayMessage message) {
         service.execute(() -> {
-            Long userId = ChannelAttributeUtil.getUserId(channel);
-            //登录
+
             if (message.getMessageId() == csLoginMessageId) {
-                if (userId != null) {
-                    userChange(channel, userId);
-                }
                 prepLoginChannels.put(ChannelAttributeUtil.getToken(channel), channel);
             } else if (message.getMessageId() == csHeartMessageId) {
                 SCHeartMessage heartMessage = new SCHeartMessage();
                 sendMessage2Client(heartMessage, ChannelAttributeUtil.getToken(channel));
                 return;
-            } else {
-                if (userId != null) {
-                    message.setUserId(userId);
-                }
             }
+            Long userId = ChannelAttributeUtil.getUserId(channel);
+            if (userId != null) {
+                message.setUserId(userId);
+            }
+            //登录
             message.setToken(ChannelAttributeUtil.getToken(channel));
             //转发到具体的子服务器
             HandleMessageManager handleMessageManager = handleMessageManagerMap.get(message.getMessageId());
@@ -169,6 +168,7 @@ public class GatewayMessageExecuter {
             logger.warn("messageExecuter 已经初始化");
             return;
         }
+        Assert.notNull(gateway, "gateway 配置文件不能为空");
         init = true;
         Assert.isTrue(csLoginMessageId > 0 && scLoginMessageId > 0, "登录消息为设置");
         sgHandlerMap.put(SCRegServerHandleMessageMessage.MESSAGE_ID, this::regServerInstance);
@@ -178,6 +178,8 @@ public class GatewayMessageExecuter {
         sgHandlerMap.put(SCHeartMessage.MESSAGE_ID, (channel, server2GatewayMessage) -> true);
         sgHandlerMap.put(scLoginMessageId, (channel, server2GatewayMessage) -> loginMessage(server2GatewayMessage));
         sgHandlerMap.put(SCBreakUserGatewayMessage.MESSAGE_ID, this::breakRelationMessage);
+        sgHandlerMap.put(SCKickOffMessage.MESSAGE_ID, (channel, server2GatewayMessage) -> kickOffMessage(server2GatewayMessage));
+
         startCheck();
     }
 
@@ -235,13 +237,24 @@ public class GatewayMessageExecuter {
         }
     }
 
-    public void userChange(Channel channel, Long userId) {
-        service.execute(() -> {
-            Long token = ChannelAttributeUtil.getToken(channel);
-            logger.debug("{}  : {} : {} 切换账号", channel, token, userId);
-            userOffline(channel, token, userId);
-        });
+    /**
+     * 登陆服务不用取消关联
+     *
+     * @param channel
+     * @param token
+     * @param userId
+     */
+    private void userChange(Channel channel, Long token, Long userId) {
+        for (Map.Entry<String, ServerManager> entry : serverInstanceMap.entrySet()) {
+            ServerManager serverManager = entry.getValue();
+            if (serverManager.getHandleIds().contains(csLoginMessageId)) {
+                logger.info("切换账号 {} 不用取消关联", serverManager.getServerName());
+            } else {
+                serverManager.breakUserGateway(channel, token, userId);
+            }
+        }
     }
+
 
     public void clientOffline(Channel channel) {
         service.execute(() -> {
@@ -299,7 +312,7 @@ public class GatewayMessageExecuter {
         for (Integer id : serverManager.getHandleIds()) {
             boolean discard = true;
             for (HandleMessage handleMessage : handleMessages) {
-                if (handleMessage.getHandleMessageId() == id.intValue()) {
+                if (handleMessage.getHandleMessageId() == id) {
                     discard = false;
                     break;
                 }
@@ -411,7 +424,7 @@ public class GatewayMessageExecuter {
             WaitRelationTask task = entry.getValue();
             if (task.check()) {
                 tokens.add(entry.getKey());
-                service.execute(() -> task.sendMessage());
+                service.execute(task::sendMessage);
             } else {
                 if (task.cancel()) {
                     tokens.add(entry.getKey());
@@ -428,12 +441,40 @@ public class GatewayMessageExecuter {
         long userId = message.getUserIds()[0];
         Channel clientChannel = prepLoginChannels.remove(message.getToken());
         if (clientChannel != null) {
+            Long oldUserId = ChannelAttributeUtil.getUserId(clientChannel);
+            if (oldUserId != null) {
+                if (oldUserId == userId) {
+                    logger.info("{}重复登陆 {} 不做额外的处理", clientChannel, userId);
+                } else {
+                    logger.info("{}切换账号{}  -》  {} ", clientChannel, oldUserId, userId);
+                    Long token = ChannelAttributeUtil.getToken(clientChannel);
+                    userChange(clientChannel, token, oldUserId);
+                }
+            }
             ChannelAttributeUtil.setUserId(clientChannel, userId);
             userClientChannel.put(userId, clientChannel);
         } else {
             logger.warn("登录成功 userId:{} channel缺失 token{}", userId, message.getToken());
         }
         return false;
+    }
+
+    private boolean kickOffMessage(Server2GatewayMessage server2GatewayMessage) {
+        SCKickOffMessage message = new SCKickOffMessage();
+        readMessage(message, server2GatewayMessage);
+        long tempUserId = message.getUserId();
+        Channel userChannel = null;
+        if (tempUserId > 0) {
+            userChannel = userClientChannel.get(tempUserId);
+        }
+        if (userChannel == null) {
+            userChannel = tokenChannel.get(server2GatewayMessage.getToken());
+        }
+        if (userChannel != null) {
+            logger.info("{} token:{} uerId:{} 踢下线", userChannel, ChannelAttributeUtil.getToken(userChannel), ChannelAttributeUtil.getUserId(userChannel));
+            userChannel.close();
+        }
+        return true;
     }
 
     private boolean askMessage(Channel channel, Server2GatewayMessage server2GatewayMessage) {
@@ -524,6 +565,13 @@ public class GatewayMessageExecuter {
         this.scLoginMessageId = scLoginMessageId;
     }
 
+    public ServerProperties.Gateway getGateway() {
+        return gateway;
+    }
+
+    public void setGateway(ServerProperties.Gateway gateway) {
+        this.gateway = gateway;
+    }
 
     private interface SGInnerHandler {
         boolean execute(Channel channel, Server2GatewayMessage server2GatewayMessage);

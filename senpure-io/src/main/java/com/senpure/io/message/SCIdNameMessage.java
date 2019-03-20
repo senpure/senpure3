@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * 数字id与字符串的关联
  * 
  * @author senpure
- * @time 2019-3-8 16:16:07
+ * @time 2019-3-20 16:36:02
  */
 public class SCIdNameMessage extends  Message {
 

@@ -1,9 +1,12 @@
 package com.senpure.io.gateway;
 
 import com.senpure.base.util.Assert;
+import com.senpure.io.Constant;
 import com.senpure.io.message.CSAskHandleMessage;
 import com.senpure.io.message.Client2GatewayMessage;
+import com.senpure.io.message.SCInnerErrorMessage;
 import com.senpure.io.protocol.Bean;
+import com.senpure.io.support.MessageIdReader;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -27,7 +30,7 @@ public class HandleMessageManager {
     private ServerManager serverManager;
     private GatewayMessageExecuter messageExecuter;
     private int csAskHandleMessageId = new CSAskHandleMessage().getMessageId();
- //   private AtomicInteger atomicIndex = new AtomicInteger(-1);
+    //   private AtomicInteger atomicIndex = new AtomicInteger(-1);
     private int handId;
 
     public HandleMessageManager(int handId, boolean direct, boolean serverShare, GatewayMessageExecuter messageExecuter) {
@@ -77,6 +80,12 @@ public class HandleMessageManager {
             } catch (Exception e) {
                 logger.error("读取询问值出错询问值只能是string 类型 messageId " + message.getMessageId(), e);
                 // Assert.error("读取询问值出错 询问值只能是string 类型 messageId  " + message.getMessageId());
+
+                SCInnerErrorMessage errorMessage = new SCInnerErrorMessage();
+                errorMessage.setType(Constant.ERROR_SERVER_ERROR);
+                errorMessage.setId(message.getMessageId());
+                errorMessage.setMessage("询问值只能是String类型" + MessageIdReader.read(message.getMessageId()));
+                messageExecuter.sendMessage2Client(errorMessage, message.getToken());
                 return;
             }
             CSAskHandleMessage askHandleMessage = new CSAskHandleMessage();
@@ -93,7 +102,7 @@ public class HandleMessageManager {
             byte[] data = new byte[askHandleMessage.getSerializedSize()];
             buf.readBytes(data);
             temp.setData(data);
-            WaitAskTask waitAskTask = new WaitAskTask();
+            WaitAskTask waitAskTask = new WaitAskTask(messageExecuter.getGateway().getAskMaxDelay());
             waitAskTask.setAskToken(askHandleMessage.getToken());
             waitAskTask.setFromMessageId(askHandleMessage.getFromMessageId());
             waitAskTask.setValue(value);

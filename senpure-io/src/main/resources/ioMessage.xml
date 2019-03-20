@@ -57,6 +57,10 @@
     <message id="108" type="SC" name="IdName" explain="数字id与字符串的关联">
         <list type="IdName" name="idNames"></list>
     </message>
+    <message id="204" type="SC" name="KickOff" explain="踢下线">
+        <field type="long" name="token" explain="token"></field>
+        <field type="long" name="userId" explain="userId"></field>
+    </message>
 
     <message id="301" type="CS" name="Heart" explain="心跳">
     </message>

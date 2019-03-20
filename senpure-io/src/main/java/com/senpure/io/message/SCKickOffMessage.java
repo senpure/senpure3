@@ -4,17 +4,17 @@ import com.senpure.io.protocol.Message;
 import io.netty.buffer.ByteBuf;
 
 /**
- * 客户端掉线
+ * 踢下线
  * 
  * @author senpure
  * @time 2019-3-20 16:36:02
  */
-public class CSChannelOfflineMessage extends  Message {
+public class SCKickOffMessage extends  Message {
 
-    public static final int MESSAGE_ID = 1103;
-    //channel token
+    public static final int MESSAGE_ID = 1204;
+    //token
     private long token;
-    //用户Id
+    //userId
     private long userId;
     /**
      * 写入字节缓存
@@ -22,9 +22,9 @@ public class CSChannelOfflineMessage extends  Message {
     @Override
     public void write(ByteBuf buf){
         getSerializedSize();
-        //channel token
+        //token
         writeVar64(buf,8,token);
-        //用户Id
+        //userId
         writeVar64(buf,16,userId);
     }
 
@@ -38,11 +38,11 @@ public class CSChannelOfflineMessage extends  Message {
             switch (tag) {
                 case 0://end
                 return;
-                //channel token
+                //token
                 case 8:// 1 << 3 | 0
                         token = readVar64(buf);
                     break;
-                //用户Id
+                //userId
                 case 16:// 2 << 3 | 0
                         userId = readVar64(buf);
                     break;
@@ -62,16 +62,16 @@ public class CSChannelOfflineMessage extends  Message {
             return size;
         }
         size = 0 ;
-        //channel token
+        //token
         size += computeVar64Size(1,token);
-        //用户Id
+        //userId
         size += computeVar64Size(1,userId);
         serializedSize = size ;
         return size ;
     }
 
     /**
-     * get channel token
+     * get token
      * @return
      */
     public  long getToken() {
@@ -79,14 +79,14 @@ public class CSChannelOfflineMessage extends  Message {
     }
 
     /**
-     * set channel token
+     * set token
      */
-    public CSChannelOfflineMessage setToken(long token) {
+    public SCKickOffMessage setToken(long token) {
         this.token=token;
         return this;
     }
     /**
-     * get 用户Id
+     * get userId
      * @return
      */
     public  long getUserId() {
@@ -94,21 +94,21 @@ public class CSChannelOfflineMessage extends  Message {
     }
 
     /**
-     * set 用户Id
+     * set userId
      */
-    public CSChannelOfflineMessage setUserId(long userId) {
+    public SCKickOffMessage setUserId(long userId) {
         this.userId=userId;
         return this;
     }
 
     @Override
     public int getMessageId() {
-        return 1103;
+        return 1204;
     }
 
     @Override
     public String toString() {
-        return "CSChannelOfflineMessage[1103]{"
+        return "SCKickOffMessage[1204]{"
                 +"token=" + token
                 +",userId=" + userId
                 + "}";
@@ -121,11 +121,11 @@ public class CSChannelOfflineMessage extends  Message {
     public String toString(String indent) {
         indent = indent == null ? "" : indent;
         StringBuilder sb = new StringBuilder();
-        sb.append("CSChannelOfflineMessage").append("[1103]").append("{");
-        //channel token
+        sb.append("SCKickOffMessage").append("[1204]").append("{");
+        //token
         sb.append("\n");
         sb.append(indent).append(rightPad("token", filedPad)).append(" = ").append(token);
-        //用户Id
+        //userId
         sb.append("\n");
         sb.append(indent).append(rightPad("userId", filedPad)).append(" = ").append(userId);
         sb.append("\n");

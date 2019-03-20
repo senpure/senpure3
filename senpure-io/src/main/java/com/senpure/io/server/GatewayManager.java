@@ -2,6 +2,7 @@ package com.senpure.io.server;
 
 
 import com.senpure.io.message.SCBreakUserGatewayMessage;
+import com.senpure.io.message.SCKickOffMessage;
 import com.senpure.io.message.Server2GatewayMessage;
 import com.senpure.io.protocol.Message;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class GatewayManager {
 
     public void report() {
         for (Map.Entry<String, GatewayChannelManager> entry : gatewayChannelMap.entrySet()) {
-            logger.debug("{} {}", entry.getKey());
+            logger.debug("{} {}", entry.getKey(), entry.getValue().toString());
         }
     }
 
@@ -118,6 +119,7 @@ public class GatewayManager {
 
     /**
      * 用户登录成功后调用该方法
+     *
      * @param token
      * @param userId
      * @param message
@@ -141,37 +143,45 @@ public class GatewayManager {
         }
     }
 
+
     /**
      * 用户主动离开该服务器后，调用该方法，断线不要调用
      * 与bytoken 调用一个就可以了
+     *
      * @param userId
      */
     public void sendBreakGatewayMessage2Gateway(Long userId) {
-        GatewayRelation relation = userGatewayMap.get(userId);
-        if (relation != null) {
-            Server2GatewayMessage toGateway = new Server2GatewayMessage();
-            toGateway.setUserIds(new Long[]{userId});
-            toGateway.setMessage(new SCBreakUserGatewayMessage());
-            toGateway.setMessageId(SCBreakUserGatewayMessage.MESSAGE_ID);
-            relation.gatewayChannelManager.sendMessage(toGateway);
-        }
+        sendMessage2Gateway(userId,new SCBreakUserGatewayMessage());
     }
 
     /**
      * 用户主动离开该服务器后，调用该方法，断线不要调用
      * 与userid 调用一个就可以了
+     *
      * @param token
      */
-    public void sendBreakGatewayMessageByToken2Gateway(Long token) {
-        GatewayRelation relation = tokenGatewayMap.get(token);
-        if (relation != null) {
-            Server2GatewayMessage toGateway = new Server2GatewayMessage();
-            toGateway.setToken(token);
-            toGateway.setUserIds(new Long[0]);
-            toGateway.setMessage(new SCBreakUserGatewayMessage());
-            toGateway.setMessageId(SCBreakUserGatewayMessage.MESSAGE_ID);
-            relation.gatewayChannelManager.sendMessage(toGateway);
-        }
+    public void sendBreakGatewayMessage2GatewayByToken(Long token) {
+        sendMessage2GatewayByToken(token, new SCBreakUserGatewayMessage());
+    }
+
+    /**
+     * 踢下线
+     * @param userId
+     */
+    public void sendKickOffMessage2Gateway(Long userId) {
+        SCKickOffMessage message = new SCKickOffMessage();
+        message.setUserId(userId);
+        sendMessage2Gateway(userId, message);
+    }
+
+    /**
+     * 踢下线
+     * @param token
+     */
+    public void sendKickOffMessage2GatewayByToken(Long token) {
+        SCKickOffMessage message = new SCKickOffMessage();
+        message.setToken(token);
+        sendMessage2Gateway(token, message);
     }
 
     public void sendMessage2GatewayByToken(Long token, Message message) {

@@ -280,6 +280,10 @@ public class ServerProperties {
          * 雪花算法 workId
          */
         private int snowflakeworkId = 0;
+        /**
+         * 询问处理最多延迟毫秒
+         */
+        private long askMaxDelay=3000;
 
         public int getCsPort() {
             return csPort;
@@ -314,6 +318,14 @@ public class ServerProperties {
             this.scLoginMessageId = scLoginMessageId;
         }
 
+
+        public long getAskMaxDelay() {
+            return askMaxDelay;
+        }
+
+        public void setAskMaxDelay(long askMaxDelay) {
+            this.askMaxDelay = askMaxDelay;
+        }
 
         public int getExecuterThreadPoolSize() {
             return executerThreadPoolSize;

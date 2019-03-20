@@ -162,7 +162,7 @@ public class ProducerServer implements ApplicationRunner {
             long now = System.currentTimeMillis();
             if (now - lastLogTime >= 60000) {
                 lastLogTime = now;
-                logger.debug("");
+                gatewayManager.report();
             }
         }, 2000, 50, TimeUnit.MILLISECONDS);
     }

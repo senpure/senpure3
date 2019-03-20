@@ -28,7 +28,7 @@ public class WaitAskTask {
      * 应答了多少个服务器
      */
     private int answerTimes;
-    private long maxDelay = 5000;
+    private long maxDelay = 3000;
 
     private  int  fromMessageId;
     private ServerChannelManager serverChannelManager;
@@ -36,7 +36,9 @@ public class WaitAskTask {
     private ServerManager serverManager;
     private Client2GatewayMessage message;
 
-    public WaitAskTask() {
+
+    public WaitAskTask(long maxDelay) {
+        this.maxDelay = maxDelay;
         startTime = System.currentTimeMillis();
     }
 
