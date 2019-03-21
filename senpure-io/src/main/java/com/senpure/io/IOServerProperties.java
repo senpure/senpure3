@@ -33,6 +33,7 @@ public class IOServerProperties {
      * 读心跳检查时间毫秒
      */
     private long readIdleTime = 5000;
+    private boolean enableHeartCheck=true;
 
     public boolean isSsl() {
         return ssl;
@@ -88,5 +89,13 @@ public class IOServerProperties {
 
     public void setHost(String host) {
         this.host = host;
+    }
+
+    public boolean isEnableHeartCheck() {
+        return enableHeartCheck;
+    }
+
+    public void setEnableHeartCheck(boolean enableHeartCheck) {
+        this.enableHeartCheck = enableHeartCheck;
     }
 }

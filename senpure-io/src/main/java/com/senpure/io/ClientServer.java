@@ -25,11 +25,15 @@ public class ClientServer {
     private IOServerProperties properties;
     private IOMessageProperties ioMessageProperties;
     private ChannelFuture channelFuture;
-    private EventLoopGroup group;
     private String serverName = "游戏客户端";
     private Channel channel;
+    private EventLoopGroup group;
+    private Bootstrap bootstrap;
 
-    public boolean start(String host, int port) throws CertificateException, SSLException {
+    public Channel connect() throws CertificateException, SSLException {
+        if (channel != null && channel.isActive()) {
+            return channel;
+        }
         if (properties == null) {
             properties = new IOServerProperties();
         }
@@ -39,6 +43,8 @@ public class ClientServer {
             ioMessageProperties.setOutFormat(properties.isOutFormat());
         }
 
+        String host = properties.getHost();
+        int port = properties.getPort();
         logger.debug("启动{}，服务器地址 {}", getServerName(), host + ":" + port);
         serverName = serverName + "[" + host + ":" + port + "]";
         // Configure SSL.
@@ -50,55 +56,67 @@ public class ClientServer {
             sslCtx = null;
         }
 
-        group = new NioEventLoopGroup(1);
-        Bootstrap b = new Bootstrap();
-        b.group(group)
-                .channel(NioSocketChannel.class)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
-                        ChannelPipeline p = ch.pipeline();
-                        if (sslCtx != null) {
-                            p.addLast(sslCtx.newHandler(ch.alloc(), host, port));
-                        }
-                        p.addLast(new ByteBufToMessageDecoder());
-                        p.addLast(new MessageToByteBufEncoder());
-                        OffLineHandler offLineHandler = new OffLineHandler();
-                        ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
-                        p.addLast(offLineHandler);
-                        p.addLast(new IdleStateHandler(0, properties.getWriterIdleTime(), 0, TimeUnit.MILLISECONDS));
-                        p.addLast(new MessageLoggingHandler(LogLevel.DEBUG, ioMessageProperties));
-                        p.addLast(new ClientHandler());
-                    }
-                });
+        if (bootstrap == null) {
+            synchronized (this) {
+                if (bootstrap == null) {
+                    group = new NioEventLoopGroup(1);
+                    bootstrap = new Bootstrap();
+                    bootstrap.group(group)
+                            .channel(NioSocketChannel.class)
+                            .option(ChannelOption.TCP_NODELAY, true)
+                            .handler(new ChannelInitializer<SocketChannel>() {
+                                @Override
+                                public void initChannel(SocketChannel ch) throws Exception {
+                                    ChannelPipeline p = ch.pipeline();
+                                    if (sslCtx != null) {
+                                        p.addLast(sslCtx.newHandler(ch.alloc(), host, port));
+                                    }
+                                    p.addLast(new ByteBufToMessageDecoder());
+                                    p.addLast(new MessageToByteBufEncoder());
+                                    OffLineHandler offLineHandler = new OffLineHandler();
+                                    ChannelAttributeUtil.setOfflineHandler(ch, offLineHandler);
+                                    p.addLast(offLineHandler);
+                                    if (properties.isEnableHeartCheck()) {
+                                        p.addLast(new IdleStateHandler(0, properties.getWriterIdleTime(), 0, TimeUnit.MILLISECONDS));
+                                    }
+                                    p.addLast(new MessageLoggingHandler(LogLevel.DEBUG, ioMessageProperties));
+                                    p.addLast(new ClientHandler());
+                                }
+                            });
+                }
+            }
+        }
 
         // Start the client.
         try {
             logger.info("{}启动完成", getServerName());
-            channelFuture = b.connect(host, port).sync();
+            channelFuture = bootstrap.connect(host, port).sync();
             channel = channelFuture.channel();
+            return channel;
         } catch (Exception e) {
             logger.error("启动" + getServerName() + " 失败", e);
             destroy();
-            return false;
+            return null;
         }
-        return true;
 
     }
 
     public void destroy() {
-        if (channelFuture != null) {
-            channelFuture.channel().close();
-        }
+//        if (channelFuture != null) {
+//            channelFuture.channel().close();
+//        }
         if (group != null) {
             group.shutdownGracefully();
         }
-
         logger.debug("关闭{}并释放资源 ", getServerName());
 
     }
 
+    /**
+     * 最近的一次连接
+     *
+     * @return
+     */
     public Channel getChannel() {
         return channel;
     }

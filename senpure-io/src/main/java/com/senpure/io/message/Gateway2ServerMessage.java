@@ -49,7 +49,7 @@ public class Gateway2ServerMessage {
 
     @Override
     public String toString() {
-        return "Gateway2ServerMessage{" +
+        return "GS{" +
                 "token=" + token +
                 ", messageId=" +  MessageIdReader.read(messageId)  +
                 ", userId=" + userId +

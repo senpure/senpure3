@@ -47,7 +47,7 @@ public class OffLineHandler extends ChannelInboundHandlerAdapter {
 
     public void offLineExecute(Channel channel) {
         if (MessageHandlerUtil.isShutdown()) {
-            logger.info("服务器已经停止允许");
+            logger.info("服务器已经停止运行");
             return;
         }
         MessageHandlerUtil.execute(() -> {

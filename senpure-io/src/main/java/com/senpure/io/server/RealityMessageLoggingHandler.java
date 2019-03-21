@@ -1,7 +1,6 @@
 package com.senpure.io.server;
 
 
-import com.senpure.io.ChannelAttributeUtil;
 import com.senpure.io.IOMessageProperties;
 import com.senpure.io.message.Server2GatewayMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -26,12 +25,12 @@ public class RealityMessageLoggingHandler extends LoggingHandler {
             if (msg instanceof Server2GatewayMessage) {
                 if (config.isOutFormat()) {
                     this.logger.log(this.internalLevel, "{} {} {}{}",
-                            ChannelAttributeUtil.getChannelLogStr(ctx.channel()),
+                            ctx.channel(),
                             "WRITE", "\n", ((Server2GatewayMessage) msg).toString(null));
                     //this.logger.log(this.internalLevel, this.format(ctx, ChannelAttributeUtil.getChannelPlayerStr(ctx.channel())+" WRITE", "\n"+((Message) msg).toString(null)));
                 } else {
                     this.logger.log(this.internalLevel, "{} {} {}",
-                            ChannelAttributeUtil.getChannelLogStr(ctx.channel()),
+                            ctx.channel(),
                             "WRITE: ", msg);
                     //  this.logger.log(this.internalLevel, this.format(ctx, ChannelAttributeUtil.getChannelPlayerStr(ctx.channel())+" WRITE", msg));
 
@@ -39,7 +38,7 @@ public class RealityMessageLoggingHandler extends LoggingHandler {
 
             } else {
                 this.logger.log(this.internalLevel, "{} {} {}",
-                        ChannelAttributeUtil.getChannelLogStr(ctx.channel()),
+                        ctx.channel(),
                         "WRITE: ", msg);
             }
         }
@@ -54,18 +53,18 @@ public class RealityMessageLoggingHandler extends LoggingHandler {
             if (msg instanceof Server2GatewayMessage) {
                 if (config.isInFormat()) {
                     this.logger.log(this.internalLevel, "{} {} {}{}",
-                            ChannelAttributeUtil.getChannelLogStr(ctx.channel()),
+                            ctx.channel(),
                             "RECEIVED", "\n", ((Server2GatewayMessage) msg).toString(null));
                     // this.logger.log(this.internalLevel, this.format(ctx, ChannelAttributeUtil.getChannelPlayerStr(ctx.channel()) + " RECEIVED", "\n" + ((Message) msg).toString(null)));
 
                 } else {
                     this.logger.log(this.internalLevel, "{} {} {}{}",
-                            ChannelAttributeUtil.getChannelLogStr(ctx.channel()),
+                            ctx.channel(),
                             "RECEIVED: ", msg);
                 }
             } else {
                 this.logger.log(this.internalLevel, "{} {} {}{}",
-                        ChannelAttributeUtil.getChannelLogStr(ctx.channel()),
+                        ctx.channel(),
                         "RECEIVED: ", msg);
             }
         }

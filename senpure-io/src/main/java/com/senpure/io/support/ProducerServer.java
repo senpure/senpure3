@@ -105,10 +105,12 @@ public class ProducerServer implements ApplicationRunner {
             handleMessage.setServerShare(handler.serverShare());
             handleMessage.setMessageClasses(RealityMessageHandlerUtil.getEmptyMessage(id).getClass().getName());
             handleMessages.add(handleMessage);
+            MessageIdReader.relation(id, handler.getEmptyMessage().getClass().getSimpleName());
         }
         List<IdName> idNames = null;
         if (StringUtils.isNotEmpty(producer.getIdNamesPackage())) {
             idNames = MessageScanner.scan(producer.getIdNamesPackage());
+            //MessageIdReader.relation(idNames);
         }
         List<IdName> finalIdNames = idNames;
         service.scheduleWithFixedDelay(() -> {

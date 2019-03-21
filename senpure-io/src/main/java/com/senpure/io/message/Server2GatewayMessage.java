@@ -61,13 +61,13 @@ public class Server2GatewayMessage {
 
     public String toString() {
         if (message != null) {
-            return "Server2GatewayMessage{" +
+            return "SG{" +
                     "token=" + token +
                     ", userIds=" + Arrays.toString(userIds) +
                     ", message=" + message +
                     '}';
         }
-        return "Server2GatewayMessage{" +
+        return "SG{" +
                 "messageId=" + MessageIdReader.read(messageId) +
                 ",token=" + token +
                 ", userIds=" + Arrays.toString(userIds) +
@@ -79,7 +79,7 @@ public class Server2GatewayMessage {
         if (message == null) {
             return toString();
         }
-        return "Server2GatewayMessage{" +
+        return "SG{" +
                 "messageId=" + MessageIdReader.read(messageId) +
                 ", token=" + token +
                 ", userIds=" + Arrays.toString(userIds) +
