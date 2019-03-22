@@ -1,7 +1,7 @@
 package com.senpure.io.gateway;
 
 import com.senpure.base.util.Assert;
-import com.senpure.io.Constant;
+import com.senpure.io.protocol.Constant;
 import com.senpure.io.message.CSAskHandleMessage;
 import com.senpure.io.message.Client2GatewayMessage;
 import com.senpure.io.message.SCInnerErrorMessage;

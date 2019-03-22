@@ -1,7 +1,7 @@
 package com.senpure.io.gateway;
 
 
-import com.senpure.io.Constant;
+import com.senpure.io.protocol.Constant;
 import com.senpure.io.message.CSBreakUserGatewayMessage;
 import com.senpure.io.message.CSRelationUserGatewayMessage;
 import com.senpure.io.message.Client2GatewayMessage;
@@ -152,15 +152,20 @@ public class ServerManager {
     }
 
 
-    public void breakUserGateway(Channel clientChannel, Long token, Long userId) {
-        ServerRelation serverRelation = tokenServerChannelManagerMap.remove(token);
+    public void breakUserGateway(Channel clientChannel, Long token, Long userId, String type) {
+        breakUserGateway(clientChannel, token, userId, type, true);
+    }
+
+    public void breakUserGateway(Channel clientChannel, Long token, Long userId, String type, boolean localRemove) {
+        ServerRelation serverRelation = localRemove ? tokenServerChannelManagerMap.remove(token) : tokenServerChannelManagerMap.get(token);
         if (serverRelation != null) {
-            logger.info("{} {} 取消 对{} :token{} userId:{}的 关联",
-                    serverName, serverRelation.serverChannelManager.getServerKey(), clientChannel, token, userId);
+            logger.info("{} {} 取消 对{} :token{} userId:{}的 关联  {}",
+                    serverName, serverRelation.serverChannelManager.getServerKey(), clientChannel, token, userId, localRemove ? "移除" : "不移除");
             CSBreakUserGatewayMessage breakUserGatewayMessage = new CSBreakUserGatewayMessage();
             breakUserGatewayMessage.setRelationToken(serverRelation.relationToken);
             breakUserGatewayMessage.setUserId(userId);
             breakUserGatewayMessage.setToken(token);
+            breakUserGatewayMessage.setType(type);
             Client2GatewayMessage client2GatewayMessage = new Client2GatewayMessage();
             client2GatewayMessage.setMessageId(breakUserGatewayMessage.getMessageId());
             client2GatewayMessage.setUserId(breakUserGatewayMessage.getUserId());
@@ -172,7 +177,7 @@ public class ServerManager {
             client2GatewayMessage.setData(data);
             serverRelation.serverChannelManager.sendMessage(client2GatewayMessage);
         } else {
-            logger.warn("{} {} 没有对{} 没有关联 :token{} userId:{} ",
+            logger.info("{} {} 没有对{} 没有关联 :token{} userId:{} ",
                     serverName, serverRelation.serverChannelManager.getServerKey(), clientChannel, token, userId);
 
         }

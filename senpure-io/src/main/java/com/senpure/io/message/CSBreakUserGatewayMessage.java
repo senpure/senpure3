@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
  * 断开用户与网关
  * 
  * @author senpure
- * @time 2019-3-20 16:36:02
+ * @time 2019-3-22 10:34:46
  */
 public class CSBreakUserGatewayMessage extends  Message {
 
@@ -18,6 +18,8 @@ public class CSBreakUserGatewayMessage extends  Message {
     private long userId;
     //relation token
     private long relationToken;
+    //error,userChange,userOffline
+    private String type;
     /**
      * 写入字节缓存
      */
@@ -30,6 +32,10 @@ public class CSBreakUserGatewayMessage extends  Message {
         writeVar64(buf,16,userId);
         //relation token
         writeVar64(buf,24,relationToken);
+        //error,userChange,userOffline
+        if (type != null){
+            writeString(buf,32,type);
+        }
     }
 
     /**
@@ -54,6 +60,10 @@ public class CSBreakUserGatewayMessage extends  Message {
                 case 24:// 3 << 3 | 0
                         relationToken = readVar64(buf);
                     break;
+                //error,userChange,userOffline
+                case 32:// 4 << 3 | 0
+                        type = readString(buf);
+                    break;
                 default://skip
                     skip(buf, tag);
                     break;
@@ -76,6 +86,10 @@ public class CSBreakUserGatewayMessage extends  Message {
         size += computeVar64Size(1,userId);
         //relation token
         size += computeVar64Size(1,relationToken);
+        //error,userChange,userOffline
+        if (type != null){
+            size += computeStringSize(1,type);
+        }
         serializedSize = size ;
         return size ;
     }
@@ -125,6 +139,21 @@ public class CSBreakUserGatewayMessage extends  Message {
         this.relationToken=relationToken;
         return this;
     }
+    /**
+     * get error,userChange,userOffline
+     * @return
+     */
+    public  String getType() {
+        return type;
+    }
+
+    /**
+     * set error,userChange,userOffline
+     */
+    public CSBreakUserGatewayMessage setType(String type) {
+        this.type=type;
+        return this;
+    }
 
     @Override
     public int getMessageId() {
@@ -137,6 +166,7 @@ public class CSBreakUserGatewayMessage extends  Message {
                 +"token=" + token
                 +",userId=" + userId
                 +",relationToken=" + relationToken
+                +",type=" + type
                 + "}";
    }
 
@@ -157,6 +187,9 @@ public class CSBreakUserGatewayMessage extends  Message {
         //relation token
         sb.append("\n");
         sb.append(indent).append(rightPad("relationToken", filedPad)).append(" = ").append(relationToken);
+        //error,userChange,userOffline
+        sb.append("\n");
+        sb.append(indent).append(rightPad("type", filedPad)).append(" = ").append(type);
         sb.append("\n");
         sb.append(indent).append("}");
         return sb.toString();

@@ -4,7 +4,7 @@ import com.senpure.base.util.Assert;
 import com.senpure.base.util.IDGenerator;
 import com.senpure.base.util.NameThreadFactory;
 import com.senpure.io.ChannelAttributeUtil;
-import com.senpure.io.Constant;
+import com.senpure.io.protocol.Constant;
 import com.senpure.io.ServerProperties;
 import com.senpure.io.bean.HandleMessage;
 import com.senpure.io.message.*;
@@ -108,7 +108,7 @@ public class GatewayMessageExecuter {
     //将客户端消息转发给具体的服务器
     public void execute(final Channel channel, final Client2GatewayMessage message) {
         service.execute(() -> {
-
+            Long userId = ChannelAttributeUtil.getUserId(channel);
             if (message.getMessageId() == csLoginMessageId) {
                 prepLoginChannels.put(ChannelAttributeUtil.getToken(channel), channel);
             } else if (message.getMessageId() == csHeartMessageId) {
@@ -116,7 +116,7 @@ public class GatewayMessageExecuter {
                 sendMessage2Client(heartMessage, ChannelAttributeUtil.getToken(channel));
                 return;
             }
-            Long userId = ChannelAttributeUtil.getUserId(channel);
+
             if (userId != null) {
                 message.setUserId(userId);
             }
@@ -233,7 +233,7 @@ public class GatewayMessageExecuter {
     private void userOffline(Channel channel, Long token, Long userId) {
         for (Map.Entry<String, ServerManager> entry : serverInstanceMap.entrySet()) {
             ServerManager serverManager = entry.getValue();
-            serverManager.breakUserGateway(channel, token, userId);
+            serverManager.breakUserGateway(channel, token, userId, Constant.BREAK_TYPE_USER_OFFlINE);
         }
     }
 
@@ -248,9 +248,9 @@ public class GatewayMessageExecuter {
         for (Map.Entry<String, ServerManager> entry : serverInstanceMap.entrySet()) {
             ServerManager serverManager = entry.getValue();
             if (serverManager.getHandleIds().contains(csLoginMessageId)) {
-                logger.info("切换账号 {} 不用取消关联", serverManager.getServerName());
+                serverManager.breakUserGateway(channel, token, userId, Constant.BREAK_TYPE_USER_CHANGE, false);
             } else {
-                serverManager.breakUserGateway(channel, token, userId);
+                serverManager.breakUserGateway(channel, token, userId, Constant.BREAK_TYPE_USER_CHANGE);
             }
         }
     }
@@ -412,7 +412,7 @@ public class GatewayMessageExecuter {
             String serverName = ChannelAttributeUtil.getRemoteServerName(channel);
             ServerManager serverManager = serverInstanceMap.get(serverName);
             if (serverManager != null) {
-                serverManager.breakUserGateway(userChannel, token, userId);
+                serverManager.breakUserGateway(userChannel, token, userId, Constant.BREAK_TYPE_ERROR);
             }
         }
         return true;
@@ -473,9 +473,8 @@ public class GatewayMessageExecuter {
         if (userChannel != null) {
             logger.info("{} token:{} uerId:{} 踢下线", userChannel, ChannelAttributeUtil.getToken(userChannel), ChannelAttributeUtil.getUserId(userChannel));
             userChannel.close();
-        }
-        else {
-            logger.info("{} 踢下线失败，找不到channel",message.toString());
+        } else {
+            logger.info("{} 踢下线失败，找不到channel", message.toString());
         }
         return true;
     }

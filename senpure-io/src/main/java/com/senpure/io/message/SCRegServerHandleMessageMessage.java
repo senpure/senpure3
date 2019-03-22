@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * 服务器注册消息处理器到网关
  * 
  * @author senpure
- * @time 2019-3-20 16:36:02
+ * @time 2019-3-22 10:34:46
  */
 public class SCRegServerHandleMessageMessage extends  Message {
 
